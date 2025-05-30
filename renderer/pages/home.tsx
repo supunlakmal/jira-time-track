@@ -101,9 +101,8 @@ export default function HomePage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredData.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={3}
+                      <tr>                        <td
+                          colSpan={4}
                           className="px-6 py-4 text-center text-gray-500"
                         >
                           {searchTerm

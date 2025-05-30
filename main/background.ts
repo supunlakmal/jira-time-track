@@ -2,6 +2,7 @@ import path from "path";
 import { app, ipcMain, BrowserWindow, screen } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
+import fs from "fs";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
@@ -141,5 +142,17 @@ ipcMain.on("window-resize", (_, { height }) => {
   if (floatingWindow) {
     const [width] = floatingWindow.getSize();
     floatingWindow.setSize(width, height);
+  }
+});
+
+// Add this before the app.on('window-all-closed') handler
+ipcMain.handle("load-jira-data", async () => {
+  try {
+    const dataPath = path.join(__dirname, "../json/data.json");
+    const rawData = await fs.promises.readFile(dataPath, "utf8");
+    return JSON.parse(rawData);
+  } catch (error) {
+    console.error("Error loading data:", error);
+    throw error;
   }
 });

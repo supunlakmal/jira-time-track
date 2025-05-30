@@ -7,11 +7,15 @@ const validChannels = [
   "window-resize",
   "start-task",
   "toggle-float-window",
+  "load-jira-data",
 ];
 
 const handler = {
   send(channel: string, value: unknown) {
     if (validChannels.includes(channel)) {
+      if (channel === "load-jira-data") {
+        return ipcRenderer.invoke(channel);
+      }
       ipcRenderer.send(channel, value);
     }
   },

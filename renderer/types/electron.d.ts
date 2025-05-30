@@ -1,6 +1,7 @@
 export interface JiraTicket {
   ticket_number: string;
   ticket_name: string;
+  story_points: number;
 }
 
 export interface TaskTimer {

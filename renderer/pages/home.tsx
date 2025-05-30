@@ -83,12 +83,16 @@ export default function HomePage() {
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
+                    {" "}
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Ticket
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Story Points
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -113,11 +117,15 @@ export default function HomePage() {
                           key={ticket.ticket_number}
                           className="hover:bg-gray-50"
                         >
+                          {" "}
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                             {ticket.ticket_number}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-900">
                             {ticket.ticket_name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                            {ticket.story_points?.toFixed(1) || "-"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <button

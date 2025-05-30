@@ -1,202 +1,252 @@
 [
   {
     "ticket_number": "MA-292",
-    "ticket_name": "[FUNC][MA-39] User session not automatically logged out After 1 Hour of Inactivity"
+    "ticket_name": "[FUNC][MA-39] User session not automatically logged out After 1 Hour of Inactivity",
+    "story_points": 2.5
   },
   {
     "ticket_number": "MA-290",
-    "ticket_name": "[FUNC][MA-39] Logout success message not displayed After Logging Out"
+    "ticket_name": "[FUNC][MA-39] Logout success message not displayed After Logging Out",
+    "story_points": 1.0
   },
   {
     "ticket_number": "MA-274",
-    "ticket_name": "Skeleton Development - As a supervisor I must be able to get updates on all the status changes via WhatsApp and in app notifications."
+    "ticket_name": "Skeleton Development - As a supervisor I must be able to get updates on all the status changes via WhatsApp and in app notifications.",
+    "story_points": 5.5
   },
   {
     "ticket_number": "MA-273",
-    "ticket_name": "UI Integration - As a supervisor I must be able to get updates on all the status changes via WhatsApp and in app notifications."
+    "ticket_name": "UI Integration - As a supervisor I must be able to get updates on all the status changes via WhatsApp and in app notifications.",
+    "story_points": 3.0
   },
   {
     "ticket_number": "MA-270",
-    "ticket_name": "Skeleton Development - As a supervisor I must be able to see the following tiles on my dashboard:   Escalated requests,  Unassigned Requests,  In - progress Requests, On hold requests  ,Completed Requests "
+    "ticket_name": "Skeleton Development - As a supervisor I must be able to see the following tiles on my dashboard:   Escalated requests,  Unassigned Requests,  In - progress Requests, On hold requests  ,Completed Requests ",
+    "story_points": 4.5
   },
   {
     "ticket_number": "MA-269",
-    "ticket_name": "UI Integration - As a supervisor I must be able to see the following tiles on my dashboard:   Escalated requests,  Unassigned Requests,  In - progress Requests, On hold requests  ,Completed Requests "
+    "ticket_name": "UI Integration - As a supervisor I must be able to see the following tiles on my dashboard:   Escalated requests,  Unassigned Requests,  In - progress Requests, On hold requests  ,Completed Requests ",
+    "story_points": 3.5
   },
   {
     "ticket_number": "MA-265",
-    "ticket_name": "UI Integration - As a supervisor, I must be able to view all my service requests created in RAG indicators "
+    "ticket_name": "UI Integration - As a supervisor, I must be able to view all my service requests created in RAG indicators ",
+    "story_points": 2.0
   },
   {
     "ticket_number": "MA-262",
-    "ticket_name": "Skeleton Development - As a guest, I must be notified via WhatsApp and in-app notifications about the status of my submitted requests, including updates when the request is marked as ‘In Progress’ and when it is ‘Completed’."
+    "ticket_name": "Skeleton Development - As a guest, I must be notified via WhatsApp and in-app notifications about the status of my submitted requests, including updates when the request is marked as ‘In Progress’ and when it is ‘Completed’.",
+    "story_points": 5.0
   },
   {
     "ticket_number": "MA-261",
-    "ticket_name": "UI Integration - As a guest, I must be notified via WhatsApp and in-app notifications about the status of my submitted requests, including updates when the request is marked as ‘In Progress’ and when it is ‘Completed’."
+    "ticket_name": "UI Integration - As a guest, I must be notified via WhatsApp and in-app notifications about the status of my submitted requests, including updates when the request is marked as ‘In Progress’ and when it is ‘Completed’.",
+    "story_points": 3.0
   },
   {
     "ticket_number": "MA-258",
-    "ticket_name": "Skeleton Development - As a guest I should receive a confirmation when the SR is complete as WhatsApp or in app."
+    "ticket_name": "Skeleton Development - As a guest I should receive a confirmation when the SR is complete as WhatsApp or in app.",
+    "story_points": 4.0
   },
   {
     "ticket_number": "MA-257",
-    "ticket_name": "UI Integration - As a guest I should receive a confirmation when the SR is complete as WhatsApp or in app."
+    "ticket_name": "UI Integration - As a guest I should receive a confirmation when the SR is complete as WhatsApp or in app.",
+    "story_points": 2.5
   },
   {
     "ticket_number": "MA-254",
-    "ticket_name": "Skeleton Development - As an assigned staff member to a service request, once when the accept is triggered the Service request SLA starts the count down mapped with the task duration. "
+    "ticket_name": "Skeleton Development - As an assigned staff member to a service request, once when the accept is triggered the Service request SLA starts the count down mapped with the task duration. ",
+    "story_points": 6.0
   },
   {
     "ticket_number": "MA-253",
-    "ticket_name": "UI Integration - As an assigned staff member to a service request, once when the accept is triggered the Service request SLA starts the count down mapped with the task duration. "
+    "ticket_name": "UI Integration - As an assigned staff member to a service request, once when the accept is triggered the Service request SLA starts the count down mapped with the task duration. ",
+    "story_points": 3.5
   },
   {
     "ticket_number": "MA-250",
-    "ticket_name": "Skeleton Development - As an assigned staff member I must receive a WhatsApp and in-app notification about the assigned service request"
+    "ticket_name": "Skeleton Development - As an assigned staff member I must receive a WhatsApp and in-app notification about the assigned service request",
+    "story_points": 4.5
   },
   {
     "ticket_number": "MA-249",
-    "ticket_name": "UI Integration - As an assigned staff member I must receive a WhatsApp and in-app notification about the assigned service request"
+    "ticket_name": "UI Integration - As an assigned staff member I must receive a WhatsApp and in-app notification about the assigned service request",
+    "story_points": 2.0
   },
   {
     "ticket_number": "MA-245",
-    "ticket_name": "UI Integration - As a supervisor I must be able to reassign the assigned staff member "
+    "ticket_name": "UI Integration - As a supervisor I must be able to reassign the assigned staff member ",
+    "story_points": 1.5
   },
   {
     "ticket_number": "MA-242",
-    "ticket_name": "Skeleton Development - As a supervisor, when the guests has submitted a service request then I must be able to get notified via WhatsApp and in app notification of service request submission. "
+    "ticket_name": "Skeleton Development - As a supervisor, when the guests has submitted a service request then I must be able to get notified via WhatsApp and in app notification of service request submission. ",
+    "story_points": 5.0
   },
   {
     "ticket_number": "MA-241",
-    "ticket_name": "UI Integration - As a supervisor, when the guests has submitted a service request then I must be able to get notified via WhatsApp and in app notification of service request submission. "
+    "ticket_name": "UI Integration - As a supervisor, when the guests has submitted a service request then I must be able to get notified via WhatsApp and in app notification of service request submission. ",
+    "story_points": 3.0
   },
   {
     "ticket_number": "MA-238",
-    "ticket_name": "Skeleton Development - As a guest, once I have submitted a service request, I must receive an in-app notification confirming the request submission along with the generated Job ID"
+    "ticket_name": "Skeleton Development - As a guest, once I have submitted a service request, I must receive an in-app notification confirming the request submission along with the generated Job ID",
+    "story_points": 3.5
   },
   {
     "ticket_number": "MA-237",
-    "ticket_name": "UI Integration - As a guest, once I have submitted a service request, I must receive an in-app notification confirming the request submission along with the generated Job ID"
+    "ticket_name": "UI Integration - As a guest, once I have submitted a service request, I must receive an in-app notification confirming the request submission along with the generated Job ID",
+    "story_points": 1.5
   },
   {
     "ticket_number": "MA-234",
-    "ticket_name": "Skeleton Development - As a guest, I should receive confirmation of my SR with a unique job ID number"
+    "ticket_name": "Skeleton Development - As a guest, I should receive confirmation of my SR with a unique job ID number",
+    "story_points": 2.5
   },
   {
     "ticket_number": "MA-233",
-    "ticket_name": "UI Integration - As a guest, I should receive confirmation of my SR with a unique job ID number"
+    "ticket_name": "UI Integration - As a guest, I should receive confirmation of my SR with a unique job ID number",
+    "story_points": 1.0
   },
   {
     "ticket_number": "MA-230",
-    "ticket_name": "UI Integration - As a guest when I login  my dashboard should have create Service request button, My Service Requests tile and Notification Tile.  "
+    "ticket_name": "UI Integration - As a guest when I login  my dashboard should have create Service request button, My Service Requests tile and Notification Tile.  ",
+    "story_points": 3.0
   },
   {
     "ticket_number": "MA-229",
-    "ticket_name": "Skeleton Development - As a guest when I login  my dashboard should have create Service request button, My Service Requests tile and Notification Tile.  "
+    "ticket_name": "Skeleton Development - As a guest when I login  my dashboard should have create Service request button, My Service Requests tile and Notification Tile.  ",
+    "story_points": 4.5
   },
   {
     "ticket_number": "MA-223",
-    "ticket_name": "UI Integration - As a guest, I must be able to view all my submitted service requests under a “My Service Requests” section, with RAG (Red, Amber, Green) indicators clearly showing the current status of each request (e.g., In Progress, Completed, Pending)"
+    "ticket_name": "UI Integration - As a guest, I must be able to view all my submitted service requests under a “My Service Requests” section, with RAG (Red, Amber, Green) indicators clearly showing the current status of each request (e.g., In Progress, Completed, Pending)",
+    "story_points": 3.5
   },
   {
     "ticket_number": "MA-219",
-    "ticket_name": "UI Integration - As an assigned staff member to a service request I must be able to 'accept' and status change to 'in progress' to 'complete' the service request "
+    "ticket_name": "UI Integration - As an assigned staff member to a service request I must be able to 'accept' and status change to 'in progress' to 'complete' the service request ",
+    "story_points": 2.5
   },
   {
     "ticket_number": "MA-215",
-    "ticket_name": "UI Integration - As a supervisor I would be able to assign the ticket to a staff"
+    "ticket_name": "UI Integration - As a supervisor I would be able to assign the ticket to a staff",
+    "story_points": 1.0
   },
   {
     "ticket_number": "MA-211",
-    "ticket_name": "UI Integration - As a supervisor, I must be able to see newly submitted guest service requests in my dashboard assigned to the respective Supervisor group"
+    "ticket_name": "UI Integration - As a supervisor, I must be able to see newly submitted guest service requests in my dashboard assigned to the respective Supervisor group",
+    "story_points": 2.0
   },
   {
     "ticket_number": "MA-204",
-    "ticket_name": "UI Integration - As a guest when I click on the \"Create service request\" button I must be able to select the 'Maintenance' department"
+    "ticket_name": "UI Integration - As a guest when I click on the \"Create service request\" button I must be able to select the 'Maintenance' department",
+    "story_points": 0.5
   },
   {
     "ticket_number": "MA-200",
-    "ticket_name": "UI Integration - As a guest when I login  my dashboard should have create Service request button and My Service Requests tile. "
+    "ticket_name": "UI Integration - As a guest when I login  my dashboard should have create Service request button and My Service Requests tile. ",
+    "story_points": 1.5
   },
   {
     "ticket_number": "MA-197",
-    "ticket_name": "As a guest, I must be able to scan the Room (Location) QR code - UI Integration"
+    "ticket_name": "As a guest, I must be able to scan the Room (Location) QR code - UI Integration",
+    "story_points": 2.5
   },
   {
     "ticket_number": "MA-188",
-    "ticket_name": "UI Integration - Submit the request saying that the light bulb is not working (Light bulb replacement)"
+    "ticket_name": "UI Integration - Submit the request saying that the light bulb is not working (Light bulb replacement)",
+    "story_points": 1.0
   },
   {
     "ticket_number": "MA-183",
-    "ticket_name": "Editing the user | User Management - Changes"
+    "ticket_name": "Editing the user | User Management - Changes",
+    "story_points": 2.0
   },
   {
     "ticket_number": "MA-182",
-    "ticket_name": "User Management View - Changes"
+    "ticket_name": "User Management View - Changes",
+    "story_points": 1.5
   },
   {
     "ticket_number": "MA-181",
-    "ticket_name": "Admin Adding a User | User Management - Changes"
+    "ticket_name": "Admin Adding a User | User Management - Changes",
+    "story_points": 2.0
   },
   {
     "ticket_number": "MA-96",
-    "ticket_name": "Admin Password Reset | User Management "
+    "ticket_name": "Admin Password Reset | User Management ",
+    "story_points": 1.0
   },
   {
     "ticket_number": "CBAT-1897",
-    "ticket_name": "[FUNC] Mobile | Incorrect retake assessment count displayed on the mobile app homepage"
+    "ticket_name": "[FUNC] Mobile | Incorrect retake assessment count displayed on the mobile app homepage",
+    "story_points": 3.0
   },
   {
     "ticket_number": "CBAT-1888",
-    "ticket_name": "[FUNC] Mobile | Trainer user unable to change password via mobile app – error displayed"
+    "ticket_name": "[FUNC] Mobile | Trainer user unable to change password via mobile app – error displayed",
+    "story_points": 2.5
   },
   {
     "ticket_number": "CBAT-1869",
-    "ticket_name": "[FUNC] Mobile | Assessor appears as a member in the mobile app after being unassigned"
+    "ticket_name": "[FUNC] Mobile | Assessor appears as a member in the mobile app after being unassigned",
+    "story_points": 3.5
   },
   {
     "ticket_number": "CBAT-1827",
-    "ticket_name": "[FUNC] Mobile | Text Alignment Issue for Member Name on Start Assessment Page in Mobile App"
+    "ticket_name": "[FUNC] Mobile | Text Alignment Issue for Member Name on Start Assessment Page in Mobile App",
+    "story_points": 0.5
   },
   {
     "ticket_number": "CBAT-1826",
-    "ticket_name": "[FUNC] Mobile | Member Name Displayed in the Top Left Corner When Opening Reset Assessment on Home Page (As Assessor Login on Mobile App)"
+    "ticket_name": "[FUNC] Mobile | Member Name Displayed in the Top Left Corner When Opening Reset Assessment on Home Page (As Assessor Login on Mobile App)",
+    "story_points": 1.0
   },
   {
     "ticket_number": "CBAT-1825",
-    "ticket_name": "[CBAT] [FUNC] - Report Displays Full Rating (5/5) for All Questions Even When Only One Question is Rated by Assessor"
+    "ticket_name": "[CBAT] [FUNC] - Report Displays Full Rating (5/5) for All Questions Even When Only One Question is Rated by Assessor",
+    "story_points": 4.0
   },
   {
     "ticket_number": "CBAT-1824",
-    "ticket_name": "[CBAT] [FUNC] - Deleted Library Causes Assessor and Member to Display as \"Deleted User\" in Mobile Assessment Page"
+    "ticket_name": "[CBAT] [FUNC] - Deleted Library Causes Assessor and Member to Display as \"Deleted User\" in Mobile Assessment Page",
+    "story_points": 4.5
   },
   {
     "ticket_number": "CBAT-1775",
-    "ticket_name": "[FUNC] Mobile | Internal Server Error When Member Submits Verification After Being Removed from Assessment"
+    "ticket_name": "[FUNC] Mobile | Internal Server Error When Member Submits Verification After Being Removed from Assessment",
+    "story_points": 5.0
   },
   {
     "ticket_number": "CBAT-1773",
-    "ticket_name": "[FUNC] Mobile | Long Competency Name is Truncated with \"...\" on Start Assessment & Verify Assessment Pages in Mobile App"
+    "ticket_name": "[FUNC] Mobile | Long Competency Name is Truncated with \"...\" on Start Assessment & Verify Assessment Pages in Mobile App",
+    "story_points": 1.0
   },
   {
     "ticket_number": "CBAT-1772",
-    "ticket_name": "[Security]-Deleted user not get logged out from the mobile device"
+    "ticket_name": "[Security]-Deleted user not get logged out from the mobile device",
+    "story_points": 5.5
   },
   {
     "ticket_number": "CBAT-1736",
-    "ticket_name": "[FUNC] Mobile | Mobile App Logs Out Immediately When Pressing Back Button Without Confirmation"
+    "ticket_name": "[FUNC] Mobile | Mobile App Logs Out Immediately When Pressing Back Button Without Confirmation",
+    "story_points": 2.0
   },
   {
     "ticket_number": "CBAT-1735",
-    "ticket_name": "[FUNC] Mobile | Completed, In-progress, Verification pending   Assessments Are Displayed on the \"Home\" Page"
+    "ticket_name": "[FUNC] Mobile | Completed, In-progress, Verification pending   Assessments Are Displayed on the \"Home\" Page",
+    "story_points": 2.5
   },
   {
     "ticket_number": "CBAT-1734",
-    "ticket_name": "[FUNC] Mobile | Intermittent Issue – Pause & Exit Button & submit Button Not Working After Resetting an Assessment"
+    "ticket_name": "[FUNC] Mobile | Intermittent Issue – Pause & Exit Button & submit Button Not Working After Resetting an Assessment",
+    "story_points": 3.5
   },
   {
     "ticket_number": "CBAT-1733",
-    "ticket_name": "[FUNC] Mobile | No Message Displayed When Resetting an Assessment in Paused Status"
+    "ticket_name": "[FUNC] Mobile | No Message Displayed When Resetting an Assessment in Paused Status",
+    "story_points": 1.5
   }
 ]

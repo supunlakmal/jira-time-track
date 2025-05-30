@@ -129,7 +129,7 @@ export default function HomePage() {
                               }}
                               className="text-blue-600 hover:text-blue-900"
                             >
-                              Start Timer
+                              Add to queue
                             </button>
                           </td>
                         </tr>

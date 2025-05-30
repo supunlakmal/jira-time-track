@@ -6,6 +6,9 @@ const validChannels = [
   "window-move",
   "window-resize",
   "start-task",
+  "pause-task",
+  "resume-task",
+  "stop-task",
   "toggle-float-window",
   "load-jira-data",
 ];

@@ -153,6 +153,30 @@ ipcMain.handle("load-jira-data", async () => {
     return JSON.parse(rawData);
   } catch (error) {
     console.error("Error loading data:", error);
-    throw error;
+  }
+});
+
+// Timer event handlers
+ipcMain.on("start-task", (event, { ticket }) => {
+  if (floatingWindow) {
+    floatingWindow.webContents.send("task-started", ticket);
+  }
+});
+
+ipcMain.on("pause-task", (event, { ticket }) => {
+  if (floatingWindow) {
+    floatingWindow.webContents.send("task-paused", ticket);
+  }
+});
+
+ipcMain.on("resume-task", (event, { ticket }) => {
+  if (floatingWindow) {
+    floatingWindow.webContents.send("task-resumed", ticket);
+  }
+});
+
+ipcMain.on("stop-task", (event, { ticket }) => {
+  if (floatingWindow) {
+    floatingWindow.webContents.send("task-stopped", ticket);
   }
 });

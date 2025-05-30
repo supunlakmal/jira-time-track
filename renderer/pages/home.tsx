@@ -125,7 +125,6 @@ export default function HomePage() {
                                 window.ipc.send("start-task", {
                                   ticket: ticket.ticket_number,
                                 });
-                                toggleFloatingWindow();
                               }}
                               className="text-blue-600 hover:text-blue-900"
                             >

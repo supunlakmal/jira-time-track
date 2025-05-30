@@ -1,6 +1,6 @@
-appId: com.example.nextron
-productName: My Nextron App
-copyright: Copyright © 2018 Yoshihide Shiono
+appId: com.jira.timetrack
+productName: Jira Time Track
+copyright: Copyright © 2025
 directories:
   output: dist
   buildResources: resources

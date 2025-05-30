@@ -3,6 +3,14 @@ export interface JiraTicket {
   ticket_name: string;
 }
 
+export interface TaskTimer {
+  ticketNumber: string;
+  ticketName: string;
+  startTime: number;
+  elapsedTime: number;
+  isRunning: boolean;
+}
+
 export interface IpcHandler {
   send(channel: "toggle-float-window", value: boolean): void;
   send(
@@ -11,6 +19,9 @@ export interface IpcHandler {
   ): void;
   send(channel: "window-resize", value: { height: number }): void;
   send(channel: "start-task", value: { ticket: string }): void;
+  send(channel: "pause-task", value: { ticket: string }): void;
+  send(channel: "resume-task", value: { ticket: string }): void;
+  send(channel: "stop-task", value: { ticket: string }): void;
   send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
   on(channel: string, callback: (...args: unknown[]) => void): () => void;
   window: {

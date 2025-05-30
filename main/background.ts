@@ -68,10 +68,8 @@ const createFloatingWindow = async () => {
     },
   });
 
-  // Create floating window right after main window
   await createFloatingWindow();
 
-  // Debug: Force show floating window after a short delay
   setTimeout(() => {
     if (floatingWindow) {
       floatingWindow.show();
@@ -145,7 +143,6 @@ ipcMain.on("window-resize", (_, { height }) => {
   }
 });
 
-// Add this before the app.on('window-all-closed') handler
 ipcMain.handle("load-jira-data", async () => {
   try {
     const dataPath = path.join(__dirname, "../json/data.json");
@@ -153,30 +150,38 @@ ipcMain.handle("load-jira-data", async () => {
     return JSON.parse(rawData);
   } catch (error) {
     console.error("Error loading data:", error);
+    return []; // Return empty array or throw, depending on desired error handling
   }
 });
 
 // Timer event handlers
-ipcMain.on("start-task", (event, { ticket }) => {
+ipcMain.on("start-task", (event, { ticket, name }) => {
+  // Receive both ticket and name
   if (floatingWindow) {
-    floatingWindow.webContents.send("task-started", ticket);
+    console.log(
+      `Main: Received start-task for ${ticket} - ${name}. Forwarding to float.`
+    );
+    floatingWindow.webContents.send("task-started", {
+      ticketNumber: ticket,
+      ticketName: name,
+    }); // Send both
   }
 });
 
 ipcMain.on("pause-task", (event, { ticket }) => {
   if (floatingWindow) {
-    floatingWindow.webContents.send("task-paused", ticket);
+    floatingWindow.webContents.send("task-paused", ticket); // Only ticket number is needed
   }
 });
 
 ipcMain.on("resume-task", (event, { ticket }) => {
   if (floatingWindow) {
-    floatingWindow.webContents.send("task-resumed", ticket);
+    floatingWindow.webContents.send("task-resumed", ticket); // Only ticket number is needed
   }
 });
 
 ipcMain.on("stop-task", (event, { ticket }) => {
   if (floatingWindow) {
-    floatingWindow.webContents.send("task-stopped", ticket);
+    floatingWindow.webContents.send("task-stopped", ticket); // Only ticket number is needed
   }
 });

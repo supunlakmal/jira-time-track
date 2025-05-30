@@ -1,31 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 
-// Assuming window.ipc structure is defined elsewhere (e.g., in a preload script)
-declare global {
-  interface Window {
-    ipc: {
-      send: (channel: string, ...args: any[]) => Promise<any> | void; // Adjusted to allow Promise for load-jira-data
-      on: (channel: string, listener: (...args: any[]) => void) => () => void; // Returns a cleanup function
-      window: {
-        hide: () => void;
-      };
-    };
-  }
-}
-
 export interface TaskTimer {
   ticketNumber: string;
   ticketName: string;
-  startTime: number; // Overall start time of the task, not necessarily the current session
-  elapsedTime: number; // Time elapsed in the current active segment/session
+  startTime: number;
+  elapsedTime: number;
   isRunning: boolean;
   status: "running" | "paused" | "hold" | "completed" | "stopped";
-  totalElapsed: number; // Total time spent on task across all sessions
+  totalElapsed: number;
   sessions: Array<{
     startTime: number;
     endTime?: number;
     duration: number;
-    status: string; // Status of this specific session when it ended (e.g., 'paused', 'completed')
+    status: string;
   }>;
 }
 
@@ -38,51 +25,15 @@ const FloatingWindow: React.FC = () => {
       ticketName:
         "[FUNC][MA-39] User session not automatically logged out After 1 Hour of Inactivity",
       startTime: Date.now() - 125000,
-      elapsedTime: 125000, // Current segment has run for 125s
+      elapsedTime: 125000,
       isRunning: true,
       status: "running",
       totalElapsed: 125000,
       sessions: [
         {
           startTime: Date.now() - 125000,
-          duration: 125000, // This session's duration
-          status: "running", // This session is currently running
-        },
-      ],
-    },
-    {
-      ticketNumber: "CBAT-1897",
-      ticketName:
-        "[FUNC] Mobile | Incorrect retake assessment count displayed on the mobile app homepage",
-      startTime: Date.now() - 300000,
-      elapsedTime: 280000, // Last segment ran for 280s before pause
-      isRunning: false,
-      status: "paused",
-      totalElapsed: 280000,
-      sessions: [
-        {
-          startTime: Date.now() - 300000,
-          endTime: Date.now() - (300000 - 280000), // Ended 20s ago relative to its start
-          duration: 280000,
-          status: "paused",
-        },
-      ],
-    },
-    {
-      ticketNumber: "MA-270",
-      ticketName:
-        "Skeleton Development - As a supervisor I must be able to see tiles on dashboard",
-      startTime: Date.now() - 1800000,
-      elapsedTime: 1200000, // Last segment ran for 1.2Ms before hold
-      isRunning: false,
-      status: "hold",
-      totalElapsed: 1200000,
-      sessions: [
-        {
-          startTime: Date.now() - 1800000,
-          endTime: Date.now() - (1800000 - 1200000),
-          duration: 1200000,
-          status: "hold",
+          duration: 125000,
+          status: "running",
         },
       ],
     },
@@ -90,20 +41,18 @@ const FloatingWindow: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [ticketData, setTicketData] = useState<{ [key: string]: string }>({});
 
-  // Load ticket data for name resolution
   useEffect(() => {
     const loadTicketData = async () => {
       try {
-        // Ensure your window.ipc.send for "load-jira-data" can return a Promise
-        const data = (await window.ipc.send(
-          "load-jira-data",
-          undefined
-        )) as Array<{ ticket_number: string; ticket_name: string }>;
+        const data = (await window.ipc.send("start-task", undefined)) as Array<{
+          ticket_number: string;
+          ticket_name: string;
+        }>;
         if (data && Array.isArray(data)) {
           const ticketMap = data.reduce((acc, ticket) => {
             acc[ticket.ticket_number] = ticket.ticket_name;
             return acc;
-          }, {});
+          }, {} as { [key: string]: string });
           setTicketData(ticketMap);
         } else {
           console.warn("load-jira-data did not return valid data", data);
@@ -115,7 +64,6 @@ const FloatingWindow: React.FC = () => {
     loadTicketData();
   }, []);
 
-  // Update timer names if ticketData loads after timers are created
   useEffect(() => {
     if (Object.keys(ticketData).length > 0) {
       setTimers((prevTimers) =>
@@ -130,14 +78,12 @@ const FloatingWindow: React.FC = () => {
         })
       );
     }
-  }, [ticketData]); // Runs when ticketData is populated
+  }, [ticketData]);
 
-  // Timer update effect
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-
     intervalRef.current = setInterval(() => {
       setTimers((prevTimers) =>
         prevTimers.map((timer) => {
@@ -148,8 +94,8 @@ const FloatingWindow: React.FC = () => {
               elapsedTime: newElapsedSegmentTime,
               totalElapsed: timer.totalElapsed + 1000,
               sessions: timer.sessions.map((session, index) =>
-                index === timer.sessions.length - 1 && !session.endTime // Last, open session
-                  ? { ...session, duration: session.duration + 1000 } // Update its duration
+                index === timer.sessions.length - 1 && !session.endTime
+                  ? { ...session, duration: session.duration + 1000 }
                   : session
               ),
             };
@@ -158,30 +104,37 @@ const FloatingWindow: React.FC = () => {
         })
       );
     }, 1000);
-
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, []); // No dependencies needed as setTimers uses functional updates
+  }, []);
 
   const handleTimerAction = (
     action: "start" | "pause" | "resume" | "hold" | "complete" | "stop",
-    ticket: string
+    ticketNumber: string
   ) => {
     const actionTime = Date.now();
+    let ticketNameForIPC = "";
+
     setTimers((prevTimers) =>
       prevTimers.map((timer) => {
-        if (timer.ticketNumber !== ticket) return timer;
+        if (timer.ticketNumber !== ticketNumber) return timer;
+
+        if (action === "start" && timer.ticketNumber === ticketNumber) {
+          ticketNameForIPC =
+            timer.ticketName ||
+            ticketData[timer.ticketNumber] ||
+            timer.ticketNumber;
+        }
 
         let newSessions = [...timer.sessions];
         let newElapsedTime = timer.elapsedTime;
         let newIsRunning = timer.isRunning;
         let newStatus: TaskTimer["status"] = timer.status;
 
-        // Finalize the current session if it's running and the action stops it
         if (
           timer.isRunning &&
           (action === "pause" ||
@@ -194,13 +147,11 @@ const FloatingWindow: React.FC = () => {
             newSessions[lastSessionIndex] = {
               ...newSessions[lastSessionIndex],
               endTime: actionTime,
-              duration: timer.elapsedTime, // Current segment's time is its duration
-              status: action, // Mark session with the action that ended it
+              duration: timer.elapsedTime,
+              status: action,
             };
           }
-        }
-        // Or finalize if it was paused/held and now we resume/start (effectively closing previous)
-        else if (
+        } else if (
           !timer.isRunning &&
           (action === "resume" ||
             (action === "start" &&
@@ -215,61 +166,49 @@ const FloatingWindow: React.FC = () => {
             newSessions[lastSessionIndex] = {
               ...newSessions[lastSessionIndex],
               endTime: actionTime,
-              // duration is already set from when it was paused/held
-              status: timer.status, // original status
+              status: timer.status,
             };
           }
         }
 
         switch (action) {
-          case "start": // Can start a new task, or restart a stopped/completed/on-hold one
+          case "start":
             newIsRunning = true;
             newStatus = "running";
-            newElapsedTime = 0; // Reset for new segment
+            newElapsedTime = 0;
             newSessions.push({
               startTime: actionTime,
               duration: 0,
               status: "running",
             });
-            // Note: totalElapsed and overall startTime are preserved for history
             break;
-
           case "pause":
             newIsRunning = false;
             newStatus = "paused";
-            // newElapsedTime remains to show duration of segment just paused
             break;
-
-          case "resume": // From paused or hold
+          case "resume":
             newIsRunning = true;
             newStatus = "running";
-            newElapsedTime = 0; // Reset for new segment
+            newElapsedTime = 0;
             newSessions.push({
               startTime: actionTime,
               duration: 0,
               status: "running",
             });
             break;
-
           case "hold":
             newIsRunning = false;
             newStatus = "hold";
-            // newElapsedTime remains
             break;
-
           case "complete":
             newIsRunning = false;
             newStatus = "completed";
-            // newElapsedTime remains
             break;
-
           case "stop":
             newIsRunning = false;
             newStatus = "stopped";
-            // newElapsedTime remains
             break;
         }
-
         return {
           ...timer,
           isRunning: newIsRunning,
@@ -280,78 +219,97 @@ const FloatingWindow: React.FC = () => {
       })
     );
 
-    // Send IPC messages for external actions
+    const timerDetails = { ticket: ticketNumber, name: ticketNameForIPC };
     switch (action) {
+      case "start":
+        window.ipc.send("start-task", timerDetails);
+        break;
       case "pause":
-        window.ipc.send("pause-task", { ticket });
+        window.ipc.send("pause-task", { ticket: ticketNumber });
         break;
       case "resume":
-      case "start": // If starting from UI, it might imply a resume for backend
-        if (timers.find((t) => t.ticketNumber === ticket && !t.isRunning)) {
-          window.ipc.send("resume-task", { ticket });
-        } else if (!timers.find((t) => t.ticketNumber === ticket)) {
-          // This case is less likely if timer is already in UI
-          // but if 'start' is for a brand new timer, this would be 'start-task'
-        }
+        window.ipc.send("resume-task", { ticket: ticketNumber });
         break;
       case "stop":
-      case "complete": // Completing often implies stopping
-        window.ipc.send("stop-task", { ticket }); // Or specific complete-task
+      case "complete":
+        window.ipc.send("stop-task", { ticket: ticketNumber });
         break;
-      // 'hold' might be internal state or map to pause/stop on backend
     }
   };
 
-  // IPC event listeners
   useEffect(() => {
-    const handleTaskStarted = (_: any, ticketNumber: string) => {
-      console.log("Floating window received task-started:", ticketNumber);
+    const handleTaskStarted = (data: {
+      ticketNumber: string;
+      ticketName: string;
+    }) => {
+      const { ticketNumber, ticketName } = data;
+      console.log(
+        "Float: IPC task-started received:",
+        ticketNumber,
+        ticketName
+      );
       const eventTime = Date.now();
       setTimers((prevTimers) => {
-        const existingTimer = prevTimers.find(
+        const existingTimerIndex = prevTimers.findIndex(
           (t) => t.ticketNumber === ticketNumber
         );
-        if (existingTimer) {
-          if (existingTimer.isRunning) return prevTimers; // Already running, no change
 
-          // Timer exists but is not running (paused, hold, stopped, completed)
-          // Effectively resume/restart it
+        if (existingTimerIndex !== -1) {
+          const existingTimer = prevTimers[existingTimerIndex];
+          console.log(
+            `Float: Existing timer found for ${ticketNumber}. Current status: ${existingTimer.status}, isRunning: ${existingTimer.isRunning}`
+          );
+
+          // Create new timers array for React to detect change
+          const updatedTimers = [...prevTimers];
           let updatedSessions = [...existingTimer.sessions];
           const lastSessionIdx = updatedSessions.length - 1;
+
+          // Finalize previous session if it was open (paused, hold, or even running)
           if (lastSessionIdx >= 0 && !updatedSessions[lastSessionIdx].endTime) {
             updatedSessions[lastSessionIdx] = {
               ...updatedSessions[lastSessionIdx],
               endTime: eventTime,
-              duration: existingTimer.elapsedTime, // Use current elapsedTime
-              status: existingTimer.status, // Mark with its previous status
+              duration: existingTimer.elapsedTime, // Use current elapsedTime for the segment just ended
+              status: existingTimer.isRunning
+                ? "restarted_by_ipc"
+                : existingTimer.status, // Mark how it ended
             };
           }
+
+          // Add a new running session
           updatedSessions.push({
             startTime: eventTime,
             duration: 0,
             status: "running",
           });
 
-          return prevTimers.map((timer) =>
-            timer.ticketNumber === ticketNumber
-              ? {
-                  ...timer,
-                  isRunning: true,
-                  status: "running",
-                  elapsedTime: 0, // Reset for new segment
-                  // totalElapsed and startTime are preserved
-                  sessions: updatedSessions,
-                }
-              : timer
-          );
+          updatedTimers[existingTimerIndex] = {
+            ...existingTimer,
+            isRunning: true,
+            status: "running",
+            elapsedTime: 0, // Reset for new segment
+            ticketName:
+              ticketName ||
+              existingTimer.ticketName ||
+              ticketData[ticketNumber] ||
+              ticketNumber,
+            sessions: updatedSessions,
+            // startTime and totalElapsed are preserved for overall task history
+          };
+          return updatedTimers;
         } else {
-          // Add new timer
-          console.log("Adding new timer via IPC for:", ticketNumber);
+          console.log(
+            "Float: Adding new timer via IPC:",
+            ticketNumber,
+            ticketName
+          );
           return [
             ...prevTimers,
             {
               ticketNumber: ticketNumber,
-              ticketName: ticketData[ticketNumber] || ticketNumber,
+              ticketName:
+                ticketName || ticketData[ticketNumber] || ticketNumber,
               startTime: eventTime,
               elapsedTime: 0,
               isRunning: true,
@@ -366,7 +324,8 @@ const FloatingWindow: React.FC = () => {
       });
     };
 
-    const handleTaskPaused = (_: any, ticketNumber: string) => {
+    const handleTaskPaused = (ticketNumber: string) => {
+      console.log("Float: IPC task-paused:", ticketNumber);
       const eventTime = Date.now();
       setTimers((prevTimers) =>
         prevTimers.map((timer) => {
@@ -388,7 +347,6 @@ const FloatingWindow: React.FC = () => {
               ...timer,
               isRunning: false,
               status: "paused",
-              // elapsedTime remains to show duration of segment just paused
               sessions: updatedSessions,
             };
           }
@@ -397,14 +355,14 @@ const FloatingWindow: React.FC = () => {
       );
     };
 
-    const handleTaskResumed = (_: any, ticketNumber: string) => {
+    const handleTaskResumed = (ticketNumber: string) => {
+      console.log("Float: IPC task-resumed:", ticketNumber);
       const eventTime = Date.now();
       setTimers((prevTimers) =>
         prevTimers.map((timer) => {
           if (timer.ticketNumber === ticketNumber && !timer.isRunning) {
             let updatedSessions = [...timer.sessions];
             const lastSessionIdx = updatedSessions.length - 1;
-            // Finalize previous session if it was open
             if (
               lastSessionIdx >= 0 &&
               !updatedSessions[lastSessionIdx].endTime
@@ -412,10 +370,6 @@ const FloatingWindow: React.FC = () => {
               updatedSessions[lastSessionIdx] = {
                 ...updatedSessions[lastSessionIdx],
                 endTime: eventTime,
-                // duration would already be set from when it was paused/held
-                // or use timer.elapsedTime if it was still reflecting that segment.
-                // For safety, let's assume duration was correctly captured previously.
-                // If not, use timer.elapsedTime here.
                 status: timer.status,
               };
             }
@@ -428,7 +382,7 @@ const FloatingWindow: React.FC = () => {
               ...timer,
               isRunning: true,
               status: "running",
-              elapsedTime: 0, // Reset for new segment
+              elapsedTime: 0,
               sessions: updatedSessions,
             };
           }
@@ -437,12 +391,12 @@ const FloatingWindow: React.FC = () => {
       );
     };
 
-    const handleTaskStopped = (_: any, ticketNumber: string) => {
+    const handleTaskStopped = (ticketNumber: string) => {
+      console.log("Float: IPC task-stopped:", ticketNumber);
       const eventTime = Date.now();
       setTimers((prevTimers) =>
         prevTimers.map((timer) => {
           if (timer.ticketNumber === ticketNumber) {
-            // Stop it even if it wasn't running (e.g. from paused to stopped)
             let updatedSessions = [...timer.sessions];
             const lastSessionIdx = updatedSessions.length - 1;
             if (
@@ -461,18 +415,16 @@ const FloatingWindow: React.FC = () => {
               lastSessionIdx >= 0 &&
               !updatedSessions[lastSessionIdx].endTime
             ) {
-              // If it was paused/held and then stopped, update that session's status
               updatedSessions[lastSessionIdx] = {
                 ...updatedSessions[lastSessionIdx],
-                endTime: eventTime, // Update end time
-                status: "stopped", // Mark explicitly as stopped
+                endTime: eventTime,
+                status: "stopped",
               };
             }
             return {
               ...timer,
               isRunning: false,
               status: "stopped",
-              // elapsedTime remains
               sessions: updatedSessions,
             };
           }
@@ -492,9 +444,8 @@ const FloatingWindow: React.FC = () => {
       cleanupTaskResumed();
       cleanupTaskStopped();
     };
-  }, [ticketData]); // Re-run if ticketData changes, so new timers get correct names
+  }, [ticketData]);
 
-  // Mouse event handlers for dragging
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
@@ -518,7 +469,6 @@ const FloatingWindow: React.FC = () => {
     const seconds = totalSeconds % 60;
     const minutes = Math.floor(totalSeconds / 60) % 60;
     const hours = Math.floor(totalSeconds / 3600);
-
     if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
     if (minutes > 0) return `${minutes}m ${seconds}s`;
     return `${seconds}s`;
@@ -533,7 +483,7 @@ const FloatingWindow: React.FC = () => {
       window.ipc.send("window-resize", { height: 40 });
     } else {
       const baseHeight = 80;
-      const timerHeight = 130; // Adjusted for potentially more button space
+      const timerHeight = 130;
       const minHeight = 200;
       const calculatedHeight = Math.max(
         minHeight,
@@ -541,7 +491,7 @@ const FloatingWindow: React.FC = () => {
       );
       window.ipc.send("window-resize", {
         height: Math.min(calculatedHeight, 600),
-      }); // Max height cap
+      });
     }
   };
 
@@ -555,12 +505,12 @@ const FloatingWindow: React.FC = () => {
   };
 
   const getStatusIcon = (status: TaskTimer["status"], isRunning: boolean) => {
-    if (isRunning && status === "running") return "●"; // U+25CF Black Circle
-    if (status === "paused") return "⏸"; // U+23F8 Pause Button
-    if (status === "hold") return "⏳"; // U+23F3 Hourglass Not Done
-    if (status === "completed") return "✓"; // U+2713 Check Mark
-    if (status === "stopped") return "⏹"; // U+23F9 Stop Button
-    return "○"; // U+25CB White Circle
+    if (isRunning && status === "running") return "●";
+    if (status === "paused") return "⏸";
+    if (status === "hold") return "⏳";
+    if (status === "completed") return "✓";
+    if (status === "stopped") return "⏹";
+    return "○";
   };
 
   const getStatusText = (status: TaskTimer["status"], isRunning: boolean) => {
@@ -575,7 +525,6 @@ const FloatingWindow: React.FC = () => {
   return (
     <div className="h-screen bg-transparent select-none">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
-        {/* Title bar */}
         <div
           className="bg-gray-800 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
           onMouseDown={(e) => {
@@ -604,11 +553,8 @@ const FloatingWindow: React.FC = () => {
           </div>
         </div>
 
-        {/* Content area */}
         {!isMinimized && (
           <div className="p-4 overflow-y-auto flex-grow">
-            {" "}
-            {/* Use flex-grow for scrolling */}
             <div className="space-y-4">
               {timers.length === 0 ? (
                 <div className="text-center text-gray-500 p-4">
@@ -627,7 +573,7 @@ const FloatingWindow: React.FC = () => {
                         ? "bg-orange-50 border-orange-500"
                         : timer.status === "completed"
                         ? "bg-blue-50 border-blue-500"
-                        : "bg-gray-50 border-gray-500" // for 'stopped'
+                        : "bg-gray-50 border-gray-500"
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -663,7 +609,6 @@ const FloatingWindow: React.FC = () => {
                         </div>
                       </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-1 mt-3">
                       {timer.isRunning && timer.status === "running" ? (
                         <>
@@ -724,24 +669,19 @@ const FloatingWindow: React.FC = () => {
                         </>
                       ) : timer.status === "completed" ||
                         timer.status === "stopped" ? (
-                        <>
-                          <button
-                            onClick={() =>
-                              handleTimerAction("start", timer.ticketNumber)
-                            }
-                            className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
-                          >
-                            Start New
-                          </button>
-                        </>
+                        <button
+                          onClick={() =>
+                            handleTimerAction("start", timer.ticketNumber)
+                          }
+                          className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
+                        >
+                          Start New
+                        </button>
                       ) : (
-                        // Should not be reached if all statuses handled
                         <div className="text-xs text-gray-400 col-span-2">
                           No actions available
                         </div>
                       )}
-
-                      {/* Common Actions: Complete and Stop - always available unless already completed/stopped */}
                       {timer.status !== "completed" &&
                         timer.status !== "stopped" && (
                           <button
@@ -753,7 +693,6 @@ const FloatingWindow: React.FC = () => {
                             Complete
                           </button>
                         )}
-                      {/* Make sure "Start New" for completed/stopped doesn't overlap these if they are also present */}
                       {!(
                         timer.status === "completed" ||
                         timer.status === "stopped"
@@ -767,14 +706,12 @@ const FloatingWindow: React.FC = () => {
                           Stop
                         </button>
                       )}
-                      {
-                        (timer.status === "completed" ||
-                          timer.status === "stopped") && (
-                          <div className="col-span-2"></div>
-                        ) /* Placeholder for grid */
-                      }
+                      {(timer.status === "completed" ||
+                        timer.status === "stopped") && (
+                        <div className="col-span-2"></div>
+                      )}
                     </div>
-                    {timer.sessions.length > 0 && ( // Show session summary if there's at least one session, even if not many
+                    {timer.sessions.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-gray-200">
                         <details className="text-xs">
                           <summary className="cursor-pointer text-gray-600 hover:text-gray-800">

@@ -18,12 +18,30 @@ export interface IpcHandler {
     value: { movementX: number; movementY: number }
   ): void;
   send(channel: "window-resize", value: { height: number }): void;
-  send(channel: "start-task", value: { ticket: string }): void;
+  send(channel: "start-task", value: { ticket: string; name: string }): void; // Updated: now sends name too
   send(channel: "pause-task", value: { ticket: string }): void;
   send(channel: "resume-task", value: { ticket: string }): void;
   send(channel: "stop-task", value: { ticket: string }): void;
   send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
-  on(channel: string, callback: (...args: unknown[]) => void): () => void;
+
+  on(
+    channel: "task-started",
+    listener: (data: { ticketNumber: string; ticketName: string }) => void
+  ): () => void; // Updated: receives an object
+  on(
+    channel: "task-paused",
+    listener: (ticketNumber: string) => void
+  ): () => void;
+  on(
+    channel: "task-resumed",
+    listener: (ticketNumber: string) => void
+  ): () => void;
+  on(
+    channel: "task-stopped",
+    listener: (ticketNumber: string) => void
+  ): () => void;
+  on(channel: string, listener: (...args: any[]) => void): () => void;
+
   window: {
     minimize(): void;
     maximize(): void;

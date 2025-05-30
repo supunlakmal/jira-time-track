@@ -123,7 +123,8 @@ export default function HomePage() {
                             <button
                               onClick={() => {
                                 window.ipc.send("start-task", {
-                                  ticket: ticket.ticket_number,
+                                  ticket: ticket.ticket_number, // Renamed for consistency with float.tsx
+                                  name: ticket.ticket_name, // Send the name
                                 });
                               }}
                               className="text-blue-600 hover:text-blue-900"

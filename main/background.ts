@@ -1,40 +1,145 @@
-import path from 'path'
-import { app, ipcMain } from 'electron'
-import serve from 'electron-serve'
-import { createWindow } from './helpers'
+import path from "path";
+import { app, ipcMain, BrowserWindow, screen } from "electron";
+import serve from "electron-serve";
+import { createWindow } from "./helpers";
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === "production";
+let floatingWindow: BrowserWindow | null = null;
 
 if (isProd) {
-  serve({ directory: 'app' })
+  serve({ directory: "app" });
 } else {
-  app.setPath('userData', `${app.getPath('userData')} (development)`)
+  app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
-;(async () => {
-  await app.whenReady()
+const createFloatingWindow = async () => {
+  const display = screen.getPrimaryDisplay();
+  const { width, height } = display.workAreaSize;
 
-  const mainWindow = createWindow('main', {
+  floatingWindow = new BrowserWindow({
+    width: 300,
+    height: 400,
+    x: width - 350,
+    y: height - 450,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: false,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  if (isProd) {
+    await floatingWindow.loadURL("app://./float");
+  } else {
+    const port = process.argv[2];
+    await floatingWindow.loadURL(`http://localhost:${port}/float`);
+    floatingWindow.webContents.openDevTools();
+  }
+
+  floatingWindow.once("ready-to-show", () => {
+    if (floatingWindow) {
+      floatingWindow.show();
+      floatingWindow.focus();
+    }
+  });
+
+  floatingWindow.on("closed", () => {
+    floatingWindow = null;
+  });
+};
+
+(async () => {
+  await app.whenReady();
+
+  const mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
-  })
+  });
+
+  // Create floating window right after main window
+  await createFloatingWindow();
+
+  // Debug: Force show floating window after a short delay
+  setTimeout(() => {
+    if (floatingWindow) {
+      floatingWindow.show();
+      floatingWindow.focus();
+      if (!isProd) {
+        floatingWindow.webContents.openDevTools();
+      }
+    }
+  }, 2000);
 
   if (isProd) {
-    await mainWindow.loadURL('app://./home')
+    await mainWindow.loadURL("app://./home");
   } else {
-    const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/home`)
-    mainWindow.webContents.openDevTools()
+    const port = process.argv[2];
+    await mainWindow.loadURL(`http://localhost:${port}/home`);
+    mainWindow.webContents.openDevTools();
   }
-})()
+})();
 
-app.on('window-all-closed', () => {
-  app.quit()
-})
+app.on("window-all-closed", () => {
+  app.quit();
+});
 
-ipcMain.on('message', async (event, arg) => {
-  event.reply('message', `${arg} World!`)
-})
+ipcMain.on("toggle-float-window", () => {
+  if (floatingWindow?.isVisible()) {
+    floatingWindow.hide();
+  } else if (floatingWindow) {
+    floatingWindow.show();
+  } else {
+    createFloatingWindow();
+  }
+});
+
+ipcMain.on("message", async (event, arg) => {
+  event.reply("message", `${arg} World!`);
+});
+
+ipcMain.on("window-control", (_, command) => {
+  switch (command) {
+    case "minimize":
+      floatingWindow?.minimize();
+      break;
+    case "maximize":
+      if (floatingWindow?.isMaximized()) {
+        floatingWindow.unmaximize();
+      } else {
+        floatingWindow?.maximize();
+      }
+      break;
+    case "close":
+    case "hide":
+      floatingWindow?.hide();
+      break;
+    case "show":
+      floatingWindow?.show();
+      break;
+  }
+});
+
+ipcMain.on("window-move", (_, { movementX, movementY }) => {
+  if (floatingWindow) {
+    const [x, y] = floatingWindow.getPosition();
+    floatingWindow.setPosition(x + movementX, y + movementY);
+  }
+});
+
+ipcMain.on("window-resize", (_, { height }) => {
+  if (floatingWindow) {
+    const [width] = floatingWindow.getSize();
+    floatingWindow.setSize(width, height);
+  }
+});

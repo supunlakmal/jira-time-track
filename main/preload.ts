@@ -1,20 +1,41 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+
+// Whitelist of safe channels that can be used
+const validChannels = [
+  "window-control",
+  "window-move",
+  "window-resize",
+  "start-task",
+  "toggle-float-window",
+];
 
 const handler = {
   send(channel: string, value: unknown) {
-    ipcRenderer.send(channel, value)
-  },
-  on(channel: string, callback: (...args: unknown[]) => void) {
-    const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
-      callback(...args)
-    ipcRenderer.on(channel, subscription)
-
-    return () => {
-      ipcRenderer.removeListener(channel, subscription)
+    if (validChannels.includes(channel)) {
+      ipcRenderer.send(channel, value);
     }
   },
-}
+  on(channel: string, callback: (...args: unknown[]) => void) {
+    if (validChannels.includes(channel)) {
+      const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
+        callback(...args);
+      ipcRenderer.on(channel, subscription);
 
-contextBridge.exposeInMainWorld('ipc', handler)
+      return () => {
+        ipcRenderer.removeListener(channel, subscription);
+      };
+    }
+    return () => {};
+  },
+  window: {
+    minimize: () => ipcRenderer.send("window-control", "minimize"),
+    maximize: () => ipcRenderer.send("window-control", "maximize"),
+    close: () => ipcRenderer.send("window-control", "close"),
+    hide: () => ipcRenderer.send("window-control", "hide"),
+    show: () => ipcRenderer.send("window-control", "show"),
+  },
+};
 
-export type IpcHandler = typeof handler
+contextBridge.exposeInMainWorld("ipc", handler);
+
+export type IpcHandler = typeof handler;

@@ -102,6 +102,21 @@ const FloatingWindow: React.FC = () => {
   }, []);
   // --- End of largely unchanged useEffects ---
 
+  // NEW: Delete timer function
+  const handleDeleteTimer = (ticketNumber: string) => {
+    setTimers((prevTimers) =>
+      prevTimers.filter((timer) => timer.ticketNumber !== ticketNumber)
+    );
+
+    // If we're currently viewing the deleted timer in detail view, go back to grid
+    if (selectedTicketNumber === ticketNumber) {
+      setSelectedTicketNumber(null);
+    }
+
+    // Optionally notify the main app about the deletion
+    window.ipc.send("delete-task", { ticket: ticketNumber });
+  };
+
   // --- handleTimerAction remains largely the same ---
   const handleTimerAction = (
     action: "start" | "pause" | "resume" | "hold" | "complete" | "stop",
@@ -554,10 +569,13 @@ const FloatingWindow: React.FC = () => {
           >
             ← Back
           </button>
-          <div className="flex-1 text-right">
-            {" "}
-            {/* Placeholder to push title center if needed or remove */}
-          </div>
+          <button
+            onClick={() => handleDeleteTimer(timer.ticketNumber)}
+            className="text-red-500 hover:text-red-700 text-sm font-medium p-1 rounded hover:bg-red-50"
+            title="Delete Timer"
+          >
+            🗑️
+          </button>
         </div>
         <div className="flex justify-between items-start mb-2">
           <div className="flex-1 mr-3">
@@ -598,13 +616,13 @@ const FloatingWindow: React.FC = () => {
             <>
               <button
                 onClick={() => handleTimerAction("pause", timer.ticketNumber)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Pause
               </button>
               <button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Hold
               </button>
@@ -613,13 +631,13 @@ const FloatingWindow: React.FC = () => {
             <>
               <button
                 onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Resume
               </button>
               <button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Hold
               </button>
@@ -628,13 +646,13 @@ const FloatingWindow: React.FC = () => {
             <>
               <button
                 onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Resume
               </button>
               <button // Changed from "Restart" to "Start" to be consistent
                 onClick={() => handleTimerAction("start", timer.ticketNumber)}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-xs font-medium"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
                 Start New Session {/* Clarified button text */}
               </button>
@@ -642,7 +660,7 @@ const FloatingWindow: React.FC = () => {
           ) : timer.status === "completed" || timer.status === "stopped" ? (
             <button
               onClick={() => handleTimerAction("start", timer.ticketNumber)}
-              className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
             >
               Start New
             </button>
@@ -662,7 +680,7 @@ const FloatingWindow: React.FC = () => {
           {!(timer.status === "completed" || timer.status === "stopped") && (
             <button
               onClick={() => handleTimerAction("stop", timer.ticketNumber)}
-              className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-xs font-medium"
+              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
             >
               Stop
             </button>

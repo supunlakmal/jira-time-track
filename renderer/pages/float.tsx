@@ -19,25 +19,7 @@ export interface TaskTimer {
 const FloatingWindow: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [timers, setTimers] = useState<TaskTimer[]>([
-    {
-      ticketNumber: "MA-292",
-      ticketName:
-        "[FUNC][MA-39] User session not automatically logged out After 1 Hour of Inactivity",
-      startTime: Date.now() - 125000,
-      elapsedTime: 125000,
-      isRunning: true,
-      status: "running",
-      totalElapsed: 125000,
-      sessions: [
-        {
-          startTime: Date.now() - 125000,
-          duration: 125000,
-          status: "running",
-        },
-      ],
-    },
-  ]);
+  const [timers, setTimers] = useState<TaskTimer[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [ticketData, setTicketData] = useState<{ [key: string]: string }>({});
 
@@ -312,12 +294,10 @@ const FloatingWindow: React.FC = () => {
                 ticketName || ticketData[ticketNumber] || ticketNumber,
               startTime: eventTime,
               elapsedTime: 0,
-              isRunning: true,
-              status: "running",
+              isRunning: false,
+              status: "stopped",
               totalElapsed: 0,
-              sessions: [
-                { startTime: eventTime, duration: 0, status: "running" },
-              ],
+              sessions: [],
             },
           ];
         }

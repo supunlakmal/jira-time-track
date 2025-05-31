@@ -2,12 +2,12 @@
   {
     "ticket_number": "MA-292",
     "ticket_name": "[FUNC][MA-39] User session not automatically logged out After 1 Hour of Inactivity",
-    "story_points": 2.5
+    "story_points": 0.08
   },
   {
     "ticket_number": "MA-290",
     "ticket_name": "[FUNC][MA-39] Logout success message not displayed After Logging Out",
-    "story_points": 1.0
+    "story_points": null
   },
   {
     "ticket_number": "MA-274",

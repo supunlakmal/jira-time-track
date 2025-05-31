@@ -1,3 +1,5 @@
+// main/types/electron.d.ts
+
 export interface JiraTicket {
   ticket_number: string;
   ticket_name: string;
@@ -10,6 +12,15 @@ export interface TaskTimer {
   startTime: number;
   elapsedTime: number;
   isRunning: boolean;
+  status: "running" | "paused" | "hold" | "completed" | "stopped"; // Added more statuses
+  totalElapsed: number;
+  sessions: Array<{
+    startTime: number;
+    endTime?: number;
+    duration: number;
+    status: string;
+  }>;
+  storyPoints?: number; // <-- ADD THIS
 }
 
 export interface IpcHandler {
@@ -19,16 +30,24 @@ export interface IpcHandler {
     value: { movementX: number; movementY: number }
   ): void;
   send(channel: "window-resize", value: { height: number }): void;
-  send(channel: "start-task", value: { ticket: string; name: string }): void; // Updated: now sends name too
+  send(
+    channel: "start-task",
+    value: { ticket: string; name: string; storyPoints?: number }
+  ): void; // <-- UPDATED
   send(channel: "pause-task", value: { ticket: string }): void;
   send(channel: "resume-task", value: { ticket: string }): void;
   send(channel: "stop-task", value: { ticket: string }): void;
   send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  send(channel: "delete-task", value: { ticket: string }): void; // Added for completeness if needed
 
   on(
     channel: "task-started",
-    listener: (data: { ticketNumber: string; ticketName: string }) => void
-  ): () => void; // Updated: receives an object
+    listener: (data: {
+      ticketNumber: string;
+      ticketName: string;
+      storyPoints?: number;
+    }) => void // <-- UPDATED
+  ): () => void;
   on(
     channel: "task-paused",
     listener: (ticketNumber: string) => void

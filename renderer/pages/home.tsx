@@ -1,14 +1,17 @@
+// renderer/pages/home.tsx
 import React, { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useJiraData } from "../hooks/useJiraData";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import type { JiraTicket } from "../types/electron"; // Assuming you have this type
 
 export default function HomePage() {
   const { data, loading, error, refreshData } = useJiraData();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredData = data.filter((ticket) => {
+  const filteredData = data.filter((ticket: JiraTicket) => {
+    // Added type annotation for ticket
     const searchLower = searchTerm.toLowerCase();
     return (
       ticket.ticket_number.toLowerCase().includes(searchLower) ||
@@ -17,7 +20,7 @@ export default function HomePage() {
   });
 
   const toggleFloatingWindow = () => {
-    window.ipc.send("toggle-float-window", true);
+    window.ipc.send("toggle-float-window", true); // Value 'true' might not be necessary, depends on main process logic
   };
 
   return (
@@ -101,7 +104,8 @@ export default function HomePage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredData.length === 0 ? (
-                      <tr>                        <td
+                      <tr>
+                        <td
                           colSpan={4}
                           className="px-6 py-4 text-center text-gray-500"
                         >
@@ -130,8 +134,9 @@ export default function HomePage() {
                             <button
                               onClick={() => {
                                 window.ipc.send("start-task", {
-                                  ticket: ticket.ticket_number, // Renamed for consistency with float.tsx
-                                  name: ticket.ticket_name, // Send the name
+                                  ticket: ticket.ticket_number,
+                                  name: ticket.ticket_name,
+                                  storyPoints: ticket.story_points, // Pass story points
                                 });
                               }}
                               className="text-blue-600 hover:text-blue-900"

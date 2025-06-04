@@ -1,4 +1,4 @@
-// main/types/electron.d.ts
+// renderer/types/electron.d.ts
 
 export interface JiraTicket {
   ticket_number: string;
@@ -12,7 +12,7 @@ export interface TaskTimer {
   startTime: number;
   elapsedTime: number;
   isRunning: boolean;
-  status: "running" | "paused" | "hold" | "completed" | "stopped"; // Added more statuses
+  status: "running" | "paused" | "hold" | "completed" | "stopped";
   totalElapsed: number;
   sessions: Array<{
     startTime: number;
@@ -20,7 +20,7 @@ export interface TaskTimer {
     duration: number;
     status: string;
   }>;
-  storyPoints?: number; // <-- ADD THIS
+  storyPoints?: number;
 }
 
 export interface IpcHandler {
@@ -33,12 +33,36 @@ export interface IpcHandler {
   send(
     channel: "start-task",
     value: { ticket: string; name: string; storyPoints?: number }
-  ): void; // <-- UPDATED
+  ): void;
   send(channel: "pause-task", value: { ticket: string }): void;
   send(channel: "resume-task", value: { ticket: string }): void;
   send(channel: "stop-task", value: { ticket: string }): void;
   send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
-  send(channel: "delete-task", value: { ticket: string }): void; // Added for completeness if needed
+  send(channel: "delete-task", value: { ticket: string }): void;
+  send(channel: "save-project-paths", value: Record<string, string>): void;
+  send(
+    channel: "run-github-action",
+    value: { projectName: string; projectPath: string }
+  ): void;
+
+  // Add invoke method
+  invoke(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  invoke(channel: "get-project-paths"): Promise<Record<string, string>>;
+  invoke(
+    channel: "select-project-directory",
+    projectName: string
+  ): Promise<{
+    canceled?: boolean;
+    filePath?: string;
+    error?: string;
+  }>;
+  invoke(
+    channel: "get-current-branch",
+    data: { projectName: string; projectPath: string }
+  ): Promise<{
+    branch?: string;
+    error?: string;
+  }>;
 
   on(
     channel: "task-started",
@@ -46,7 +70,7 @@ export interface IpcHandler {
       ticketNumber: string;
       ticketName: string;
       storyPoints?: number;
-    }) => void // <-- UPDATED
+    }) => void
   ): () => void;
   on(
     channel: "task-paused",

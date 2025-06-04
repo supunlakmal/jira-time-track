@@ -9,6 +9,7 @@ interface ProjectSummary {
   name: string;
   ticketCount: number;
   location?: string; // Local file system path to the project's repository
+  currentBranch?: string; // Current active Git branch
 }
 
 export default function HomePage() {
@@ -16,6 +17,9 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
+  const [projectBranches, setProjectBranches] = useState<
+    Record<string, string>
+  >({});
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -39,6 +43,46 @@ export default function HomePage() {
     };
     loadPaths();
   }, []);
+
+  // Load current branches for projects with paths
+  useEffect(() => {
+    const loadBranches = async () => {
+      const branches: Record<string, string> = {};
+
+      for (const [projectName, projectPath] of Object.entries(projectPaths)) {
+        if (
+          projectPath &&
+          window.ipc &&
+          typeof window.ipc.invoke === "function"
+        ) {
+          try {
+            const branchResult = await window.ipc.invoke("get-current-branch", {
+              projectName,
+              projectPath,
+            });
+            if (branchResult && branchResult.branch) {
+              branches[projectName] = branchResult.branch;
+            } else if (branchResult && branchResult.error) {
+              branches[projectName] = "Error";
+              console.warn(
+                `Failed to get branch for ${projectName}:`,
+                branchResult.error
+              );
+            }
+          } catch (e) {
+            console.error(`Error getting branch for ${projectName}:`, e);
+            branches[projectName] = "Unknown";
+          }
+        }
+      }
+
+      setProjectBranches(branches);
+    };
+
+    if (Object.keys(projectPaths).length > 0) {
+      loadBranches();
+    }
+  }, [projectPaths]);
 
   // Function to save paths to the main process
   const saveProjectPaths = (newPaths: Record<string, string>) => {
@@ -73,9 +117,10 @@ export default function HomePage() {
         name,
         ticketCount: projectData.count,
         location: projectPaths[name] || undefined,
+        currentBranch: projectBranches[name] || undefined,
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [data, projectPaths]);
+  }, [data, projectPaths, projectBranches]);
 
   const ticketsToDisplay = useMemo(() => {
     let currentTickets = data;
@@ -127,26 +172,35 @@ export default function HomePage() {
     }
   };
 
-  const handleRunGithubAction = (
-    projectName: string,
-    projectLocation?: string
-  ) => {
-    if (!projectLocation) {
-      alert(
-        `Project location for ${projectName} is not set. Please set it first using the "Choose Path" button.`
-      );
-      return;
-    }
-    if (window.ipc && typeof window.ipc.send === "function") {
-      window.ipc.send("run-github-action", {
-        projectName,
-        projectPath: projectLocation,
-      });
-      alert(
-        `Attempting to trigger GitHub Action for ${projectName} at ${projectLocation}.\nCheck main process console for details.`
-      );
-    } else {
-      alert("IPC not available. Cannot run GitHub Action.");
+  const refreshBranch = async (projectName: string, projectPath: string) => {
+    if (window.ipc && typeof window.ipc.invoke === "function") {
+      try {
+        const branchResult = await window.ipc.invoke("get-current-branch", {
+          projectName,
+          projectPath,
+        });
+        if (branchResult && branchResult.branch) {
+          setProjectBranches((prev) => ({
+            ...prev,
+            [projectName]: branchResult.branch,
+          }));
+        } else if (branchResult && branchResult.error) {
+          setProjectBranches((prev) => ({
+            ...prev,
+            [projectName]: "Error",
+          }));
+          console.warn(
+            `Failed to refresh branch for ${projectName}:`,
+            branchResult.error
+          );
+        }
+      } catch (e) {
+        console.error(`Error refreshing branch for ${projectName}:`, e);
+        setProjectBranches((prev) => ({
+          ...prev,
+          [projectName]: "Unknown",
+        }));
+      }
     }
   };
 
@@ -222,9 +276,8 @@ export default function HomePage() {
                               Local Path
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Trigger Action
-                            </th>{" "}
-                            {/* New column for action button */}
+                              Current Branch
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -272,24 +325,44 @@ export default function HomePage() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRunGithubAction(
-                                      proj.name,
-                                      proj.location
-                                    );
-                                  }}
-                                  className="text-xs py-1 px-2 rounded border border-purple-500 hover:bg-purple-100 text-purple-600 hover:text-purple-800 disabled:text-gray-400 disabled:border-gray-300 disabled:hover:bg-transparent disabled:cursor-not-allowed"
-                                  disabled={!proj.location}
-                                  title={
-                                    !proj.location
-                                      ? "Set project local path first"
-                                      : "Run GitHub Action"
-                                  }
-                                >
-                                  🚀 Run Action
-                                </button>
+                                <div className="flex items-center justify-between">
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full ${
+                                      proj.currentBranch === "main" ||
+                                      proj.currentBranch === "master"
+                                        ? "bg-green-100 text-green-800"
+                                        : proj.currentBranch === "Error"
+                                        ? "bg-red-100 text-red-800"
+                                        : proj.currentBranch === "Unknown"
+                                        ? "bg-gray-100 text-gray-800"
+                                        : proj.currentBranch
+                                        ? "bg-blue-100 text-blue-800"
+                                        : "bg-gray-100 text-gray-400"
+                                    }`}
+                                    title={
+                                      proj.currentBranch ||
+                                      "No branch information"
+                                    }
+                                  >
+                                    {proj.currentBranch ||
+                                      (proj.location ? "..." : "No path")}
+                                  </span>
+                                  {proj.location && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        refreshBranch(
+                                          proj.name,
+                                          proj.location!
+                                        );
+                                      }}
+                                      className="ml-2 text-xs py-1 px-2 rounded border border-gray-300 hover:bg-gray-100 text-gray-600"
+                                      title="Refresh branch information"
+                                    >
+                                      ↻
+                                    </button>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -322,7 +395,6 @@ export default function HomePage() {
 
               {/* Main Ticket Table */}
               <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                {/* ... (rest of the main ticket table remains the same) ... */}
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">

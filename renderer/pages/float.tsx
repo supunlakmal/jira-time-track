@@ -7,7 +7,7 @@ export interface TaskTimer {
   startTime: number;
   elapsedTime: number;
   isRunning: boolean;
-  status: "running" | "paused" | "hold" | "completed" | "stopped";
+  status: "running" | "paused" | "hold" | "completed" | "stopped" | "queue";
   totalElapsed: number;
   sessions: Array<{
     startTime: number;
@@ -160,17 +160,27 @@ const FloatingWindow: React.FC = () => {
             };
           }
         }
-
         switch (action) {
           case "start":
             newIsRunning = true;
             newStatus = "running";
             newElapsedTime = 0;
-            newSessions.push({
-              startTime: actionTime,
-              duration: 0,
-              status: "running",
-            });
+            // For tasks in queue, we want to start a fresh session
+            if (timer.status === "queue") {
+              newSessions = [
+                {
+                  startTime: actionTime,
+                  duration: 0,
+                  status: "running",
+                },
+              ];
+            } else {
+              newSessions.push({
+                startTime: actionTime,
+                duration: 0,
+                status: "running",
+              });
+            }
             break;
           case "pause":
             newIsRunning = false;
@@ -297,11 +307,11 @@ const FloatingWindow: React.FC = () => {
               storyPoints: storyPoints,
               startTime: eventTime,
               elapsedTime: 0,
-              isRunning: true,
-              status: "running",
+              isRunning: false,
+              status: "queue", // Initial status is queue
               totalElapsed: 0,
               sessions: [
-                { startTime: eventTime, duration: 0, status: "running" },
+                { startTime: eventTime, duration: 0, status: "queue" },
               ],
             },
           ];
@@ -448,39 +458,39 @@ const FloatingWindow: React.FC = () => {
     if (minutes > 0) return `${minutes}m ${seconds}s`;
     return `${seconds}s`;
   };
-
   const getStatusColor = (status: TaskTimer["status"], isRunning: boolean) => {
     if (isRunning && status === "running") return "text-green-600";
+    if (status === "queue") return "text-purple-600";
     if (status === "paused") return "text-yellow-600";
     if (status === "hold") return "text-orange-600";
     if (status === "completed") return "text-blue-600";
     if (status === "stopped") return "text-gray-600";
     return "text-gray-500";
   };
-
   const getStatusIcon = (status: TaskTimer["status"], isRunning: boolean) => {
     if (isRunning && status === "running") return "●";
+    if (status === "queue") return "⊕";
     if (status === "paused") return "⏸";
     if (status === "hold") return "⏳";
     if (status === "completed") return "✓";
     if (status === "stopped") return "⏹";
     return "○";
   };
-
   const getMinimalStatusColorClass = (
     status: TaskTimer["status"],
     isRunning: boolean
   ) => {
     if (isRunning && status === "running") return "bg-green-500";
+    if (status === "queue") return "bg-purple-500";
     if (status === "paused") return "bg-yellow-500";
     if (status === "hold") return "bg-orange-500";
     if (status === "completed") return "bg-blue-500";
     if (status === "stopped") return "bg-gray-400";
     return "bg-gray-300";
   };
-
   const getStatusText = (status: TaskTimer["status"], isRunning: boolean) => {
     if (isRunning && status === "running") return "Running";
+    if (status === "queue") return "In Queue";
     if (status === "paused") return "Paused";
     if (status === "hold") return "On Hold";
     if (status === "completed") return "Completed";
@@ -612,7 +622,6 @@ const FloatingWindow: React.FC = () => {
             </div>
           </div>
         </div>
-
         {/* START: Progress Bar */}
         {timer.storyPoints && timer.storyPoints > 0 && estimatedTimeMs > 0 && (
           <div className="w-full bg-gray-200 rounded-full h-2.5 my-2 dark:bg-gray-700">
@@ -622,10 +631,20 @@ const FloatingWindow: React.FC = () => {
             ></div>
           </div>
         )}
-        {/* END: Progress Bar */}
-
+        {/* END: Progress Bar */}{" "}
         <div className="grid grid-cols-2 gap-1 mt-3">
-          {timer.isRunning && timer.status === "running" ? (
+          {" "}
+          {timer.status === "queue" ? (
+            <>
+              <button
+                onClick={() => handleTimerAction("start", timer.ticketNumber)}
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
+              >
+                Start Timer
+              </button>
+              {/* No Complete/Stop buttons for queued tasks */}
+            </>
+          ) : timer.isRunning && timer.status === "running" ? (
             <>
               <button
                 onClick={() => handleTimerAction("pause", timer.ticketNumber)}
@@ -677,24 +696,29 @@ const FloatingWindow: React.FC = () => {
             >
               Start New Session
             </button>
-          ) : null}
-
-          {timer.status !== "completed" && timer.status !== "stopped" && (
-            <button
-              onClick={() => handleTimerAction("complete", timer.ticketNumber)}
-              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
-            >
-              Complete
-            </button>
-          )}
-          {timer.status !== "completed" && timer.status !== "stopped" && (
-            <button
-              onClick={() => handleTimerAction("stop", timer.ticketNumber)}
-              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
-            >
-              Stop
-            </button>
-          )}
+          ) : null}{" "}
+          {timer.status !== "completed" &&
+            timer.status !== "stopped" &&
+            timer.status !== "queue" && (
+              <button
+                onClick={() =>
+                  handleTimerAction("complete", timer.ticketNumber)
+                }
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+              >
+                Complete
+              </button>
+            )}
+          {timer.status !== "completed" &&
+            timer.status !== "stopped" &&
+            timer.status !== "queue" && (
+              <button
+                onClick={() => handleTimerAction("stop", timer.ticketNumber)}
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+              >
+                Stop
+              </button>
+            )}
         </div>
         {timer.sessions.length > 0 && (
           <div className="mt-2 pt-2 border-t border-gray-200">

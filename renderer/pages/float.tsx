@@ -1,7 +1,6 @@
 // renderer/pages/float.tsx
-import React, { useEffect, useState, useRef } from "react";
-import { useDispatch } from "react-redux";
-import { saveSession } from "../store/sessionsSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { useSharedData } from "../hooks/useSharedData";
 
 export interface TaskTimer {
   ticketNumber: string;
@@ -21,7 +20,7 @@ export interface TaskTimer {
 }
 
 const FloatingWindow: React.FC = () => {
-  const dispatch = useDispatch();
+  const { saveSession } = useSharedData();
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [timers, setTimers] = useState<TaskTimer[]>([]);
@@ -94,15 +93,14 @@ const FloatingWindow: React.FC = () => {
             };
 
             // Save to Redux
-            dispatch(
-              saveSession({
-                ticketNumber: timer.ticketNumber,
-                ticketName: timer.ticketName,
-                storyPoints: timer.storyPoints,
-                sessions: updatedTimer.sessions,
-                totalElapsed: updatedTimer.totalElapsed,
-              })
-            );
+
+            saveSession({
+              ticketNumber: timer.ticketNumber,
+              ticketName: timer.ticketName,
+              storyPoints: timer.storyPoints,
+              sessions: updatedTimer.sessions,
+              totalElapsed: updatedTimer.totalElapsed,
+            });
 
             return updatedTimer;
           }
@@ -234,15 +232,14 @@ const FloatingWindow: React.FC = () => {
         };
 
         // Save to Redux
-        dispatch(
-          saveSession({
-            ticketNumber: timer.ticketNumber,
-            ticketName: timer.ticketName,
-            storyPoints: timer.storyPoints,
-            sessions: newSessions,
-            totalElapsed: timer.totalElapsed,
-          })
-        );
+
+        saveSession({
+          ticketNumber: timer.ticketNumber,
+          ticketName: timer.ticketName,
+          storyPoints: timer.storyPoints,
+          sessions: newSessions,
+          totalElapsed: timer.totalElapsed,
+        });
 
         return updatedTimer;
       })

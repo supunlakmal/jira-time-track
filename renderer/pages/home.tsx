@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { useJiraData } from "../hooks/useJiraData";
+import { useSharedData } from "../hooks/useSharedData";
 
 interface ProjectSummary {
   name: string;
@@ -13,7 +13,7 @@ interface ProjectSummary {
 }
 
 export default function HomePage() {
-  const { data, loading, error, refreshData } = useJiraData();
+  const { jiraData: data, loading } = useSharedData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
@@ -233,17 +233,19 @@ export default function HomePage() {
 
           {loading ? (
             <LoadingSpinner />
-          ) : error ? (
-            <div className="p-8 text-center">
-              <p className="text-red-500 mb-4">{error}</p>
-              <button
-                onClick={refreshData}
-                className="text-blue-500 hover:text-blue-700"
-              >
-                Try Again
-              </button>
-            </div>
           ) : (
+            // : error ? (
+            //   <div className="p-8 text-center">
+            //     {/* <p className="text-red-500 mb-4">{error}</p> */}
+            //     <button
+            //       // onClick={refreshData}
+            //       className="text-blue-500 hover:text-blue-700"
+            //     >
+            //       Try Again
+            //     </button>
+            //   </div>
+            // )
+
             <>
               {/* Project Summary Table */}
               {projectSummaryData.length > 0 && (
@@ -385,7 +387,7 @@ export default function HomePage() {
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 />
                 <button
-                  onClick={refreshData}
+                  // onClick={refreshData}
                   disabled={loading}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
                 >

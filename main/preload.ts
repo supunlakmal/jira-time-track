@@ -11,11 +11,20 @@ const validChannels = [
   "stop-task",
   "toggle-float-window",
   "load-jira-data",
+  "get-project-paths",
+  "save-project-paths",
+  "select-project-directory",
+  "get-current-branch",
+  "run-github-action",
   // Add any other channels your application might use between renderer and main
   "task-started", // For main-to-renderer
   "task-paused", // For main-to-renderer
   "task-resumed", // For main-to-renderer
   "task-stopped", // For main-to-renderer
+  "get-sessions",
+  "save-session",
+  "sessions-updated",
+  "jira-data-updated",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;
@@ -25,7 +34,6 @@ const originalIpcRendererRemoveListener = ipcRenderer.removeListener;
 
 const handler = {
   send(channel: string, ...args: any[]) {
-    // Use rest parameter for args
     if (validChannels.includes(channel)) {
       console.log(`[IPC PRELOAD SEND] Channel: "${channel}"`, "Args:", args);
       if (channel === "load-jira-data") {
@@ -56,6 +64,37 @@ const handler = {
       console.warn(`[IPC PRELOAD SEND BLOCKED] Invalid channel: "${channel}"`);
     }
   },
+
+  invoke(channel: string, ...args: any[]) {
+    if (validChannels.includes(channel)) {
+      console.log(`[IPC PRELOAD INVOKE] Channel: "${channel}"`, "Args:", args);
+      const promise = originalIpcRendererInvoke.apply(ipcRenderer, [
+        channel,
+        ...args,
+      ]);
+      promise.then(
+        (result) =>
+          console.log(
+            `[IPC PRELOAD INVOKE SUCCESS] Channel: "${channel}"`,
+            "Result:",
+            result
+          ),
+        (error) =>
+          console.error(
+            `[IPC PRELOAD INVOKE ERROR] Channel: "${channel}"`,
+            "Error:",
+            error
+          )
+      );
+      return promise;
+    } else {
+      console.warn(
+        `[IPC PRELOAD INVOKE BLOCKED] Invalid channel: "${channel}"`
+      );
+      return Promise.reject(new Error(`Invalid channel: ${channel}`));
+    }
+  },
+
   on(channel: string, callback: (...args: any[]) => void) {
     if (validChannels.includes(channel)) {
       console.log(

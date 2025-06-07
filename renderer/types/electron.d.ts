@@ -1,3 +1,5 @@
+// renderer/types/electron.d.ts
+
 export interface JiraTicket {
   ticket_number: string;
   ticket_name: string;
@@ -10,6 +12,15 @@ export interface TaskTimer {
   startTime: number;
   elapsedTime: number;
   isRunning: boolean;
+  status: "running" | "paused" | "hold" | "completed" | "stopped";
+  totalElapsed: number;
+  sessions: Array<{
+    startTime: number;
+    endTime?: number;
+    duration: number;
+    status: string;
+  }>;
+  storyPoints?: number;
 }
 
 export interface IpcHandler {
@@ -19,16 +30,48 @@ export interface IpcHandler {
     value: { movementX: number; movementY: number }
   ): void;
   send(channel: "window-resize", value: { height: number }): void;
-  send(channel: "start-task", value: { ticket: string; name: string }): void; // Updated: now sends name too
+  send(
+    channel: "start-task",
+    value: { ticket: string; name: string; storyPoints?: number }
+  ): void;
   send(channel: "pause-task", value: { ticket: string }): void;
   send(channel: "resume-task", value: { ticket: string }): void;
   send(channel: "stop-task", value: { ticket: string }): void;
   send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  send(channel: "delete-task", value: { ticket: string }): void;
+  send(channel: "save-project-paths", value: Record<string, string>): void;
+  send(
+    channel: "run-github-action",
+    value: { projectName: string; projectPath: string }
+  ): void;
+
+  // Add invoke method
+  invoke(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  invoke(channel: "get-project-paths"): Promise<Record<string, string>>;
+  invoke(
+    channel: "select-project-directory",
+    projectName: string
+  ): Promise<{
+    canceled?: boolean;
+    filePath?: string;
+    error?: string;
+  }>;
+  invoke(
+    channel: "get-current-branch",
+    data: { projectName: string; projectPath: string }
+  ): Promise<{
+    branch?: string;
+    error?: string;
+  }>;
 
   on(
     channel: "task-started",
-    listener: (data: { ticketNumber: string; ticketName: string }) => void
-  ): () => void; // Updated: receives an object
+    listener: (data: {
+      ticketNumber: string;
+      ticketName: string;
+      storyPoints?: number;
+    }) => void
+  ): () => void;
   on(
     channel: "task-paused",
     listener: (ticketNumber: string) => void

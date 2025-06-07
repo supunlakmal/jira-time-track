@@ -286,15 +286,45 @@ ipcMain.handle("select-project-directory", async (_, projectName) => {
   }
 });
 
-ipcMain.handle("get-current-branch", async (_, projectPath) => {
-  if (!projectPath) {
+// ==================== FIXED GET-CURRENT-BRANCH HANDLER ====================
+ipcMain.handle("get-current-branch", async (_, data) => {
+  // Handle both old format (just string) and new format (object)
+  let projectPath: string;
+  let projectName: string;
+
+  if (typeof data === "string") {
+    // Legacy format: just projectPath
+    projectPath = data;
+    projectName = "Unknown";
+  } else if (data && typeof data === "object") {
+    // New format: { projectName, projectPath }
+    projectPath = data.projectPath;
+    projectName = data.projectName || "Unknown";
+  } else {
+    return { error: "Invalid parameters provided" };
+  }
+
+  if (!projectPath || typeof projectPath !== "string") {
+    console.error(`Invalid project path for ${projectName}:`, projectPath);
     return { error: "No project path provided" };
   }
+
+  // Check if the directory exists
+  if (!fs.existsSync(projectPath)) {
+    console.error(
+      `Project path does not exist for ${projectName}: ${projectPath}`
+    );
+    return { error: "Project path does not exist" };
+  }
+
+  console.log(
+    `Getting current branch for ${projectName} at path: ${projectPath}`
+  );
 
   try {
     return new Promise((resolve) => {
       const gitProcess = spawn("git", ["branch", "--show-current"], {
-        cwd: projectPath,
+        cwd: projectPath, // Now correctly passing the string path
         stdio: ["ignore", "pipe", "pipe"],
       });
 
@@ -311,17 +341,37 @@ ipcMain.handle("get-current-branch", async (_, projectPath) => {
 
       gitProcess.on("close", (code) => {
         if (code === 0) {
-          resolve({ branch: output.trim() });
+          const branch = output.trim();
+          if (branch) {
+            console.log(`Current branch for ${projectName}: ${branch}`);
+            resolve({ branch });
+          } else {
+            console.warn(`No branch found for ${projectName}`);
+            resolve({ error: "No branch found or not a git repository" });
+          }
         } else {
+          console.error(`Git command failed for ${projectName}:`, error.trim());
           resolve({ error: error.trim() || "Git command failed" });
         }
       });
 
       gitProcess.on("error", (err) => {
-        resolve({ error: err.message });
+        console.error(
+          `Error running git command for ${projectName}:`,
+          err.message
+        );
+        resolve({ error: `Failed to run git: ${err.message}` });
       });
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        gitProcess.kill();
+        console.warn(`Git command timeout for ${projectName}`);
+        resolve({ error: "Git command timeout" });
+      }, 10000);
     });
   } catch (error) {
+    console.error(`Exception in get-current-branch for ${projectName}:`, error);
     return { error: error.message };
   }
 });

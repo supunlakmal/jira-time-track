@@ -11,8 +11,10 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
     "electron-serve": "^1.3.0",
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.16",

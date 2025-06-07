@@ -1,5 +1,7 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useState, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { saveSession } from "../store/sessionsSlice";
 
 export interface TaskTimer {
   ticketNumber: string;
@@ -19,6 +21,7 @@ export interface TaskTimer {
 }
 
 const FloatingWindow: React.FC = () => {
+  const dispatch = useDispatch();
   const [isDragging, setIsDragging] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [timers, setTimers] = useState<TaskTimer[]>([]);
@@ -79,7 +82,7 @@ const FloatingWindow: React.FC = () => {
         prevTimers.map((timer) => {
           if (timer.isRunning && timer.status === "running") {
             const newElapsedSegmentTime = timer.elapsedTime + 1000;
-            return {
+            const updatedTimer = {
               ...timer,
               elapsedTime: newElapsedSegmentTime,
               totalElapsed: timer.totalElapsed + 1000,
@@ -89,6 +92,19 @@ const FloatingWindow: React.FC = () => {
                   : session
               ),
             };
+
+            // Save to Redux
+            dispatch(
+              saveSession({
+                ticketNumber: timer.ticketNumber,
+                ticketName: timer.ticketName,
+                storyPoints: timer.storyPoints,
+                sessions: updatedTimer.sessions,
+                totalElapsed: updatedTimer.totalElapsed,
+              })
+            );
+
+            return updatedTimer;
           }
           return timer;
         })
@@ -209,13 +225,26 @@ const FloatingWindow: React.FC = () => {
             newStatus = "stopped";
             break;
         }
-        return {
+        const updatedTimer = {
           ...timer,
           isRunning: newIsRunning,
           status: newStatus,
           elapsedTime: newElapsedTime,
           sessions: newSessions,
         };
+
+        // Save to Redux
+        dispatch(
+          saveSession({
+            ticketNumber: timer.ticketNumber,
+            ticketName: timer.ticketName,
+            storyPoints: timer.storyPoints,
+            sessions: newSessions,
+            totalElapsed: timer.totalElapsed,
+          })
+        );
+
+        return updatedTimer;
       })
     );
 

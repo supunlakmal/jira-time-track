@@ -9,6 +9,7 @@ import { spawn } from "child_process";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
 
 // Store for project paths
 const projectPathsStore = new Store<Record<string, string>>({
@@ -16,6 +17,80 @@ const projectPathsStore = new Store<Record<string, string>>({
   defaults: {},
 });
 
+// ==================== CENTRALIZED DATA MANAGER ====================
+interface AppData {
+  sessions: { [ticketNumber: string]: any };
+  jiraData: any[];
+}
+
+class DataManager {
+  private store = new Store<AppData>({
+    name: "app-data",
+    defaults: { sessions: {}, jiraData: [] },
+  });
+
+  private windows: Set<BrowserWindow> = new Set();
+
+  registerWindow(window: BrowserWindow) {
+    this.windows.add(window);
+
+    // Clean up when window is closed
+    window.on("closed", () => {
+      this.windows.delete(window);
+    });
+  }
+
+  // Sync data to all windows
+  private broadcast(channel: string, data: any) {
+    this.windows.forEach((window) => {
+      if (!window.isDestroyed()) {
+        window.webContents.send(channel, data);
+      }
+    });
+  }
+
+  // Session methods
+  saveSession(sessionData: any) {
+    const sessions = this.store.get("sessions");
+    sessions[sessionData.ticketNumber] = sessionData;
+    this.store.set("sessions", sessions);
+    this.broadcast("sessions-updated", sessions);
+    console.log(`DataManager: Session saved for ${sessionData.ticketNumber}`);
+  }
+
+  getSessions() {
+    return this.store.get("sessions");
+  }
+
+  // Jira data methods
+  setJiraData(data: any[]) {
+    this.store.set("jiraData", data);
+    this.broadcast("jira-data-updated", data);
+    console.log(`DataManager: Jira data updated with ${data.length} tickets`);
+  }
+
+  getJiraData() {
+    return this.store.get("jiraData");
+  }
+
+  // Load initial Jira data from file
+  async loadInitialJiraData() {
+    try {
+      const dataPath = path.join(__dirname, "../json/data.json");
+      const rawData = await fs.promises.readFile(dataPath, "utf8");
+      const jiraData = JSON.parse(rawData);
+      this.setJiraData(jiraData);
+      return jiraData;
+    } catch (error) {
+      console.error("Error loading initial Jira data:", error);
+      return [];
+    }
+  }
+}
+
+const dataManager = new DataManager();
+
+// ==================== ELECTRON SETUP ====================
 if (isProd) {
   serve({ directory: "app" });
 } else {
@@ -44,12 +119,14 @@ const createFloatingWindow = async () => {
     },
   });
 
+  // Register with data manager
+  dataManager.registerWindow(floatingWindow);
+
   if (isProd) {
     await floatingWindow.loadURL("app://./float");
   } else {
     const port = process.argv[2];
     await floatingWindow.loadURL(`http://localhost:${port}/float`);
-    // floatingWindow.webContents.openDevTools(); // Keep this commented out for default behavior
   }
 
   floatingWindow.once("ready-to-show", () => {
@@ -67,7 +144,7 @@ const createFloatingWindow = async () => {
 (async () => {
   await app.whenReady();
 
-  const mainWindow = createWindow("main", {
+  mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     webPreferences: {
@@ -77,19 +154,13 @@ const createFloatingWindow = async () => {
     },
   });
 
-  await createFloatingWindow();
+  // Register main window with data manager
+  dataManager.registerWindow(mainWindow);
 
-  // Remove the automatic showing and dev tools opening for floatingWindow
-  // It will be controlled by the toggle button or other interactions
-  // setTimeout(() => {
-  //   if (floatingWindow) {
-  //     floatingWindow.show();
-  //     floatingWindow.focus();
-  //     if (!isProd) {
-  //       floatingWindow.webContents.openDevTools();
-  //     }
-  //   }
-  // }, 2000);
+  // Load initial data
+  await dataManager.loadInitialJiraData();
+
+  await createFloatingWindow();
 
   if (isProd) {
     await mainWindow.loadURL("app://./home");
@@ -104,6 +175,7 @@ app.on("window-all-closed", () => {
   app.quit();
 });
 
+// ==================== WINDOW CONTROL IPC ====================
 ipcMain.on("toggle-float-window", () => {
   if (floatingWindow?.isVisible()) {
     floatingWindow.hide();
@@ -121,27 +193,21 @@ ipcMain.on("toggle-float-window", () => {
   }
 });
 
-// This IPC channel seems unused for now, but kept for potential future use.
-ipcMain.on("message", async (event, arg) => {
-  event.reply("message", `${arg} World!`);
-});
-
 ipcMain.on("window-control", (_, command) => {
   if (!floatingWindow) return;
 
   switch (command) {
-    case "minimize": // This will now be handled by the resize logic in float.tsx
-      // floatingWindow.minimize(); // Actual minimize might not be desired
-      // Instead, float.tsx will send a resize command
+    case "minimize":
+      // This will now be handled by the resize logic in float.tsx
       break;
-    case "maximize": // Standard maximize/unmaximize
+    case "maximize":
       if (floatingWindow.isMaximized()) {
         floatingWindow.unmaximize();
       } else {
         floatingWindow.maximize();
       }
       break;
-    case "close": // This actually means 'hide' for the float window
+    case "close":
     case "hide":
       floatingWindow.hide();
       break;
@@ -167,166 +233,199 @@ ipcMain.on("window-resize", (_, { height }) => {
   }
 });
 
+// ==================== CENTRALIZED DATA IPC HANDLERS ====================
+// Replace old load-jira-data handler
 ipcMain.handle("load-jira-data", async () => {
-  try {
-    const dataPath = path.join(__dirname, "../json/data.json"); // Adjusted path
-    const rawData = await fs.promises.readFile(dataPath, "utf8");
-    return JSON.parse(rawData);
-  } catch (error) {
-    console.error("Error loading data:", error);
-    return [];
-  }
+  return dataManager.getJiraData();
 });
 
-// Project paths storage handlers
-ipcMain.handle("get-project-paths", async () => {
-  try {
-    return projectPathsStore.store;
-  } catch (error) {
-    console.error("Error getting project paths:", error);
-    return {};
-  }
+// New centralized data handlers
+ipcMain.handle("get-sessions", () => {
+  return dataManager.getSessions();
 });
 
-ipcMain.on("save-project-paths", (event, paths: Record<string, string>) => {
-  try {
-    projectPathsStore.store = paths;
-    console.log("Project paths saved:", paths);
-  } catch (error) {
-    console.error("Error saving project paths:", error);
-  }
+ipcMain.on("save-session", (_, sessionData) => {
+  dataManager.saveSession(sessionData);
 });
 
-// Directory selection handler
-ipcMain.handle(
-  "select-project-directory",
-  async (event, projectName: string) => {
-    try {
-      const result = await dialog.showOpenDialog({
-        title: `Select directory for ${projectName}`,
-        properties: ["openDirectory"],
-        message: `Choose the local directory for project: ${projectName}`,
-      });
+ipcMain.handle("refresh-jira-data", async () => {
+  return await dataManager.loadInitialJiraData();
+});
 
-      if (result.canceled) {
-        return { canceled: true };
-      }
+// ==================== PROJECT PATHS IPC ====================
+ipcMain.handle("get-project-paths", () => {
+  return projectPathsStore.store;
+});
 
-      if (result.filePaths && result.filePaths.length > 0) {
-        return { filePath: result.filePaths[0] };
-      }
-
-      return { error: "No directory selected" };
-    } catch (error) {
-      console.error("Error in select-project-directory:", error);
-      return { error: error.message };
-    }
-  }
-);
-
-// Git current branch handler
-ipcMain.handle(
-  "get-current-branch",
-  async (event, { projectName, projectPath }) => {
-    return new Promise((resolve) => {
-      try {
-        const gitProcess = spawn("git", ["branch", "--show-current"], {
-          cwd: projectPath,
-          stdio: ["ignore", "pipe", "pipe"],
-        });
-
-        let stdout = "";
-        let stderr = "";
-
-        gitProcess.stdout.on("data", (data) => {
-          stdout += data.toString();
-        });
-
-        gitProcess.stderr.on("data", (data) => {
-          stderr += data.toString();
-        });
-
-        gitProcess.on("close", (code) => {
-          if (code === 0) {
-            const branch = stdout.trim();
-            if (branch) {
-              console.log(`Current branch for ${projectName}: ${branch}`);
-              resolve({ branch });
-            } else {
-              console.warn(`No branch found for ${projectName}`);
-              resolve({ error: "No branch found" });
-            }
-          } else {
-            console.error(`Git command failed for ${projectName}:`, stderr);
-            resolve({
-              error: `Git command failed: ${stderr.trim() || "Unknown error"}`,
-            });
-          }
-        });
-
-        gitProcess.on("error", (error) => {
-          console.error(`Error running git command for ${projectName}:`, error);
-          resolve({ error: `Failed to run git: ${error.message}` });
-        });
-
-        // Timeout after 5 seconds
-        setTimeout(() => {
-          gitProcess.kill();
-          resolve({ error: "Git command timeout" });
-        }, 5000);
-      } catch (error) {
-        console.error(
-          `Exception in get-current-branch for ${projectName}:`,
-          error
-        );
-        resolve({ error: error.message });
-      }
+ipcMain.on("save-project-paths", (_, paths) => {
+  if (paths && typeof paths === "object") {
+    Object.entries(paths).forEach(([key, value]) => {
+      projectPathsStore.set(key, value as string);
     });
   }
-);
-
-// GitHub Action trigger handler (kept for future use)
-ipcMain.on("run-github-action", (event, { projectName, projectPath }) => {
-  console.log(
-    `Attempting to run GitHub Action for ${projectName} at ${projectPath}`
-  );
-  // You can implement the actual GitHub Action triggering logic here
-  // This might involve:
-  // 1. Running git commands in the project directory
-  // 2. Making API calls to GitHub Actions
-  // 3. Running local scripts that trigger actions
-
-  // For now, just log the attempt
-  console.log("GitHub Action trigger requested but not implemented yet");
-
-  // Example implementation (uncomment and modify as needed):
-  /*
-  const gitProcess = spawn('git', ['status'], { 
-    cwd: projectPath,
-    stdio: 'inherit'
-  });
-  
-  gitProcess.on('close', (code) => {
-    console.log(`Git command exited with code ${code}`);
-  });
-  
-  gitProcess.on('error', (error) => {
-    console.error(`Error running git command: ${error}`);
-  });
-  */
 });
 
-// Timer event handlers
-ipcMain.on("start-task", (event, { ticket, name, storyPoints }) => {
-  // Added storyPoints
-  if (floatingWindow) {
-    console.log(
-      `Main: Received start-task for ${ticket} - ${name} (SP: ${storyPoints}). Forwarding to float.`
+ipcMain.handle("select-project-directory", async (_, projectName) => {
+  try {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory"],
+      title: `Select directory for ${projectName}`,
+    });
+
+    if (result.canceled || !result.filePaths.length) {
+      return { canceled: true };
+    }
+
+    const filePath = result.filePaths[0];
+    projectPathsStore.set(projectName, filePath);
+
+    return { filePath };
+  } catch (error) {
+    console.error("Error in select-project-directory:", error);
+    return { error: error.message };
+  }
+});
+
+// ==================== FIXED GET-CURRENT-BRANCH HANDLER ====================
+ipcMain.handle("get-current-branch", async (_, data) => {
+  // Handle both old format (just string) and new format (object)
+  let projectPath: string;
+  let projectName: string;
+
+  if (typeof data === "string") {
+    // Legacy format: just projectPath
+    projectPath = data;
+    projectName = "Unknown";
+  } else if (data && typeof data === "object") {
+    // New format: { projectName, projectPath }
+    projectPath = data.projectPath;
+    projectName = data.projectName || "Unknown";
+  } else {
+    return { error: "Invalid parameters provided" };
+  }
+
+  if (!projectPath || typeof projectPath !== "string") {
+    console.error(`Invalid project path for ${projectName}:`, projectPath);
+    return { error: "No project path provided" };
+  }
+
+  // Check if the directory exists
+  if (!fs.existsSync(projectPath)) {
+    console.error(
+      `Project path does not exist for ${projectName}: ${projectPath}`
     );
+    return { error: "Project path does not exist" };
+  }
+
+  console.log(
+    `Getting current branch for ${projectName} at path: ${projectPath}`
+  );
+
+  try {
+    return new Promise((resolve) => {
+      const gitProcess = spawn("git", ["branch", "--show-current"], {
+        cwd: projectPath, // Now correctly passing the string path
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let output = "";
+      let error = "";
+
+      gitProcess.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+
+      gitProcess.stderr.on("data", (data) => {
+        error += data.toString();
+      });
+
+      gitProcess.on("close", (code) => {
+        if (code === 0) {
+          const branch = output.trim();
+          if (branch) {
+            console.log(`Current branch for ${projectName}: ${branch}`);
+            resolve({ branch });
+          } else {
+            console.warn(`No branch found for ${projectName}`);
+            resolve({ error: "No branch found or not a git repository" });
+          }
+        } else {
+          console.error(`Git command failed for ${projectName}:`, error.trim());
+          resolve({ error: error.trim() || "Git command failed" });
+        }
+      });
+
+      gitProcess.on("error", (err) => {
+        console.error(
+          `Error running git command for ${projectName}:`,
+          err.message
+        );
+        resolve({ error: `Failed to run git: ${err.message}` });
+      });
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        gitProcess.kill();
+        console.warn(`Git command timeout for ${projectName}`);
+        resolve({ error: "Git command timeout" });
+      }, 10000);
+    });
+  } catch (error) {
+    console.error(`Exception in get-current-branch for ${projectName}:`, error);
+    return { error: error.message };
+  }
+});
+
+ipcMain.handle("run-github-action", async (_, { projectPath, actionName }) => {
+  if (!projectPath || !actionName) {
+    return { error: "Missing project path or action name" };
+  }
+
+  try {
+    return new Promise((resolve) => {
+      const ghProcess = spawn("gh", ["workflow", "run", actionName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let output = "";
+      let error = "";
+
+      ghProcess.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+
+      ghProcess.stderr.on("data", (data) => {
+        error += data.toString();
+      });
+
+      ghProcess.on("close", (code) => {
+        if (code === 0) {
+          resolve({ success: true, output: output.trim() });
+        } else {
+          resolve({ error: error.trim() || "GitHub CLI command failed" });
+        }
+      });
+
+      ghProcess.on("error", (err) => {
+        resolve({ error: err.message });
+      });
+    });
+  } catch (error) {
+    return { error: error.message };
+  }
+});
+
+// ==================== TASK MANAGEMENT IPC ====================
+ipcMain.on("start-task", (event, { ticket, name, storyPoints }) => {
+  console.log(
+    `Main: Received start-task for ${ticket} (${name}) with ${storyPoints} SP. Forwarding to float.`
+  );
+  if (floatingWindow) {
     floatingWindow.webContents.send("task-started", {
       ticketNumber: ticket,
       ticketName: name,
-      storyPoints: storyPoints, // Forward storyPoints
+      storyPoints: storyPoints,
     });
   }
 });
@@ -354,4 +453,9 @@ ipcMain.on("stop-task", (event, { ticket }) => {
 ipcMain.on("delete-task", (event, { ticket }) => {
   console.log(`Main: Received delete-task for ${ticket}.`);
   // Potentially log this or update some other state if needed in main
+});
+
+// Legacy IPC channel (kept for compatibility)
+ipcMain.on("message", async (event, arg) => {
+  event.reply("message", `${arg} World!`);
 });

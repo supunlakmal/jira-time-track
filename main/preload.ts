@@ -21,6 +21,10 @@ const validChannels = [
   "task-paused", // For main-to-renderer
   "task-resumed", // For main-to-renderer
   "task-stopped", // For main-to-renderer
+  "get-sessions",
+  "save-session",
+  "sessions-updated",
+  "jira-data-updated",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;

@@ -2,9 +2,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
 import { useIdleDetection } from "../hooks/useIdleDetection";
-import { useBreakTimer } from "../hooks/useBreakTimer";
-import { BreakReminder } from "../components/BreakReminder";
-import { BreakSettingsDialog } from "../components/BreakSettings";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
 export interface TaskTimer {
@@ -38,19 +35,6 @@ const FloatingWindow: React.FC = () => {
     idleTime: 5 * 60 * 1000, // 5 minutes default
   });
   const [pausedDueToIdle, setPausedDueToIdle] = useState<Set<string>>(new Set());
-  const [showBreakSettings, setShowBreakSettings] = useState(false);
-  
-  // Check if user is actively working
-  const isActivelyWorking = timers.some(t => t.isRunning && t.status === 'running');
-  
-  // Break timer integration
-  const {
-    settings: breakSettings,
-    setSettings: setBreakSettings,
-    state: breakState,
-    actions: breakActions,
-    formatTime: formatBreakTime
-  } = useBreakTimer(isActivelyWorking);
 
   // Keyboard shortcuts
   useFloatingWindowShortcuts({
@@ -65,8 +49,7 @@ const FloatingWindow: React.FC = () => {
           handleTimerAction('resume', pausedTimer.ticketNumber);
         }
       }
-    },
-    onShowBreakSettings: () => setShowBreakSettings(true)
+    }
   });
 
   // Idle detection handlers
@@ -237,7 +220,7 @@ const FloatingWindow: React.FC = () => {
               ...newSessions[lastSessionIndex],
               endTime: actionTime,
               duration: timer.elapsedTime,
-              status: action,
+              status: action === "complete" ? "completed" : action,
             };
           } else if (
             !timer.isRunning &&
@@ -309,7 +292,6 @@ const FloatingWindow: React.FC = () => {
         };
 
         // Save to Redux
-
         saveSession({
           ticketNumber: timer.ticketNumber,
           ticketName: timer.ticketName,
@@ -869,16 +851,6 @@ const FloatingWindow: React.FC = () => {
                 ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
                 : ""}
             </div>
-            {breakSettings.enabled && !breakState.isOnBreak && isActivelyWorking && (
-              <div className="text-xs text-gray-300">
-                Break in: {formatBreakTime(breakState.timeUntilBreak)}
-              </div>
-            )}
-            {breakState.isOnBreak && (
-              <div className="text-xs text-green-300">
-                {breakState.breakType === 'long' ? 'Long' : 'Short'} Break: {formatBreakTime(breakState.breakTimeRemaining)}
-              </div>
-            )}
           </div>
           <div className="flex space-x-2">
             <button
@@ -892,45 +864,6 @@ const FloatingWindow: React.FC = () => {
         </div>
 
         <div className="p-4 overflow-y-auto flex-grow">
-            {/* Break Status Banner */}
-            {breakState.isOnBreak && (
-              <div className="mb-3 p-2 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-green-600">
-                      {breakState.breakType === 'long' ? 'Long' : 'Short'}
-                    </span>
-                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                      {breakState.breakType === 'long' ? 'Long' : 'Short'} Break
-                    </span>
-                  </div>
-                  <div className="text-sm text-green-700 dark:text-green-300 font-mono">
-                    {formatBreakTime(breakState.breakTimeRemaining)}
-                  </div>
-                </div>
-                <button
-                  onClick={breakActions.endBreak}
-                  className="mt-2 w-full text-xs bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white py-1 px-2 rounded"
-                >
-                  End Break Early
-                </button>
-              </div>
-            )}
-            
-            {/* Break Settings Quick Access */}
-            {breakSettings.enabled && !breakState.isOnBreak && isActivelyWorking && (
-              <div className="mb-3 flex justify-between items-center text-xs text-gray-500">
-                <span>
-                  Next break: {formatBreakTime(breakState.timeUntilBreak)}
-                </span>
-                <button
-                  onClick={() => setShowBreakSettings(true)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  Settings
-                </button>
-              </div>
-            )}
             {selectedTicketNumber && currentTimerDetails ? (
               renderTimerDetail(currentTimerDetails)
             ) : selectedTicketNumber && !currentTimerDetails ? (
@@ -1020,23 +953,6 @@ const FloatingWindow: React.FC = () => {
               </div>
             )}
           </div>
-        
-        {/* Break Reminder */}
-        <BreakReminder
-          isVisible={breakState.showBreakReminder}
-          breakType={breakState.breakType}
-          onStartBreak={() => breakActions.startBreak(breakState.breakType!)}
-          onSkipBreak={breakActions.skipBreak}
-          onSettings={() => setShowBreakSettings(true)}
-        />
-        
-        {/* Break Settings */}
-        <BreakSettingsDialog
-          isOpen={showBreakSettings}
-          onClose={() => setShowBreakSettings(false)}
-          settings={breakSettings}
-          onSave={setBreakSettings}
-        />
       </div>
     </div>
   );

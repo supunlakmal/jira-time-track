@@ -2,12 +2,12 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
-import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ExportDialog } from "../components/ExportDialog";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { TimeGoalsWidget } from "../components/TimeGoalsWidget";
-import { useSharedData } from "../hooks/useSharedData";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useSharedData } from "../hooks/useSharedData";
+import { TimerSession } from "../store/sessionsSlice";
 
 interface ProjectSummary {
   name: string;
@@ -46,7 +46,6 @@ export default function HomePage() {
     Record<string, string>
   >({});
   const [showExportDialog, setShowExportDialog] = useState(false);
-
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -158,16 +157,19 @@ export default function HomePage() {
       (sum, ticket) => sum + (ticket.story_points || 0),
       0
     );
-    const totalTimeTracked = Object.values(sessions).reduce(
-      (sum, session) => sum + (session.totalElapsed || 0),
-      0
-    );
+    const totalTimeTracked: number = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).reduce((sum, session) => sum + (session.totalElapsed || 0), 0);
 
-    const completedTickets = Object.values(sessions).filter((session) =>
+    const completedTickets = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).filter((session) =>
       session.sessions.some((s) => s.status === "completed")
     ).length;
 
-    const inProgressTickets = Object.values(sessions).filter((session) =>
+    const inProgressTickets = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).filter((session) =>
       session.sessions.some(
         (s) => s.status === "running" || s.status === "paused"
       )
@@ -298,7 +300,7 @@ export default function HomePage() {
     onRefreshData: () => {
       // Refresh data functionality
       window.location.reload();
-    }
+    },
   });
 
   const handleProjectSelect = (projectName: string | null) => {
@@ -396,14 +398,14 @@ export default function HomePage() {
                 className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg transition-colors"
                 title="Minimize to system tray"
               >
-Minimize to Tray
+                Minimize to Tray
               </button>
               <button
                 onClick={() => setShowExportDialog(true)}
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
                 title="Export time tracking data"
               >
-Export Data
+                Export Data
               </button>
               <ThemeToggle size="md" />
             </div>
@@ -600,7 +602,7 @@ Export Data
               </div>
 
               {/* Time Goals Widget */}
-              <TimeGoalsWidget sessions={sessions} className="mb-8" />
+              {/* <TimeGoalsWidget sessions={sessions} className="mb-8" /> */}
 
               {/* Enhanced Project Summary Table */}
               {projectSummaryData.length > 0 && (
@@ -1092,12 +1094,12 @@ Export Data
             </>
           )}
         </div>
-        
+
         {/* Export Dialog */}
         <ExportDialog
           isOpen={showExportDialog}
           onClose={() => setShowExportDialog(false)}
-          projects={projectSummaryData.map(p => p.name)}
+          projects={projectSummaryData.map((p) => p.name)}
         />
       </div>
     </React.Fragment>

@@ -614,11 +614,11 @@ const FloatingWindow: React.FC = () => {
   const renderTimerDetail = (timer: TaskTimer | undefined) => {
     if (!timer) {
       return (
-        <div className="p-4 text-center text-gray-500">
+        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
           Timer details not available.
           <button
             onClick={() => setSelectedTicketNumber(null)}
-            className="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded text-sm"
+            className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
           >
             Back to Grid
           </button>
@@ -678,7 +678,7 @@ const FloatingWindow: React.FC = () => {
           {/* Reduced mb */}
           <div className="flex-1 mr-3">
             <h3
-              className="font-medium text-gray-900 text-sm truncate"
+              className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate"
               title={timer.ticketNumber}
             >
               {timer.ticketNumber}
@@ -691,7 +691,7 @@ const FloatingWindow: React.FC = () => {
             </p>
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="text-lg font-mono font-medium text-gray-900">
+            <div className="text-lg font-mono font-medium text-gray-900 dark:text-gray-100">
               {formatTime(timer.totalElapsed)}
             </div>
             <div className="text-xs text-gray-400">
@@ -817,9 +817,9 @@ const FloatingWindow: React.FC = () => {
             )}
         </div>
         {timer.sessions.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-200">
+          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
             <details className="text-xs">
-              <summary className="cursor-pointer text-gray-600 hover:text-gray-800">
+              <summary className="cursor-pointer text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">
                 {timer.sessions.length} Session
                 {timer.sessions.length > 1 ? "s" : ""} | Total:{" "}
                 {formatTime(timer.totalElapsed)}
@@ -934,11 +934,11 @@ const FloatingWindow: React.FC = () => {
             {selectedTicketNumber && currentTimerDetails ? (
               renderTimerDetail(currentTimerDetails)
             ) : selectedTicketNumber && !currentTimerDetails ? (
-              <div className="text-center text-gray-500 p-4">
+              <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                 <p>Timer '{selectedTicketNumber}' not found.</p>
                 <button
                   onClick={() => setSelectedTicketNumber(null)}
-                  className="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded text-sm"
+                  className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
                 >
                   Back to Grid
                 </button>
@@ -946,7 +946,7 @@ const FloatingWindow: React.FC = () => {
             ) : (
               <div className="space-y-2">
                 {timers.length === 0 ? (
-                  <div className="text-center text-gray-500 p-4">
+                  <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                     No active timers. Start one from the main app.
                   </div>
                 ) : (
@@ -957,7 +957,7 @@ const FloatingWindow: React.FC = () => {
                         onClick={() =>
                           setSelectedTicketNumber(timer.ticketNumber)
                         }
-                        className="p-3 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="p-3 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         title={`View details for ${timer.ticketNumber}\n${
                           timer.ticketName
                         }\nStatus: ${getStatusText(
@@ -982,7 +982,7 @@ const FloatingWindow: React.FC = () => {
                             {formatTime(timer.totalElapsed)}
                           </span>
                         </div>
-                        <h4 className="font-medium text-gray-800 text-sm truncate">
+                        <h4 className="font-medium text-gray-800 dark:text-gray-200 text-sm truncate">
                           {timer.ticketNumber}
                         </h4>
                         <p

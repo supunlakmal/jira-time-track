@@ -1,6 +1,11 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
+import { useIdleDetection } from "../hooks/useIdleDetection";
+import { useBreakTimer } from "../hooks/useBreakTimer";
+import { BreakReminder } from "../components/BreakReminder";
+import { BreakSettingsDialog } from "../components/BreakSettings";
+import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
 export interface TaskTimer {
   ticketNumber: string;
@@ -29,6 +34,71 @@ const FloatingWindow: React.FC = () => {
   const [selectedTicketNumber, setSelectedTicketNumber] = useState<
     string | null
   >(null);
+  const [idleSettings, setIdleSettings] = useState({
+    enabled: true,
+    idleTime: 5 * 60 * 1000, // 5 minutes default
+  });
+  const [pausedDueToIdle, setPausedDueToIdle] = useState<Set<string>>(new Set());
+  const [showBreakSettings, setShowBreakSettings] = useState(false);
+  
+  // Check if user is actively working
+  const isActivelyWorking = timers.some(t => t.isRunning && t.status === 'running');
+  
+  // Break timer integration
+  const {
+    settings: breakSettings,
+    setSettings: setBreakSettings,
+    state: breakState,
+    actions: breakActions,
+    formatTime: formatBreakTime
+  } = useBreakTimer(isActivelyWorking);
+
+  // Keyboard shortcuts
+  useFloatingWindowShortcuts({
+    onToggleFloating: () => window.ipc?.send('toggle-float-window'),
+    onStartTimer: () => {
+      const runningTimer = timers.find(t => t.isRunning && t.status === 'running');
+      if (runningTimer) {
+        handleTimerAction('pause', runningTimer.ticketNumber);
+      } else {
+        const pausedTimer = timers.find(t => t.status === 'paused');
+        if (pausedTimer) {
+          handleTimerAction('resume', pausedTimer.ticketNumber);
+        }
+      }
+    },
+    onShowBreakSettings: () => setShowBreakSettings(true)
+  });
+
+  // Idle detection handlers
+  const handleUserIdle = () => {
+    console.log('User went idle, pausing active timers');
+    const activeTimers = timers.filter(t => t.isRunning && t.status === 'running');
+    
+    if (activeTimers.length > 0) {
+      const newPausedSet = new Set(pausedDueToIdle);
+      activeTimers.forEach(timer => {
+        newPausedSet.add(timer.ticketNumber);
+        handleTimerAction('pause', timer.ticketNumber);
+      });
+      setPausedDueToIdle(newPausedSet);
+    }
+  };
+
+  const handleUserActive = () => {
+    console.log('User became active');
+    // Note: We don't auto-resume timers, user needs to manually resume
+    // This prevents accidental time tracking when user returns
+  };
+
+  // Initialize idle detection
+  const hasActiveTimers = timers.some(t => t.isRunning && t.status === 'running');
+  const { isIdle } = useIdleDetection({
+    idleTime: idleSettings.idleTime,
+    onIdle: handleUserIdle,
+    onActive: handleUserActive,
+    enabled: idleSettings.enabled && hasActiveTimers
+  });
 
   useEffect(() => {
     const loadTicketData = async () => {
@@ -71,6 +141,14 @@ const FloatingWindow: React.FC = () => {
       );
     }
   }, [ticketData]);
+
+  // Update tray status when timers change
+  useEffect(() => {
+    const activeTimers = timers.filter(t => t.isRunning && t.status === 'running').length;
+    if (window.ipc && typeof window.ipc.invoke === 'function') {
+      window.ipc.invoke('update-tray-status', { activeTimers }).catch(console.error);
+    }
+  }, [timers]);
 
   useEffect(() => {
     if (intervalRef.current) {
@@ -548,6 +626,13 @@ const FloatingWindow: React.FC = () => {
     }
   };
 
+  const handleResumeFromIdle = (ticketNumber: string) => {
+    const newPausedSet = new Set(pausedDueToIdle);
+    newPausedSet.delete(ticketNumber);
+    setPausedDueToIdle(newPausedSet);
+    handleTimerAction('resume', ticketNumber);
+  };
+
   const renderTimerDetail = (timer: TaskTimer | undefined) => {
     if (!timer) {
       return (
@@ -562,6 +647,8 @@ const FloatingWindow: React.FC = () => {
         </div>
       );
     }
+
+    const wasPausedByIdle = pausedDueToIdle.has(timer.ticketNumber);
 
     const estimatedTimeMs = (timer.storyPoints || 0) * 60 * 60 * 1000;
     let progressWidthPercentage = 0;
@@ -645,6 +732,11 @@ const FloatingWindow: React.FC = () => {
             >
               {getStatusIcon(timer.status, timer.isRunning)}{" "}
               {getStatusText(timer.status, timer.isRunning)}
+              {wasPausedByIdle && (
+                <div className="text-xs text-orange-600 mt-1">
+  Paused due to idle
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -688,10 +780,10 @@ const FloatingWindow: React.FC = () => {
           ) : timer.status === "paused" ? (
             <>
               <button
-                onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                onClick={() => wasPausedByIdle ? handleResumeFromIdle(timer.ticketNumber) : handleTimerAction("resume", timer.ticketNumber)}
+                className={`${wasPausedByIdle ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'} text-white py-1 px-2 rounded text-xs font-medium`}
               >
-                Resume
+                {wasPausedByIdle ? 'Resume from Idle' : 'Resume'}
               </button>
               <button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
@@ -782,21 +874,33 @@ const FloatingWindow: React.FC = () => {
 
   return (
     <div className="h-screen bg-transparent select-none">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
         <div
-          className="bg-gray-800 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
+          className="bg-gray-800 dark:bg-gray-900 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
           onMouseDown={(e) => {
             e.preventDefault();
             setIsDragging(true);
           }}
         >
           <div className="text-sm font-semibold">
-            Time Tracker{" "}
-            {selectedTicketNumber
-              ? `(${selectedTicketNumber})`
-              : timers.length > 0
-              ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
-              : ""}
+            <div>
+              Time Tracker{" "}
+              {selectedTicketNumber
+                ? `(${selectedTicketNumber})`
+                : timers.length > 0
+                ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
+                : ""}
+            </div>
+            {breakSettings.enabled && !breakState.isOnBreak && isActivelyWorking && (
+              <div className="text-xs text-gray-300">
+                Break in: {formatBreakTime(breakState.timeUntilBreak)}
+              </div>
+            )}
+            {breakState.isOnBreak && (
+              <div className="text-xs text-green-300">
+                {breakState.breakType === 'long' ? 'Long' : 'Short'} Break: {formatBreakTime(breakState.breakTimeRemaining)}
+              </div>
+            )}
           </div>
           <div className="flex space-x-2">
             <button
@@ -818,6 +922,45 @@ const FloatingWindow: React.FC = () => {
 
         {!isMinimized && (
           <div className="p-4 overflow-y-auto flex-grow">
+            {/* Break Status Banner */}
+            {breakState.isOnBreak && (
+              <div className="mb-3 p-2 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-green-600">
+                      {breakState.breakType === 'long' ? 'Long' : 'Short'}
+                    </span>
+                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                      {breakState.breakType === 'long' ? 'Long' : 'Short'} Break
+                    </span>
+                  </div>
+                  <div className="text-sm text-green-700 dark:text-green-300 font-mono">
+                    {formatBreakTime(breakState.breakTimeRemaining)}
+                  </div>
+                </div>
+                <button
+                  onClick={breakActions.endBreak}
+                  className="mt-2 w-full text-xs bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white py-1 px-2 rounded"
+                >
+                  End Break Early
+                </button>
+              </div>
+            )}
+            
+            {/* Break Settings Quick Access */}
+            {breakSettings.enabled && !breakState.isOnBreak && isActivelyWorking && (
+              <div className="mb-3 flex justify-between items-center text-xs text-gray-500">
+                <span>
+                  Next break: {formatBreakTime(breakState.timeUntilBreak)}
+                </span>
+                <button
+                  onClick={() => setShowBreakSettings(true)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Settings
+                </button>
+              </div>
+            )}
             {selectedTicketNumber && currentTimerDetails ? (
               renderTimerDetail(currentTimerDetails)
             ) : selectedTicketNumber && !currentTimerDetails ? (
@@ -908,6 +1051,23 @@ const FloatingWindow: React.FC = () => {
             )}
           </div>
         )}
+        
+        {/* Break Reminder */}
+        <BreakReminder
+          isVisible={breakState.showBreakReminder}
+          breakType={breakState.breakType}
+          onStartBreak={() => breakActions.startBreak(breakState.breakType!)}
+          onSkipBreak={breakActions.skipBreak}
+          onSettings={() => setShowBreakSettings(true)}
+        />
+        
+        {/* Break Settings */}
+        <BreakSettingsDialog
+          isOpen={showBreakSettings}
+          onClose={() => setShowBreakSettings(false)}
+          settings={breakSettings}
+          onSave={setBreakSettings}
+        />
       </div>
     </div>
   );

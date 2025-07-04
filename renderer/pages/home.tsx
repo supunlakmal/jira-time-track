@@ -3,7 +3,11 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ExportDialog } from "../components/ExportDialog";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { TimeGoalsWidget } from "../components/TimeGoalsWidget";
 import { useSharedData } from "../hooks/useSharedData";
+import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
 interface ProjectSummary {
   name: string;
@@ -41,6 +45,8 @@ export default function HomePage() {
   const [projectBranches, setProjectBranches] = useState<
     Record<string, string>
   >({});
+  const [showExportDialog, setShowExportDialog] = useState(false);
+
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -285,6 +291,16 @@ export default function HomePage() {
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
 
+  // Keyboard shortcuts
+  useMainWindowShortcuts({
+    onToggleFloating: toggleFloatingWindow,
+    onShowExport: () => setShowExportDialog(true),
+    onRefreshData: () => {
+      // Refresh data functionality
+      window.location.reload();
+    }
+  });
+
   const handleProjectSelect = (projectName: string | null) => {
     setSelectedProject(projectName);
     setSearchTerm("");
@@ -349,7 +365,7 @@ export default function HomePage() {
       <Head>
         <title>Jira Time Tracker</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -360,7 +376,7 @@ export default function HomePage() {
               width={100}
               height={100}
             />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Jira Time Tracker Dashboard
             </h1>
             <div className="flex justify-center gap-4 mb-4">
@@ -370,6 +386,26 @@ export default function HomePage() {
               >
                 Toggle Floating Timer
               </button>
+              <button
+                onClick={() => {
+                  // Minimize to tray
+                  if (window.ipc?.send) {
+                    window.close();
+                  }
+                }}
+                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Minimize to system tray"
+              >
+Minimize to Tray
+              </button>
+              <button
+                onClick={() => setShowExportDialog(true)}
+                className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Export time tracking data"
+              >
+Export Data
+              </button>
+              <ThemeToggle size="md" />
             </div>
           </div>
 
@@ -380,7 +416,7 @@ export default function HomePage() {
               {/* Dashboard Stats Cards */}
 
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Overview
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -562,6 +598,9 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Time Goals Widget */}
+              <TimeGoalsWidget sessions={sessions} className="mb-8" />
 
               {/* Enhanced Project Summary Table */}
               {projectSummaryData.length > 0 && (
@@ -1053,6 +1092,13 @@ export default function HomePage() {
             </>
           )}
         </div>
+        
+        {/* Export Dialog */}
+        <ExportDialog
+          isOpen={showExportDialog}
+          onClose={() => setShowExportDialog(false)}
+          projects={projectSummaryData.map(p => p.name)}
+        />
       </div>
     </React.Fragment>
   );

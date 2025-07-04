@@ -44,6 +44,7 @@ export interface IpcHandler {
     channel: "run-github-action",
     value: { projectName: string; projectPath: string }
   ): void;
+  send(channel: "show-main-window"): void;
 
   // Add invoke method
   invoke(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
@@ -61,6 +62,31 @@ export interface IpcHandler {
     data: { projectName: string; projectPath: string }
   ): Promise<{
     branch?: string;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-tray-status",
+    data: { activeTimers: number }
+  ): Promise<{ success: boolean }>;
+  invoke(
+    channel: "export-time-data",
+    data: {
+      format: 'csv' | 'json';
+      dateRange?: { start?: string; end?: string };
+      filterProject?: string;
+    }
+  ): Promise<{
+    success?: boolean;
+    canceled?: boolean;
+    error?: string;
+    filePath?: string;
+    recordCount?: number;
+  }>;
+  invoke(channel: "get-export-summary"): Promise<{
+    totalSessions: number;
+    totalTime: number;
+    totalProjects: number;
+    totalTickets: number;
     error?: string;
   }>;
 

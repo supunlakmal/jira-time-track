@@ -6,6 +6,7 @@ interface ThemeContextType {
   theme: Theme;
   resolvedTheme: 'light' | 'dark';
   setTheme: (theme: Theme) => void;
+  mounted: boolean;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -19,16 +20,20 @@ export const useTheme = () => {
 };
 
 export const useThemeState = (): ThemeContextType => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check if we're in the browser before accessing localStorage
+  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+
+  // Initialize theme from localStorage after mounting
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme') as Theme;
-      return saved || 'system';
+      if (saved) {
+        setTheme(saved);
+      }
     }
-    return 'system';
-  });
-
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+    setMounted(true);
+  }, []);
 
   // Function to get the resolved theme based on system preference
   const getResolvedTheme = (currentTheme: Theme): 'light' | 'dark' => {
@@ -92,6 +97,7 @@ export const useThemeState = (): ThemeContextType => {
   return {
     theme,
     resolvedTheme,
-    setTheme: handleSetTheme
+    setTheme: handleSetTheme,
+    mounted
   };
 };

@@ -12,3 +12,5 @@ next-env.d.ts
 /app
 dist
 CLAUDE.md
+.env
+.claude

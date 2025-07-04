@@ -10,7 +10,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = '',
   size = 'md'
 }) => {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme, mounted } = useTheme();
 
   const sizeClasses = {
     sm: 'p-1 text-sm',
@@ -19,6 +19,9 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const getIcon = () => {
+    if (!mounted) {
+      return 'SYS'; // Default to system during hydration
+    }
     if (theme === 'system') {
       return 'SYS';
     }
@@ -26,6 +29,9 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const getLabel = () => {
+    if (!mounted) {
+      return 'System'; // Default to system during hydration
+    }
     if (theme === 'system') {
       return 'System';
     }
@@ -33,6 +39,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const cycleTheme = () => {
+    if (!mounted) return; // Prevent cycling until mounted
     const themes = ['light', 'dark', 'system'] as const;
     const currentIndex = themes.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themes.length;

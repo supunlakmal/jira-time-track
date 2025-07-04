@@ -27,7 +27,6 @@ export interface TaskTimer {
 const FloatingWindow: React.FC = () => {
   const { saveSession } = useSharedData();
   const [isDragging, setIsDragging] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [timers, setTimers] = useState<TaskTimer[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [ticketData, setTicketData] = useState<{ [key: string]: string }>({});
@@ -604,27 +603,6 @@ const FloatingWindow: React.FC = () => {
 
   const handleClose = () => window.ipc.window.hide();
 
-  const handleMinimize = () => {
-    const newMinimized = !isMinimized;
-    setIsMinimized(newMinimized);
-    if (newMinimized) {
-      window.ipc.send("window-resize", { height: 40 });
-    } else {
-      let calculatedHeight;
-      if (selectedTicketNumber) {
-        calculatedHeight = 350;
-      } else {
-        const numTimers = timers.length;
-        const rows = Math.max(1, Math.ceil(numTimers / 3));
-        const gridBaseHeight = 60;
-        const gridRowHeight = 70;
-        calculatedHeight = gridBaseHeight + rows * gridRowHeight;
-      }
-      window.ipc.send("window-resize", {
-        height: Math.min(Math.max(calculatedHeight, 150), 600),
-      });
-    }
-  };
 
   const handleResumeFromIdle = (ticketNumber: string) => {
     const newPausedSet = new Set(pausedDueToIdle);
@@ -904,13 +882,6 @@ const FloatingWindow: React.FC = () => {
           </div>
           <div className="flex space-x-2">
             <button
-              onClick={handleMinimize}
-              className="hover:bg-gray-700 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"
-              title={isMinimized ? "Expand" : "Minimize"}
-            >
-              {isMinimized ? "□" : "−"}
-            </button>
-            <button
               onClick={handleClose}
               className="hover:bg-red-500 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"
               title="Close"
@@ -920,8 +891,7 @@ const FloatingWindow: React.FC = () => {
           </div>
         </div>
 
-        {!isMinimized && (
-          <div className="p-4 overflow-y-auto flex-grow">
+        <div className="p-4 overflow-y-auto flex-grow">
             {/* Break Status Banner */}
             {breakState.isOnBreak && (
               <div className="mb-3 p-2 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
@@ -1050,7 +1020,6 @@ const FloatingWindow: React.FC = () => {
               </div>
             )}
           </div>
-        )}
         
         {/* Break Reminder */}
         <BreakReminder

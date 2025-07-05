@@ -4,6 +4,8 @@ export interface JiraTicket {
   ticket_number: string;
   ticket_name: string;
   story_points: number;
+  isManual?: boolean;
+  createdAt?: string;
 }
 
 export interface TaskTimer {
@@ -89,6 +91,31 @@ export interface IpcHandler {
     totalTickets: number;
     error?: string;
   }>;
+  invoke(channel: "get-manual-tasks"): Promise<JiraTicket[]>;
+  invoke(channel: "get-all-tasks"): Promise<JiraTicket[]>;
+  invoke(
+    channel: "add-manual-task",
+    data: { ticket_number: string; ticket_name: string; story_points?: number }
+  ): Promise<{
+    success: boolean;
+    task?: JiraTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-manual-task",
+    data: { taskId: string; updates: Partial<JiraTicket> }
+  ): Promise<{
+    success: boolean;
+    task?: JiraTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "delete-manual-task",
+    taskId: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
 
   on(
     channel: "task-started",
@@ -109,6 +136,10 @@ export interface IpcHandler {
   on(
     channel: "task-stopped",
     listener: (ticketNumber: string) => void
+  ): () => void;
+  on(
+    channel: "manual-tasks-updated",
+    listener: (manualTasks: JiraTicket[]) => void
   ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 

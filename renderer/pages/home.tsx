@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ManualTaskDialog } from "../components/ManualTaskDialog";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
@@ -46,6 +47,8 @@ export default function HomePage() {
     Record<string, string>
   >({});
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -362,6 +365,77 @@ export default function HomePage() {
     }
   };
 
+  // Manual task handlers
+  const handleAddManualTask = async (taskData: {
+    ticket_number: string;
+    ticket_name: string;
+    story_points?: number;
+  }) => {
+    try {
+      const result = await window.ipc.invoke("add-manual-task", taskData);
+      if (result.success) {
+        console.log("Manual task added successfully:", result.task);
+      } else {
+        alert(`Error adding task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error adding manual task:", error);
+      alert("Failed to add task. Please try again.");
+    }
+  };
+
+  const handleEditManualTask = async (taskData: {
+    ticket_number: string;
+    ticket_name: string;
+    story_points?: number;
+  }) => {
+    if (!editingTask) return;
+    
+    try {
+      const result = await window.ipc.invoke("update-manual-task", {
+        taskId: editingTask.ticket_number,
+        updates: taskData,
+      });
+      if (result.success) {
+        console.log("Manual task updated successfully:", result.task);
+        setEditingTask(null);
+      } else {
+        alert(`Error updating task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error updating manual task:", error);
+      alert("Failed to update task. Please try again.");
+    }
+  };
+
+  const handleDeleteManualTask = async (ticketNumber: string) => {
+    if (!confirm("Are you sure you want to delete this manual task?")) {
+      return;
+    }
+    
+    try {
+      const result = await window.ipc.invoke("delete-manual-task", ticketNumber);
+      if (result.success) {
+        console.log("Manual task deleted successfully");
+      } else {
+        alert(`Error deleting task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error deleting manual task:", error);
+      alert("Failed to delete task. Please try again.");
+    }
+  };
+
+  const openEditDialog = (task: any) => {
+    setEditingTask(task);
+    setShowManualTaskDialog(true);
+  };
+
+  const closeManualTaskDialog = () => {
+    setShowManualTaskDialog(false);
+    setEditingTask(null);
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -387,6 +461,13 @@ export default function HomePage() {
                 className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg transition-colors"
               >
                 Toggle Floating Timer
+              </button>
+              <button
+                onClick={() => setShowManualTaskDialog(true)}
+                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Add a manual task"
+              >
+                Add Manual Task
               </button>
               <button
                 onClick={() => setShowExportDialog(true)}
@@ -910,8 +991,15 @@ export default function HomePage() {
                                     )}
                                   </div>
                                   <div>
-                                    <div className="text-sm font-medium text-blue-600">
+                                    <div className={`text-sm font-medium flex items-center ${
+                                      ticket.isManual ? 'text-purple-600' : 'text-blue-600'
+                                    }`}>
                                       {ticket.ticket_number}
+                                      {ticket.isManual && (
+                                        <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                                          Manual
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       {getProjectName(ticket.ticket_number)}
@@ -1002,6 +1090,24 @@ export default function HomePage() {
                                       Details
                                     </button>
                                   )}
+                                  {ticket.isManual && (
+                                    <>
+                                      <button
+                                        onClick={() => openEditDialog(ticket)}
+                                        className="text-purple-600 hover:text-purple-900 text-xs transition-colors"
+                                        title="Edit manual task"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteManualTask(ticket.ticket_number)}
+                                        className="text-red-600 hover:text-red-900 text-xs transition-colors"
+                                        title="Delete manual task"
+                                      >
+                                        Delete
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -1086,6 +1192,15 @@ export default function HomePage() {
           isOpen={showExportDialog}
           onClose={() => setShowExportDialog(false)}
           projects={projectSummaryData.map((p) => p.name)}
+        />
+
+        {/* Manual Task Dialog */}
+        <ManualTaskDialog
+          isOpen={showManualTaskDialog}
+          onClose={closeManualTaskDialog}
+          onSave={editingTask ? handleEditManualTask : handleAddManualTask}
+          editingTask={editingTask}
+          existingTickets={data.map((ticket) => ticket.ticket_number)}
         />
       </div>
     </React.Fragment>

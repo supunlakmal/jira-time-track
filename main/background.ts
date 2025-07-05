@@ -22,12 +22,13 @@ const projectPathsStore = new Store<Record<string, string>>({
 interface AppData {
   sessions: { [ticketNumber: string]: any };
   jiraData: any[];
+  manualTasks: any[];
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, jiraData: [] },
+    defaults: { sessions: {}, jiraData: [], manualTasks: [] },
   });
 
   private windows: Set<BrowserWindow> = new Set();
@@ -86,6 +87,50 @@ class DataManager {
       console.error("Error loading initial Jira data:", error);
       return [];
     }
+  }
+
+  // Manual task methods
+  getManualTasks() {
+    return this.store.get("manualTasks", []);
+  }
+
+  setManualTasks(tasks: any[]) {
+    this.store.set("manualTasks", tasks);
+    this.broadcast("manual-tasks-updated", tasks);
+    console.log(`DataManager: Manual tasks updated with ${tasks.length} tasks`);
+  }
+
+  addManualTask(task: any) {
+    const manualTasks = this.getManualTasks();
+    const newTask = { ...task, isManual: true, createdAt: new Date().toISOString() };
+    manualTasks.push(newTask);
+    this.setManualTasks(manualTasks);
+    return newTask;
+  }
+
+  updateManualTask(taskId: string, updates: any) {
+    const manualTasks = this.getManualTasks();
+    const index = manualTasks.findIndex(t => t.ticket_number === taskId);
+    if (index !== -1) {
+      manualTasks[index] = { ...manualTasks[index], ...updates };
+      this.setManualTasks(manualTasks);
+      return manualTasks[index];
+    }
+    return null;
+  }
+
+  deleteManualTask(taskId: string) {
+    const manualTasks = this.getManualTasks();
+    const filtered = manualTasks.filter(t => t.ticket_number !== taskId);
+    this.setManualTasks(filtered);
+    return filtered;
+  }
+
+  // Combined data method (Jira + Manual)
+  getAllTasks() {
+    const jiraData = this.getJiraData();
+    const manualTasks = this.getManualTasks();
+    return [...jiraData, ...manualTasks];
   }
 }
 
@@ -393,6 +438,61 @@ ipcMain.on("save-session", (_, sessionData) => {
 
 ipcMain.handle("refresh-jira-data", async () => {
   return await dataManager.loadInitialJiraData();
+});
+
+// Manual task IPC handlers
+ipcMain.handle("get-manual-tasks", () => {
+  return dataManager.getManualTasks();
+});
+
+ipcMain.handle("get-all-tasks", () => {
+  return dataManager.getAllTasks();
+});
+
+ipcMain.handle("add-manual-task", (_, taskData) => {
+  try {
+    // Validate task data
+    if (!taskData.ticket_number || !taskData.ticket_name) {
+      throw new Error("Ticket number and name are required");
+    }
+    
+    // Check if ticket number already exists
+    const allTasks = dataManager.getAllTasks();
+    const exists = allTasks.some(t => t.ticket_number === taskData.ticket_number);
+    if (exists) {
+      throw new Error("Ticket number already exists");
+    }
+    
+    const newTask = dataManager.addManualTask(taskData);
+    return { success: true, task: newTask };
+  } catch (error) {
+    console.error("Error adding manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("update-manual-task", (_, { taskId, updates }) => {
+  try {
+    const updatedTask = dataManager.updateManualTask(taskId, updates);
+    if (updatedTask) {
+      return { success: true, task: updatedTask };
+    } else {
+      return { success: false, error: "Task not found" };
+    }
+  } catch (error) {
+    console.error("Error updating manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-manual-task", (_, taskId) => {
+  try {
+    dataManager.deleteManualTask(taskId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting manual task:", error);
+    return { success: false, error: error.message };
+  }
 });
 
 // ==================== PROJECT PATHS IPC ====================

@@ -735,7 +735,7 @@ ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject 
 ipcMain.handle("get-export-summary", () => {
   try {
     const sessions = dataManager.getSessions();
-    const jiraData = dataManager.getJiraData();
+// const jiraData = dataManager.getJiraData();
     
     let totalSessions = 0;
     let totalTime = 0;

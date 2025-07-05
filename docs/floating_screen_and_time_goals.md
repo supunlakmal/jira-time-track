@@ -1,6 +1,6 @@
-# Jira Time Track - Key Features: Time Goals and Floating Screen
+# Project Time Track - Key Features: Time Goals and Floating Screen
 
-This document explains two core features of the Jira Time Track application: Time Goals and the Floating Screen.
+This document explains two core features of the Project Time Track application: Time Goals and the Floating Screen.
 
 ## 1. Time Goals
 
@@ -41,7 +41,7 @@ The "Floating Screen" is a compact, always-on-top window that provides quick acc
 
 ### Key Features and Functionalities of the Floating Screen (`renderer/pages/float.tsx`)
 
-*   **Timer Display:** Shows a list of active Jira task timers with details like ticket number, name, total elapsed time, current session time, status (Running, Paused, On Hold, Completed, Stopped, In Queue), and estimated time based on Story Points with a progress bar.
+*   **Timer Display:** Shows a list of active Project task timers with details like ticket number, name, total elapsed time, current session time, status (Running, Paused, On Hold, Completed, Stopped, In Queue), and estimated time based on Story Points with a progress bar.
 *   **Timer Actions:** Allows users to directly control timers (Start, Pause, Resume, Hold, Complete, Stop, Delete).
 *   **Idle Detection Integration:** Automatically pauses active timers if the user becomes idle for a configurable duration. Displays a "Paused due to idle" message.
 *   **Break Reminder Integration:** Displays information about upcoming or active breaks, including time remaining. Provides quick access to break settings and options to end or skip breaks.

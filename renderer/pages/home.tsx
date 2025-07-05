@@ -39,7 +39,7 @@ interface DashboardStats {
 }
 
 export default function HomePage() {
-  const { jiraData: data, sessions, loading } = useSharedData();
+  const { projectData: data, sessions, loading } = useSharedData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
@@ -439,7 +439,7 @@ export default function HomePage() {
   return (
     <React.Fragment>
       <Head>
-        <title>Jira Time Tracker</title>
+        <title>Project Time Tracker</title>
       </Head>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -453,7 +453,7 @@ export default function HomePage() {
               height={100}
             />
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Jira Time Tracker Dashboard
+              Project Time Tracker Dashboard
             </h1>
             <div className="flex justify-center gap-4 mb-4">
               <button
@@ -941,7 +941,7 @@ export default function HomePage() {
                               </p>
                               {data.length === 0 && (
                                 <p className="text-sm text-gray-400">
-                                  Load your Jira data to see tickets here
+                                  Load your Project data to see tickets here
                                 </p>
                               )}
                             </div>

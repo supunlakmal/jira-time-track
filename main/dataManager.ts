@@ -3,13 +3,13 @@ import Store from "electron-store";
 
 interface AppData {
   sessions: { [ticketNumber: string]: any };
-  jiraData: any[];
+  projectData: any[];
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, jiraData: [] },
+    defaults: { sessions: {}, projectData: [] },
   });
 
   private windows: Set<Electron.BrowserWindow> = new Set();
@@ -39,14 +39,14 @@ class DataManager {
     return this.store.get("sessions");
   }
 
-  // Jira data methods
-  setJiraData(data: any[]) {
-    this.store.set("jiraData", data);
-    this.broadcast("jira-data-updated", data);
+  // Project data methods
+  setProjectData(data: any[]) {
+    this.store.set("projectData", data);
+    this.broadcast("project-data-updated", data);
   }
 
-  getJiraData() {
-    return this.store.get("jiraData");
+  getProjectData() {
+    return this.store.get("projectData");
   }
 }
 

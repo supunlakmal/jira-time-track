@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "jira-time-tracker",
-  "description": "A cross-platform desktop application for tracking time spent on Jira tickets with floating timer, productivity features, and comprehensive reporting",
-  "version": "1.0.0",
+  "name": "project-time-tracker",
+  "description": "A cross-platform desktop application for tracking time spent on Project tickets with floating timer, productivity features, and comprehensive reporting",
+  "version": "1.0.1",
   "author": "Developer",
   "main": "app/background.js",
   "scripts": {

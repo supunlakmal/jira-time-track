@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { JiraTicket } from "../types/electron";
+import { ProjectTicket } from "../types/electron";
 
 interface ManualTaskDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: { ticket_number: string; ticket_name: string; story_points?: number }) => void;
-  editingTask?: JiraTicket | null;
+  editingTask?: ProjectTicket | null;
   existingTickets: string[];
 }
 

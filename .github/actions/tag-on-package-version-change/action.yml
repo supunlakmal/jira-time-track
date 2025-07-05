@@ -1,0 +1,58 @@
+name: Tag Branch on Package Version Change
+branding:
+  icon: package
+  color: green
+description: Creates a new Git tag whenever the npm package version has changed, with a branch-specific suffix.
+inputs:
+  git-user-name:
+    description: Git user.name.
+    default: github-actions[bot]
+  git-user-email:
+    description: Git user.email.
+    default: github-actions[bot]@users.noreply.github.com
+  branch-suffix-map:
+    description: 'A JSON string mapping branch names to tag suffixes. e.g., ''{"main": "-rc", "develop": "-dev"}''. Must be valid JSON.'
+    required: false
+    default: '{}'
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        #!/bin/bash
+        set -eux
+
+        BRANCH_NAME="${{ github.ref_name }}"
+        BRANCH_SUFFIX=$(echo "${INPUT_BRANCH_SUFFIX_MAP}" | jq -r --arg bn "$BRANCH_NAME" '.[$bn] // ""')
+
+        if [ ! -f package.json ]; then
+          # Error messages to stderr are generally kept for script failure diagnosis
+          echo "Error: package.json not found." >&2
+          exit 1
+        fi
+
+        RAW_PACKAGE_VERSION=$(jq -r '.version' package.json)
+
+        if [ -z "$RAW_PACKAGE_VERSION" ] || [ "$RAW_PACKAGE_VERSION" == "null" ]; then
+          echo "Error: Could not read version from package.json, or version is null." >&2
+          exit 1
+        fi
+
+        PACKAGE_VERSION=$(echo "$RAW_PACKAGE_VERSION" | sed 's/+/-/g')
+        TAG_NAME="${PACKAGE_VERSION}${BRANCH_SUFFIX}"
+
+        git fetch --tags --force
+
+        if ! git rev-parse -q --verify "refs/tags/${TAG_NAME}" >/dev/null 2>&1; then
+          git config user.name "${GIT_USER_NAME}"
+          git config user.email "${GIT_USER_EMAIL}"
+          git tag -a "${TAG_NAME}" -m "Version ${TAG_NAME}"
+          git push origin "refs/tags/${TAG_NAME}"
+        # else
+          # Tag already exists, no action needed and no output necessary
+        fi
+      env:
+        GIT_USER_NAME: ${{ inputs.git-user-name }}
+        GIT_USER_EMAIL: ${{ inputs.git-user-email }}
+        INPUT_BRANCH_SUFFIX_MAP: ${{ inputs.branch-suffix-map }}

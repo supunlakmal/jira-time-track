@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { JiraTicket } from "../types/electron";
+import type { ProjectTicket } from "../types/electron";
 
-export function useJiraData() {
-  const [data, setData] = useState<JiraTicket[]>([]);
+export function useProjectData() {
+  const [data, setData] = useState<ProjectTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,14 +11,14 @@ export function useJiraData() {
 
     const loadData = async () => {
       try {
-        const result = await window.ipc.send("load-jira-data", undefined);
+        const result = await window.ipc.send("load-project-data", undefined);
         if (mounted) {
           setData(result);
           setError(null);
         }
       } catch (err) {
         if (mounted) {
-          setError("Failed to load Jira tickets. Please try again.");
+          setError("Failed to load Project tickets. Please try again.");
           console.error("Error loading data:", err);
         }
       } finally {
@@ -38,11 +38,11 @@ export function useJiraData() {
   const refreshData = async () => {
     setLoading(true);
     try {
-      const result = await window.ipc.send("load-jira-data", undefined);
+      const result = await window.ipc.send("load-project-data", undefined);
       setData(result);
       setError(null);
     } catch (err) {
-      setError("Failed to refresh Jira tickets. Please try again.");
+      setError("Failed to refresh Project tickets. Please try again.");
       console.error("Error refreshing data:", err);
     } finally {
       setLoading(false);

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 export function useSharedData() {
-  const [jiraData, setJiraData] = useState([]);
+  const [projectData, setProjectData] = useState([]);
   const [sessions, setSessions] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +14,7 @@ export function useSharedData() {
           window.ipc.invoke("get-all-tasks"),
           window.ipc.invoke("get-sessions"),
         ]);
-        setJiraData(allTasks || []);
+        setProjectData(allTasks || []);
         setSessions(sessionData || {});
       } finally {
         setLoading(false);
@@ -22,20 +22,20 @@ export function useSharedData() {
     };
 
     // Listen for updates
-    const cleanupJira = window.ipc.on("jira-data-updated", () => {
-      // Reload all tasks when Jira data changes
-      window.ipc.invoke("get-all-tasks").then(setJiraData);
+    const cleanupProject = window.ipc.on("project-data-updated", () => {
+      // Reload all tasks when Project data changes
+      window.ipc.invoke("get-all-tasks").then(setProjectData);
     });
     const cleanupManual = window.ipc.on("manual-tasks-updated", () => {
       // Reload all tasks when manual tasks change
-      window.ipc.invoke("get-all-tasks").then(setJiraData);
+      window.ipc.invoke("get-all-tasks").then(setProjectData);
     });
     const cleanupSessions = window.ipc.on("sessions-updated", setSessions);
 
     loadData();
 
     return () => {
-      cleanupJira();
+      cleanupProject();
       cleanupManual();
       cleanupSessions();
     };
@@ -45,5 +45,5 @@ export function useSharedData() {
     window.ipc.send("save-session", sessionData);
   };
 
-  return { jiraData, sessions, loading, saveSession };
+  return { projectData, sessions, loading, saveSession };
 }

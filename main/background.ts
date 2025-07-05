@@ -21,14 +21,14 @@ const projectPathsStore = new Store<Record<string, string>>({
 // ==================== CENTRALIZED DATA MANAGER ====================
 interface AppData {
   sessions: { [ticketNumber: string]: any };
-  jiraData: any[];
+  projectData: any[];
   manualTasks: any[];
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, jiraData: [], manualTasks: [] },
+    defaults: { sessions: {}, projectData: [], manualTasks: [] },
   });
 
   private windows: Set<BrowserWindow> = new Set();
@@ -64,27 +64,27 @@ class DataManager {
     return this.store.get("sessions");
   }
 
-  // Jira data methods
-  setJiraData(data: any[]) {
-    this.store.set("jiraData", data);
-    this.broadcast("jira-data-updated", data);
-    console.log(`DataManager: Jira data updated with ${data.length} tickets`);
+  // Project data methods
+  setProjectData(data: any[]) {
+    this.store.set("projectData", data);
+    this.broadcast("project-data-updated", data);
+    console.log(`DataManager: Project data updated with ${data.length} tickets`);
   }
 
-  getJiraData() {
-    return this.store.get("jiraData");
+  getProjectData() {
+    return this.store.get("projectData");
   }
 
-  // Load initial Jira data from file
-  async loadInitialJiraData() {
+  // Load initial Project data from file
+  async loadInitialProjectData() {
     try {
       const dataPath = path.join(__dirname, "../json/data.json");
       const rawData = await fs.promises.readFile(dataPath, "utf8");
-      const jiraData = JSON.parse(rawData);
-      this.setJiraData(jiraData);
-      return jiraData;
+      const projectData = JSON.parse(rawData);
+      this.setProjectData(projectData);
+      return projectData;
     } catch (error) {
-      console.error("Error loading initial Jira data:", error);
+      console.error("Error loading initial Project data:", error);
       return [];
     }
   }
@@ -126,11 +126,11 @@ class DataManager {
     return filtered;
   }
 
-  // Combined data method (Jira + Manual)
+  // Combined data method (Project + Manual)
   getAllTasks() {
-    const jiraData = this.getJiraData();
+    const projectData = this.getProjectData();
     const manualTasks = this.getManualTasks();
-    return [...jiraData, ...manualTasks];
+    return [...projectData, ...manualTasks];
   }
 }
 
@@ -197,7 +197,7 @@ const createFloatingWindow = async () => {
   mainWindow = createMainWindow();
 
   // Load initial data
-  await dataManager.loadInitialJiraData();
+  await dataManager.loadInitialProjectData();
 
   await createFloatingWindow();
 
@@ -310,7 +310,7 @@ function createTray() {
   ]);
   
   tray.setContextMenu(contextMenu);
-  tray.setToolTip('Jira Time Tracker');
+  tray.setToolTip('Project Time Tracker');
   
   // Click on tray icon shows/hides floating window
   tray.on('click', () => {
@@ -338,9 +338,9 @@ function createTray() {
 function updateTrayTitle(activeTimers: number = 0) {
   if (tray) {
     if (activeTimers > 0) {
-      tray.setToolTip(`Jira Time Tracker - ${activeTimers} active timer${activeTimers > 1 ? 's' : ''}`);
+      tray.setToolTip(`Project Time Tracker - ${activeTimers} active timer${activeTimers > 1 ? 's' : ''}`);
     } else {
-      tray.setToolTip('Jira Time Tracker - No active timers');
+      tray.setToolTip('Project Time Tracker - No active timers');
     }
   }
 }
@@ -422,9 +422,9 @@ ipcMain.on("window-resize", (_, { height }) => {
 });
 
 // ==================== CENTRALIZED DATA IPC HANDLERS ====================
-// Replace old load-jira-data handler
-ipcMain.handle("load-jira-data", async () => {
-  return dataManager.getJiraData();
+// Replace old load-project-data handler
+ipcMain.handle("load-project-data", async () => {
+  return dataManager.getProjectData();
 });
 
 // New centralized data handlers
@@ -436,8 +436,8 @@ ipcMain.on("save-session", (_, sessionData) => {
   dataManager.saveSession(sessionData);
 });
 
-ipcMain.handle("refresh-jira-data", async () => {
-  return await dataManager.loadInitialJiraData();
+ipcMain.handle("refresh-project-data", async () => {
+  return await dataManager.loadInitialProjectData();
 });
 
 // Manual task IPC handlers
@@ -714,13 +714,13 @@ ipcMain.on("show-main-window", () => {
 ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject }) => {
   try {
     const sessions = dataManager.getSessions();
-    const jiraData = dataManager.getJiraData();
+    const projectData = dataManager.getProjectData();
     
     // Prepare export data
     const exportData = [];
     
     for (const [ticketNumber, sessionData] of Object.entries(sessions)) {
-// const ticketInfo = jiraData.find(t => t.ticket_number === ticketNumber);
+// const ticketInfo = projectData.find(t => t.ticket_number === ticketNumber);
       
       for (const session of sessionData.sessions) {
         if (session.endTime) {
@@ -835,7 +835,7 @@ ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject 
 ipcMain.handle("get-export-summary", () => {
   try {
     const sessions = dataManager.getSessions();
-// const jiraData = dataManager.getJiraData();
+// const projectData = dataManager.getProjectData();
     
     let totalSessions = 0;
     let totalTime = 0;

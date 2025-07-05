@@ -86,7 +86,7 @@ const FloatingWindow: React.FC = () => {
     const loadTicketData = async () => {
       try {
         const data = (await window.ipc.send(
-          "load-jira-data",
+          "load-project-data",
           undefined
         )) as Array<{
           ticket_number: string;
@@ -99,7 +99,7 @@ const FloatingWindow: React.FC = () => {
           }, {} as { [key: string]: string });
           setTicketData(ticketMap);
         } else {
-          console.warn("load-jira-data did not return valid data", data);
+          console.warn("load-project-data did not return valid data", data);
         }
       } catch (error) {
         console.error("Failed to load ticket data:", error);

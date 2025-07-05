@@ -1,5 +1,5 @@
-appId: com.jira.timetrack
-productName: Jira Time Track
+appId: com.project.timetrack
+productName: Project Time Track
 copyright: Copyright © 2025
 directories:
   output: dist

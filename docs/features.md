@@ -1,18 +1,18 @@
-# Jira Time Tracking Application Features
+# Project Time Tracking Application Features
 
-This project is a **Jira Time Tracking application** built using **Nextron (Next.js + Electron)**, designed to help users efficiently track time spent on Jira tickets. It features a desktop application interface with both a main window and a compact floating timer.
+This project is a **Project Time Tracking application** built using **Nextron (Next.js + Electron)**, designed to help users efficiently track time spent on Project tickets. It features a desktop application interface with both a main window and a compact floating timer.
 
 ## Core Time Tracking & Session Management
 
 1.  **Ticket-Based Time Tracking:**
-    *   Allows users to start, pause, resume, hold, complete, and stop timers associated with specific Jira ticket numbers.
+    *   Allows users to start, pause, resume, hold, complete, and stop timers associated with specific Project ticket numbers.
     *   Tracks `elapsedTime` for the current session and `totalElapsed` time across all sessions for a given ticket.
-    *   Supports associating Jira tickets with `storyPoints` for estimated vs. actual time tracking.
+    *   Supports associating Project tickets with `storyPoints` for estimated vs. actual time tracking.
 2.  **Detailed Session Recording:**
     *   Each timer activity (start, pause, resume, stop, complete, hold) creates or updates a "session" entry.
     *   Records `startTime`, `endTime`, `duration`, and `status` for each individual session.
 3.  **Persistent Data Storage:**
-    *   Utilizes `electron-store` to save all time tracking sessions and Jira data locally, ensuring data is retained across application restarts.
+    *   Utilizes `electron-store` to save all time tracking sessions and Project data locally, ensuring data is retained across application restarts.
     *   Centralized `DataManager` in the main process handles data read/write operations and broadcasts updates to all open windows.
 
 ## User Interface & Experience
@@ -59,8 +59,8 @@ This project is a **Jira Time Tracking application** built using **Nextron (Next
 
 ## Data Management & Reporting
 
-1.  **Jira Data Loading:**
-    *   Loads initial Jira ticket data from a local `json/data.json` file.
+1.  **Project Data Loading:**
+    *   Loads initial Project ticket data from a local `json/data.json` file.
     *   `useJiraData` hook handles fetching and refreshing this data for the renderer process.
 2.  **Export Functionality (`ExportDialog.tsx`):**
     *   Allows exporting recorded time data.

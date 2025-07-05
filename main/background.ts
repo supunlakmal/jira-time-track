@@ -720,7 +720,7 @@ ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject 
     const exportData = [];
     
     for (const [ticketNumber, sessionData] of Object.entries(sessions)) {
-      const ticketInfo = jiraData.find(t => t.ticket_number === ticketNumber);
+// const ticketInfo = jiraData.find(t => t.ticket_number === ticketNumber);
       
       for (const session of sessionData.sessions) {
         if (session.endTime) {
@@ -835,7 +835,7 @@ ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject 
 ipcMain.handle("get-export-summary", () => {
   try {
     const sessions = dataManager.getSessions();
-    const jiraData = dataManager.getJiraData();
+// const jiraData = dataManager.getJiraData();
     
     let totalSessions = 0;
     let totalTime = 0;

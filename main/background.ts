@@ -934,7 +934,7 @@ ipcMain.handle("import-csv-file", async () => {
         return { success: false, error: `Row ${i + 1}: Column count mismatch` };
       }
 
-      const row = {};
+      const row: Record<string, string> = {};
       headers.forEach((header, index) => {
         row[header] = values[index];
       });

@@ -6,6 +6,7 @@ import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ManualTaskDialog } from "../components/ManualTaskDialog";
 import { ThemeToggle } from "../components/ThemeToggle";
+import CsvImportDialog from "../components/CsvImportDialog";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";
@@ -48,6 +49,7 @@ export default function HomePage() {
   >({});
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
+  const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Load project paths from main process on component mount
@@ -436,6 +438,22 @@ export default function HomePage() {
     setEditingTask(null);
   };
 
+  // CSV import handler
+  const handleCsvImport = async (csvData: any[]) => {
+    try {
+      const result = await window.ipc.invoke("import-csv-data", csvData);
+      if (result.success) {
+        console.log(`Successfully imported ${result.importedCount} tasks from CSV`);
+        // Data will be automatically refreshed via the shared data hook
+      } else {
+        alert(`Error importing CSV: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error importing CSV:", error);
+      alert("Failed to import CSV. Please try again.");
+    }
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -468,6 +486,13 @@ export default function HomePage() {
                 title="Add a manual task"
               >
                 Add Manual Task
+              </button>
+              <button
+                onClick={() => setShowCsvImportDialog(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Import tasks from CSV file"
+              >
+                Import CSV
               </button>
               <button
                 onClick={() => setShowExportDialog(true)}
@@ -1192,6 +1217,13 @@ export default function HomePage() {
           isOpen={showExportDialog}
           onClose={() => setShowExportDialog(false)}
           projects={projectSummaryData.map((p) => p.name)}
+        />
+
+        {/* CSV Import Dialog */}
+        <CsvImportDialog
+          isOpen={showCsvImportDialog}
+          onClose={() => setShowCsvImportDialog(false)}
+          onImport={handleCsvImport}
         />
 
         {/* Manual Task Dialog */}

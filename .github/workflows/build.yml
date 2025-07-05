@@ -1,0 +1,45 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run TypeScript type checking
+      run: npx tsc --noEmit
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Check build artifacts
+      run: |
+        if [ -d "app" ]; then
+          echo "✅ Build successful - app directory created"
+          ls -la app/
+        else
+          echo "❌ Build failed - no app directory found"
+          exit 1
+        fi

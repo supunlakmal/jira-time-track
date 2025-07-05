@@ -49,13 +49,11 @@ export const useKeyboardShortcuts = (shortcuts: KeyboardShortcut[]) => {
 export const useFloatingWindowShortcuts = ({
   onToggleFloating,
   onStartTimer,
-  onPauseTimer,
-  onShowBreakSettings
+  onPauseTimer
 }: {
   onToggleFloating?: () => void;
   onStartTimer?: () => void;
   onPauseTimer?: () => void;
-  onShowBreakSettings?: () => void;
 }) => {
   const shortcuts: KeyboardShortcut[] = [
     {
@@ -74,12 +72,6 @@ export const useFloatingWindowShortcuts = ({
       ctrlKey: true,
       action: onPauseTimer || (() => {}),
       description: 'Pause current timer'
-    },
-    {
-      key: 'b',
-      ctrlKey: true,
-      action: onShowBreakSettings || (() => {}),
-      description: 'Show break settings'
     }
   ].filter(shortcut => shortcut.action !== (() => {}));
 

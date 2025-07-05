@@ -389,18 +389,6 @@ export default function HomePage() {
                 Toggle Floating Timer
               </button>
               <button
-                onClick={() => {
-                  // Minimize to tray
-                  if (window.ipc?.send) {
-                    window.close();
-                  }
-                }}
-                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg transition-colors"
-                title="Minimize to system tray"
-              >
-                Minimize to Tray
-              </button>
-              <button
                 onClick={() => setShowExportDialog(true)}
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
                 title="Export time tracking data"

@@ -36,6 +36,10 @@ const validChannels = [
   // Export functionality
   "export-time-data",
   "get-export-summary",
+  // CSV Import functionality
+  "import-csv-data",
+  "import-csv-file",
+  "get-data-source-info",
   // Tray and window management
   "update-tray-status",
   "show-main-window",

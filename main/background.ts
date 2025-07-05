@@ -864,6 +864,140 @@ ipcMain.on("delete-task", (event, { ticket }) => {
   // Potentially log this or update some other state if needed in main
 });
 
+// ==================== CSV IMPORT IPC HANDLERS ====================
+ipcMain.handle("import-csv-data", async (_, csvData) => {
+  try {
+    console.log(`Main: Importing ${csvData.length} tasks from CSV data`);
+    
+    // Validate CSV data structure
+    const validatedData = csvData.map((row, index) => {
+      if (!row.ticket_number || !row.ticket_name) {
+        throw new Error(`Row ${index + 1}: Missing required fields (ticket_number, ticket_name)`);
+      }
+      return {
+        ticket_number: row.ticket_number,
+        ticket_name: row.ticket_name,
+        story_points: row.story_points || null,
+        isImported: true,
+        importedAt: new Date().toISOString()
+      };
+    });
+
+    // Replace current project data with CSV data
+    dataManager.setProjectData(validatedData);
+    
+    return { success: true, importedCount: validatedData.length };
+  } catch (error) {
+    console.error("CSV import error:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("import-csv-file", async () => {
+  try {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: 'CSV Files', extensions: ['csv'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (result.canceled || !result.filePaths[0]) {
+      return { canceled: true };
+    }
+
+    const filePath = result.filePaths[0];
+    console.log(`Main: Importing CSV file: ${filePath}`);
+
+    // Read and parse CSV file
+    const csvContent = await fs.promises.readFile(filePath, 'utf8');
+    const lines = csvContent.trim().split('\n');
+    
+    if (lines.length < 2) {
+      return { success: false, error: 'CSV file must contain at least a header row and one data row' };
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const requiredColumns = ['ticket_number', 'ticket_name', 'story_points'];
+    const missingColumns = requiredColumns.filter(col => !headers.includes(col.toLowerCase()));
+    
+    if (missingColumns.length > 0) {
+      return { success: false, error: `Missing required columns: ${missingColumns.join(', ')}` };
+    }
+
+    const csvData = [];
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+      
+      if (values.length !== headers.length) {
+        return { success: false, error: `Row ${i + 1}: Column count mismatch` };
+      }
+
+      const row: Record<string, string> = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index];
+      });
+
+      if (!row.ticket_number || !row.ticket_name) {
+        return { success: false, error: `Row ${i + 1}: Missing required fields` };
+      }
+
+      const storyPoints = row.story_points && row.story_points.trim() !== '' 
+        ? parseFloat(row.story_points) 
+        : null;
+
+      if (row.story_points && row.story_points.trim() !== '' && isNaN(storyPoints)) {
+        return { success: false, error: `Row ${i + 1}: Invalid story points value` };
+      }
+
+      csvData.push({
+        ticket_number: row.ticket_number,
+        ticket_name: row.ticket_name,
+        story_points: storyPoints
+      });
+    }
+
+    // Import the parsed data
+    const validatedData = csvData.map((row, index) => {
+      return {
+        ticket_number: row.ticket_number,
+        ticket_name: row.ticket_name,
+        story_points: row.story_points || null,
+        isImported: true,
+        importedAt: new Date().toISOString()
+      };
+    });
+
+    // Replace current project data with CSV data
+    dataManager.setProjectData(validatedData);
+    
+    return { success: true, importedCount: validatedData.length };
+  } catch (error) {
+    console.error("CSV file import error:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-data-source-info", () => {
+  try {
+    const projectData = dataManager.getProjectData();
+    const manualTasks = dataManager.getManualTasks();
+    const allTasks = dataManager.getAllTasks();
+    
+    return {
+      projectDataCount: projectData.length,
+      manualTasksCount: manualTasks.length,
+      totalTasksCount: allTasks.length,
+      hasImportedData: projectData.some(task => task.isImported),
+      lastImportDate: projectData.find(task => task.importedAt)?.importedAt || null
+    };
+  } catch (error) {
+    console.error("Error getting data source info:", error);
+    return { error: error.message };
+  }
+});
+
 // Legacy IPC channel (kept for compatibility)
 ipcMain.on("message", async (event, arg) => {
   event.reply("message", `${arg} World!`);

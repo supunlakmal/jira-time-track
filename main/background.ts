@@ -1,6 +1,6 @@
 // main/background.ts
 import path from "path";
-import { app, ipcMain, BrowserWindow, screen, dialog } from "electron";
+import { app, ipcMain, BrowserWindow, screen, dialog, Tray, Menu, nativeImage } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import fs from "fs";
@@ -10,6 +10,7 @@ import { spawn } from "child_process";
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
 
 // Store for project paths
 const projectPathsStore = new Store<Record<string, string>>({
@@ -20,13 +21,14 @@ const projectPathsStore = new Store<Record<string, string>>({
 // ==================== CENTRALIZED DATA MANAGER ====================
 interface AppData {
   sessions: { [ticketNumber: string]: any };
-  jiraData: any[];
+  projectData: any[];
+  manualTasks: any[];
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, jiraData: [] },
+    defaults: { sessions: {}, projectData: [], manualTasks: [] },
   });
 
   private windows: Set<BrowserWindow> = new Set();
@@ -62,29 +64,73 @@ class DataManager {
     return this.store.get("sessions");
   }
 
-  // Jira data methods
-  setJiraData(data: any[]) {
-    this.store.set("jiraData", data);
-    this.broadcast("jira-data-updated", data);
-    console.log(`DataManager: Jira data updated with ${data.length} tickets`);
+  // Project data methods
+  setProjectData(data: any[]) {
+    this.store.set("projectData", data);
+    this.broadcast("project-data-updated", data);
+    console.log(`DataManager: Project data updated with ${data.length} tickets`);
   }
 
-  getJiraData() {
-    return this.store.get("jiraData");
+  getProjectData() {
+    return this.store.get("projectData");
   }
 
-  // Load initial Jira data from file
-  async loadInitialJiraData() {
+  // Load initial Project data from file
+  async loadInitialProjectData() {
     try {
       const dataPath = path.join(__dirname, "../json/data.json");
       const rawData = await fs.promises.readFile(dataPath, "utf8");
-      const jiraData = JSON.parse(rawData);
-      this.setJiraData(jiraData);
-      return jiraData;
+      const projectData = JSON.parse(rawData);
+      this.setProjectData(projectData);
+      return projectData;
     } catch (error) {
-      console.error("Error loading initial Jira data:", error);
+      console.error("Error loading initial Project data:", error);
       return [];
     }
+  }
+
+  // Manual task methods
+  getManualTasks() {
+    return this.store.get("manualTasks", []);
+  }
+
+  setManualTasks(tasks: any[]) {
+    this.store.set("manualTasks", tasks);
+    this.broadcast("manual-tasks-updated", tasks);
+    console.log(`DataManager: Manual tasks updated with ${tasks.length} tasks`);
+  }
+
+  addManualTask(task: any) {
+    const manualTasks = this.getManualTasks();
+    const newTask = { ...task, isManual: true, createdAt: new Date().toISOString() };
+    manualTasks.push(newTask);
+    this.setManualTasks(manualTasks);
+    return newTask;
+  }
+
+  updateManualTask(taskId: string, updates: any) {
+    const manualTasks = this.getManualTasks();
+    const index = manualTasks.findIndex(t => t.ticket_number === taskId);
+    if (index !== -1) {
+      manualTasks[index] = { ...manualTasks[index], ...updates };
+      this.setManualTasks(manualTasks);
+      return manualTasks[index];
+    }
+    return null;
+  }
+
+  deleteManualTask(taskId: string) {
+    const manualTasks = this.getManualTasks();
+    const filtered = manualTasks.filter(t => t.ticket_number !== taskId);
+    this.setManualTasks(filtered);
+    return filtered;
+  }
+
+  // Combined data method (Project + Manual)
+  getAllTasks() {
+    const projectData = this.getProjectData();
+    const manualTasks = this.getManualTasks();
+    return [...projectData, ...manualTasks];
   }
 }
 
@@ -144,21 +190,14 @@ const createFloatingWindow = async () => {
 (async () => {
   await app.whenReady();
 
-  mainWindow = createWindow("main", {
-    width: 1000,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
-  });
+  // Create system tray
+  createTray();
 
-  // Register main window with data manager
-  dataManager.registerWindow(mainWindow);
+  // Create main window
+  mainWindow = createMainWindow();
 
   // Load initial data
-  await dataManager.loadInitialJiraData();
+  await dataManager.loadInitialProjectData();
 
   await createFloatingWindow();
 
@@ -172,8 +211,157 @@ const createFloatingWindow = async () => {
 })();
 
 app.on("window-all-closed", () => {
-  app.quit();
+  // On macOS, keep app running even when all windows are closed
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
+
+app.on("activate", () => {
+  // On macOS, re-create windows when dock icon is clicked
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createMainWindow();
+  } else if (mainWindow) {
+    mainWindow.show();
+  }
+});
+
+function createTray() {
+  // Create tray icon from app icon or use a default
+  const iconPath = path.join(__dirname, "../resources/icon.png");
+  let trayIcon;
+  
+  try {
+    // Try to use the app icon, fallback to creating a simple icon
+    if (fs.existsSync(iconPath)) {
+      trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
+    } else {
+      // Create a simple icon programmatically
+      trayIcon = nativeImage.createEmpty();
+    }
+  } catch (error) {
+    console.log("Could not load tray icon, using empty icon");
+    trayIcon = nativeImage.createEmpty();
+  }
+
+  tray = new Tray(trayIcon);
+  
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show Main Window',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          mainWindow.focus();
+        } else {
+          createMainWindow();
+        }
+      }
+    },
+    {
+      label: 'Toggle Floating Timer',
+      click: () => {
+        if (floatingWindow?.isVisible()) {
+          floatingWindow.hide();
+        } else if (floatingWindow) {
+          floatingWindow.show();
+          floatingWindow.focus();
+        } else {
+          createFloatingWindow();
+        }
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Quick Actions',
+      submenu: [
+        {
+          label: 'Start New Timer',
+          click: () => {
+            // Show floating window for timer selection
+            if (!floatingWindow) {
+              createFloatingWindow();
+            } else {
+              floatingWindow.show();
+              floatingWindow.focus();
+            }
+          }
+        },
+        {
+          label: 'View Today\'s Summary',
+          click: () => {
+            if (mainWindow) {
+              mainWindow.show();
+              mainWindow.focus();
+            } else {
+              createMainWindow();
+            }
+          }
+        }
+      ]
+    },
+    { type: 'separator' },
+    {
+      label: 'Quit',
+      click: () => {
+        app.quit();
+      }
+    }
+  ]);
+  
+  tray.setContextMenu(contextMenu);
+  tray.setToolTip('Project Time Tracker');
+  
+  // Click on tray icon shows/hides floating window
+  tray.on('click', () => {
+    if (floatingWindow?.isVisible()) {
+      floatingWindow.hide();
+    } else if (floatingWindow) {
+      floatingWindow.show();
+      floatingWindow.focus();
+    } else {
+      createFloatingWindow();
+    }
+  });
+  
+  // Double-click shows main window
+  tray.on('double-click', () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.focus();
+    } else {
+      createMainWindow();
+    }
+  });
+}
+
+function updateTrayTitle(activeTimers: number = 0) {
+  if (tray) {
+    if (activeTimers > 0) {
+      tray.setToolTip(`Project Time Tracker - ${activeTimers} active timer${activeTimers > 1 ? 's' : ''}`);
+    } else {
+      tray.setToolTip('Project Time Tracker - No active timers');
+    }
+  }
+}
+
+function createMainWindow() {
+  mainWindow = createWindow("main", {
+    width: 1000,
+    height: 600,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // Register main window with data manager
+  dataManager.registerWindow(mainWindow);
+
+  return mainWindow;
+}
 
 // ==================== WINDOW CONTROL IPC ====================
 ipcMain.on("toggle-float-window", () => {
@@ -234,9 +422,9 @@ ipcMain.on("window-resize", (_, { height }) => {
 });
 
 // ==================== CENTRALIZED DATA IPC HANDLERS ====================
-// Replace old load-jira-data handler
-ipcMain.handle("load-jira-data", async () => {
-  return dataManager.getJiraData();
+// Replace old load-project-data handler
+ipcMain.handle("load-project-data", async () => {
+  return dataManager.getProjectData();
 });
 
 // New centralized data handlers
@@ -248,8 +436,63 @@ ipcMain.on("save-session", (_, sessionData) => {
   dataManager.saveSession(sessionData);
 });
 
-ipcMain.handle("refresh-jira-data", async () => {
-  return await dataManager.loadInitialJiraData();
+ipcMain.handle("refresh-project-data", async () => {
+  return await dataManager.loadInitialProjectData();
+});
+
+// Manual task IPC handlers
+ipcMain.handle("get-manual-tasks", () => {
+  return dataManager.getManualTasks();
+});
+
+ipcMain.handle("get-all-tasks", () => {
+  return dataManager.getAllTasks();
+});
+
+ipcMain.handle("add-manual-task", (_, taskData) => {
+  try {
+    // Validate task data
+    if (!taskData.ticket_number || !taskData.ticket_name) {
+      throw new Error("Ticket number and name are required");
+    }
+    
+    // Check if ticket number already exists
+    const allTasks = dataManager.getAllTasks();
+    const exists = allTasks.some(t => t.ticket_number === taskData.ticket_number);
+    if (exists) {
+      throw new Error("Ticket number already exists");
+    }
+    
+    const newTask = dataManager.addManualTask(taskData);
+    return { success: true, task: newTask };
+  } catch (error) {
+    console.error("Error adding manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("update-manual-task", (_, { taskId, updates }) => {
+  try {
+    const updatedTask = dataManager.updateManualTask(taskId, updates);
+    if (updatedTask) {
+      return { success: true, task: updatedTask };
+    } else {
+      return { success: false, error: "Task not found" };
+    }
+  } catch (error) {
+    console.error("Error updating manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-manual-task", (_, taskId) => {
+  try {
+    dataManager.deleteManualTask(taskId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting manual task:", error);
+    return { success: false, error: error.message };
+  }
 });
 
 // ==================== PROJECT PATHS IPC ====================
@@ -447,6 +690,172 @@ ipcMain.on("stop-task", (event, { ticket }) => {
   if (floatingWindow) {
     floatingWindow.webContents.send("task-stopped", ticket);
   }
+  
+  // Update tray to show no active timers (simplified)
+  updateTrayTitle(0);
+});
+
+// ==================== TRAY MANAGEMENT IPC ====================
+ipcMain.handle("update-tray-status", (_, { activeTimers }) => {
+  updateTrayTitle(activeTimers);
+  return { success: true };
+});
+
+ipcMain.on("show-main-window", () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
+    createMainWindow();
+  }
+});
+
+// ==================== EXPORT FUNCTIONALITY ====================
+ipcMain.handle("export-time-data", async (_, { format, dateRange, filterProject }) => {
+  try {
+    const sessions = dataManager.getSessions();
+    const projectData = dataManager.getProjectData();
+    
+    // Prepare export data
+    const exportData = [];
+    
+    for (const [ticketNumber, sessionData] of Object.entries(sessions)) {
+// const ticketInfo = projectData.find(t => t.ticket_number === ticketNumber);
+      
+      for (const session of sessionData.sessions) {
+        if (session.endTime) {
+          const sessionDate = new Date(session.startTime);
+          
+          // Apply date filter if specified
+          if (dateRange) {
+            if (dateRange.start && sessionDate < new Date(dateRange.start)) continue;
+            if (dateRange.end && sessionDate > new Date(dateRange.end)) continue;
+          }
+          
+          // Apply project filter if specified
+          if (filterProject) {
+            const projectName = ticketNumber.split('-')[0];
+            if (projectName !== filterProject) continue;
+          }
+          
+          exportData.push({
+            ticketNumber,
+            ticketName: sessionData.ticketName,
+            projectName: ticketNumber.split('-')[0],
+            storyPoints: sessionData.storyPoints || 0,
+            sessionStart: new Date(session.startTime).toISOString(),
+            sessionEnd: new Date(session.endTime).toISOString(),
+            duration: session.duration,
+            durationHours: (session.duration / (1000 * 60 * 60)).toFixed(2),
+            status: session.status,
+            date: sessionDate.toISOString().split('T')[0]
+          });
+        }
+      }
+    }
+    
+    if (format === 'csv') {
+      // Generate CSV
+      const headers = [
+        'Ticket Number',
+        'Ticket Name', 
+        'Project',
+        'Story Points',
+        'Date',
+        'Session Start',
+        'Session End',
+        'Duration (ms)',
+        'Duration (hours)',
+        'Status'
+      ];
+      
+      const csvRows = [headers.join(',')];
+      
+      exportData.forEach(row => {
+        const csvRow = [
+          `"${row.ticketNumber}"`,
+          `"${row.ticketName.replace(/"/g, '""')}"`,
+          `"${row.projectName}"`,
+          row.storyPoints,
+          `"${row.date}"`,
+          `"${row.sessionStart}"`,
+          `"${row.sessionEnd}"`,
+          row.duration,
+          row.durationHours,
+          `"${row.status}"`
+        ];
+        csvRows.push(csvRow.join(','));
+      });
+      
+      const csvContent = csvRows.join('\n');
+      
+      // Show save dialog
+      const result = await dialog.showSaveDialog({
+        filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+        defaultPath: `time-tracking-export-${new Date().toISOString().split('T')[0]}.csv`
+      });
+      
+      if (!result.canceled && result.filePath) {
+        await fs.promises.writeFile(result.filePath, csvContent, 'utf8');
+        return { success: true, filePath: result.filePath, recordCount: exportData.length };
+      } else {
+        return { canceled: true };
+      }
+      
+    } else if (format === 'json') {
+      // Generate JSON
+      const jsonContent = JSON.stringify({
+        exportDate: new Date().toISOString(),
+        filters: { dateRange, filterProject },
+        totalRecords: exportData.length,
+        data: exportData
+      }, null, 2);
+      
+      const result = await dialog.showSaveDialog({
+        filters: [{ name: 'JSON Files', extensions: ['json'] }],
+        defaultPath: `time-tracking-export-${new Date().toISOString().split('T')[0]}.json`
+      });
+      
+      if (!result.canceled && result.filePath) {
+        await fs.promises.writeFile(result.filePath, jsonContent, 'utf8');
+        return { success: true, filePath: result.filePath, recordCount: exportData.length };
+      } else {
+        return { canceled: true };
+      }
+    }
+    
+    return { error: 'Unsupported format' };
+    
+  } catch (error) {
+    console.error('Export error:', error);
+    return { error: error.message };
+  }
+});
+
+ipcMain.handle("get-export-summary", () => {
+  try {
+    const sessions = dataManager.getSessions();
+// const projectData = dataManager.getProjectData();
+    
+    let totalSessions = 0;
+    let totalTime = 0;
+    const projects = new Set();
+    
+    for (const [ticketNumber, sessionData] of Object.entries(sessions)) {
+      projects.add(ticketNumber.split('-')[0]);
+      totalSessions += sessionData.sessions.length;
+      totalTime += sessionData.totalElapsed || 0;
+    }
+    
+    return {
+      totalSessions,
+      totalTime,
+      totalProjects: projects.size,
+      totalTickets: Object.keys(sessions).length
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
 });
 
 // Optional: Handle task deletion if you want main process to be aware or do something
@@ -458,4 +867,11 @@ ipcMain.on("delete-task", (event, { ticket }) => {
 // Legacy IPC channel (kept for compatibility)
 ipcMain.on("message", async (event, arg) => {
   event.reply("message", `${arg} World!`);
+});
+
+// Cleanup on app quit
+app.on("before-quit", () => {
+  if (tray) {
+    tray.destroy();
+  }
 });

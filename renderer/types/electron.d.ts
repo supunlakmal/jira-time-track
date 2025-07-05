@@ -1,9 +1,11 @@
 // renderer/types/electron.d.ts
 
-export interface JiraTicket {
+export interface ProjectTicket {
   ticket_number: string;
   ticket_name: string;
   story_points: number;
+  isManual?: boolean;
+  createdAt?: string;
 }
 
 export interface TaskTimer {
@@ -37,16 +39,17 @@ export interface IpcHandler {
   send(channel: "pause-task", value: { ticket: string }): void;
   send(channel: "resume-task", value: { ticket: string }): void;
   send(channel: "stop-task", value: { ticket: string }): void;
-  send(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  send(channel: "load-project-data", value?: undefined): Promise<ProjectTicket[]>;
   send(channel: "delete-task", value: { ticket: string }): void;
   send(channel: "save-project-paths", value: Record<string, string>): void;
   send(
     channel: "run-github-action",
     value: { projectName: string; projectPath: string }
   ): void;
+  send(channel: "show-main-window"): void;
 
   // Add invoke method
-  invoke(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
+  invoke(channel: "load-project-data", value?: undefined): Promise<ProjectTicket[]>;
   invoke(channel: "get-project-paths"): Promise<Record<string, string>>;
   invoke(
     channel: "select-project-directory",
@@ -61,6 +64,56 @@ export interface IpcHandler {
     data: { projectName: string; projectPath: string }
   ): Promise<{
     branch?: string;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-tray-status",
+    data: { activeTimers: number }
+  ): Promise<{ success: boolean }>;
+  invoke(
+    channel: "export-time-data",
+    data: {
+      format: 'csv' | 'json';
+      dateRange?: { start?: string; end?: string };
+      filterProject?: string;
+    }
+  ): Promise<{
+    success?: boolean;
+    canceled?: boolean;
+    error?: string;
+    filePath?: string;
+    recordCount?: number;
+  }>;
+  invoke(channel: "get-export-summary"): Promise<{
+    totalSessions: number;
+    totalTime: number;
+    totalProjects: number;
+    totalTickets: number;
+    error?: string;
+  }>;
+  invoke(channel: "get-manual-tasks"): Promise<ProjectTicket[]>;
+  invoke(channel: "get-all-tasks"): Promise<ProjectTicket[]>;
+  invoke(
+    channel: "add-manual-task",
+    data: { ticket_number: string; ticket_name: string; story_points?: number }
+  ): Promise<{
+    success: boolean;
+    task?: ProjectTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-manual-task",
+    data: { taskId: string; updates: Partial<ProjectTicket> }
+  ): Promise<{
+    success: boolean;
+    task?: ProjectTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "delete-manual-task",
+    taskId: string
+  ): Promise<{
+    success: boolean;
     error?: string;
   }>;
 
@@ -83,6 +136,10 @@ export interface IpcHandler {
   on(
     channel: "task-stopped",
     listener: (ticketNumber: string) => void
+  ): () => void;
+  on(
+    channel: "manual-tasks-updated",
+    listener: (manualTasks: ProjectTicket[]) => void
   ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 

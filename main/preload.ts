@@ -10,7 +10,7 @@ const validChannels = [
   "resume-task",
   "stop-task",
   "toggle-float-window",
-  "load-jira-data",
+  "load-project-data",
   "get-project-paths",
   "save-project-paths",
   "select-project-directory",
@@ -24,7 +24,22 @@ const validChannels = [
   "get-sessions",
   "save-session",
   "sessions-updated",
-  "jira-data-updated",
+  "project-data-updated",
+  "refresh-project-data",
+  // Manual task channels
+  "get-all-tasks",
+  "get-manual-tasks",
+  "add-manual-task",
+  "update-manual-task",
+  "delete-manual-task",
+  "manual-tasks-updated",
+  // Export functionality
+  "export-time-data",
+  "get-export-summary",
+  // Tray and window management
+  "update-tray-status",
+  "show-main-window",
+  "delete-task",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;
@@ -36,7 +51,7 @@ const handler = {
   send(channel: string, ...args: any[]) {
     if (validChannels.includes(channel)) {
       console.log(`[IPC PRELOAD SEND] Channel: "${channel}"`, "Args:", args);
-      if (channel === "load-jira-data") {
+      if (channel === "load-project-data") {
         // For invoke, we need to return the promise
         const promise = originalIpcRendererInvoke.apply(ipcRenderer, [
           channel,

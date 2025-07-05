@@ -1,0 +1,24 @@
+# .github/workflows/release-tag.yml
+
+name: Create Version Tag
+on:
+  push:
+    branches: [main, DEVELOP]
+    paths: ["package.json"]
+
+jobs:
+  tag-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/tag-on-package-version-change
+        with:
+          branch-suffix-map: |
+            {
+              "main": "",
+              "DEVELOP": "-alpha"
+            }

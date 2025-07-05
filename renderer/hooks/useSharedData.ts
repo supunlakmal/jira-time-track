@@ -10,11 +10,11 @@ export function useSharedData() {
     // Load initial data
     const loadData = async () => {
       try {
-        const [jira, sessionData] = await Promise.all([
-          window.ipc.invoke("load-jira-data"),
+        const [allTasks, sessionData] = await Promise.all([
+          window.ipc.invoke("get-all-tasks"),
           window.ipc.invoke("get-sessions"),
         ]);
-        setJiraData(jira || []);
+        setJiraData(allTasks || []);
         setSessions(sessionData || {});
       } finally {
         setLoading(false);
@@ -22,13 +22,21 @@ export function useSharedData() {
     };
 
     // Listen for updates
-    const cleanupJira = window.ipc.on("jira-data-updated", setJiraData);
+    const cleanupJira = window.ipc.on("jira-data-updated", () => {
+      // Reload all tasks when Jira data changes
+      window.ipc.invoke("get-all-tasks").then(setJiraData);
+    });
+    const cleanupManual = window.ipc.on("manual-tasks-updated", () => {
+      // Reload all tasks when manual tasks change
+      window.ipc.invoke("get-all-tasks").then(setJiraData);
+    });
     const cleanupSessions = window.ipc.on("sessions-updated", setSessions);
 
     loadData();
 
     return () => {
       cleanupJira();
+      cleanupManual();
       cleanupSessions();
     };
   }, []);

@@ -1,6 +1,8 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
+import { useIdleDetection } from "../hooks/useIdleDetection";
+import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
 export interface TaskTimer {
   ticketNumber: string;
@@ -22,13 +24,63 @@ export interface TaskTimer {
 const FloatingWindow: React.FC = () => {
   const { saveSession } = useSharedData();
   const [isDragging, setIsDragging] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [timers, setTimers] = useState<TaskTimer[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [ticketData, setTicketData] = useState<{ [key: string]: string }>({});
   const [selectedTicketNumber, setSelectedTicketNumber] = useState<
     string | null
   >(null);
+  const [idleSettings, setIdleSettings] = useState({
+    enabled: true,
+    idleTime: 5 * 60 * 1000, // 5 minutes default
+  });
+  const [pausedDueToIdle, setPausedDueToIdle] = useState<Set<string>>(new Set());
+
+  // Keyboard shortcuts
+  useFloatingWindowShortcuts({
+    onToggleFloating: () => window.ipc?.send('toggle-float-window'),
+    onStartTimer: () => {
+      const runningTimer = timers.find(t => t.isRunning && t.status === 'running');
+      if (runningTimer) {
+        handleTimerAction('pause', runningTimer.ticketNumber);
+      } else {
+        const pausedTimer = timers.find(t => t.status === 'paused');
+        if (pausedTimer) {
+          handleTimerAction('resume', pausedTimer.ticketNumber);
+        }
+      }
+    }
+  });
+
+  // Idle detection handlers
+  const handleUserIdle = () => {
+    console.log('User went idle, pausing active timers');
+    const activeTimers = timers.filter(t => t.isRunning && t.status === 'running');
+    
+    if (activeTimers.length > 0) {
+      const newPausedSet = new Set(pausedDueToIdle);
+      activeTimers.forEach(timer => {
+        newPausedSet.add(timer.ticketNumber);
+        handleTimerAction('pause', timer.ticketNumber);
+      });
+      setPausedDueToIdle(newPausedSet);
+    }
+  };
+
+  const handleUserActive = () => {
+    console.log('User became active');
+    // Note: We don't auto-resume timers, user needs to manually resume
+    // This prevents accidental time tracking when user returns
+  };
+
+  // Initialize idle detection
+  const hasActiveTimers = timers.some(t => t.isRunning && t.status === 'running');
+  const { isIdle } = useIdleDetection({
+    idleTime: idleSettings.idleTime,
+    onIdle: handleUserIdle,
+    onActive: handleUserActive,
+    enabled: idleSettings.enabled && hasActiveTimers
+  });
 
   useEffect(() => {
     const loadTicketData = async () => {
@@ -71,6 +123,14 @@ const FloatingWindow: React.FC = () => {
       );
     }
   }, [ticketData]);
+
+  // Update tray status when timers change
+  useEffect(() => {
+    const activeTimers = timers.filter(t => t.isRunning && t.status === 'running').length;
+    if (window.ipc && typeof window.ipc.invoke === 'function') {
+      window.ipc.invoke('update-tray-status', { activeTimers }).catch(console.error);
+    }
+  }, [timers]);
 
   useEffect(() => {
     if (intervalRef.current) {
@@ -160,7 +220,7 @@ const FloatingWindow: React.FC = () => {
               ...newSessions[lastSessionIndex],
               endTime: actionTime,
               duration: timer.elapsedTime,
-              status: action,
+              status: action === "complete" ? "completed" : action,
             };
           } else if (
             !timer.isRunning &&
@@ -232,7 +292,6 @@ const FloatingWindow: React.FC = () => {
         };
 
         // Save to Redux
-
         saveSession({
           ticketNumber: timer.ticketNumber,
           ticketName: timer.ticketName,
@@ -526,42 +585,30 @@ const FloatingWindow: React.FC = () => {
 
   const handleClose = () => window.ipc.window.hide();
 
-  const handleMinimize = () => {
-    const newMinimized = !isMinimized;
-    setIsMinimized(newMinimized);
-    if (newMinimized) {
-      window.ipc.send("window-resize", { height: 40 });
-    } else {
-      let calculatedHeight;
-      if (selectedTicketNumber) {
-        calculatedHeight = 350;
-      } else {
-        const numTimers = timers.length;
-        const rows = Math.max(1, Math.ceil(numTimers / 3));
-        const gridBaseHeight = 60;
-        const gridRowHeight = 70;
-        calculatedHeight = gridBaseHeight + rows * gridRowHeight;
-      }
-      window.ipc.send("window-resize", {
-        height: Math.min(Math.max(calculatedHeight, 150), 600),
-      });
-    }
+
+  const handleResumeFromIdle = (ticketNumber: string) => {
+    const newPausedSet = new Set(pausedDueToIdle);
+    newPausedSet.delete(ticketNumber);
+    setPausedDueToIdle(newPausedSet);
+    handleTimerAction('resume', ticketNumber);
   };
 
   const renderTimerDetail = (timer: TaskTimer | undefined) => {
     if (!timer) {
       return (
-        <div className="p-4 text-center text-gray-500">
+        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
           Timer details not available.
           <button
             onClick={() => setSelectedTicketNumber(null)}
-            className="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded text-sm"
+            className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
           >
             Back to Grid
           </button>
         </div>
       );
     }
+
+    const wasPausedByIdle = pausedDueToIdle.has(timer.ticketNumber);
 
     const estimatedTimeMs = (timer.storyPoints || 0) * 60 * 60 * 1000;
     let progressWidthPercentage = 0;
@@ -613,7 +660,7 @@ const FloatingWindow: React.FC = () => {
           {/* Reduced mb */}
           <div className="flex-1 mr-3">
             <h3
-              className="font-medium text-gray-900 text-sm truncate"
+              className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate"
               title={timer.ticketNumber}
             >
               {timer.ticketNumber}
@@ -626,7 +673,7 @@ const FloatingWindow: React.FC = () => {
             </p>
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="text-lg font-mono font-medium text-gray-900">
+            <div className="text-lg font-mono font-medium text-gray-900 dark:text-gray-100">
               {formatTime(timer.totalElapsed)}
             </div>
             <div className="text-xs text-gray-400">
@@ -645,6 +692,11 @@ const FloatingWindow: React.FC = () => {
             >
               {getStatusIcon(timer.status, timer.isRunning)}{" "}
               {getStatusText(timer.status, timer.isRunning)}
+              {wasPausedByIdle && (
+                <div className="text-xs text-orange-600 mt-1">
+  Paused due to idle
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -688,10 +740,10 @@ const FloatingWindow: React.FC = () => {
           ) : timer.status === "paused" ? (
             <>
               <button
-                onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                onClick={() => wasPausedByIdle ? handleResumeFromIdle(timer.ticketNumber) : handleTimerAction("resume", timer.ticketNumber)}
+                className={`${wasPausedByIdle ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'} text-white py-1 px-2 rounded text-xs font-medium`}
               >
-                Resume
+                {wasPausedByIdle ? 'Resume from Idle' : 'Resume'}
               </button>
               <button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
@@ -747,9 +799,9 @@ const FloatingWindow: React.FC = () => {
             )}
         </div>
         {timer.sessions.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-200">
+          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
             <details className="text-xs">
-              <summary className="cursor-pointer text-gray-600 hover:text-gray-800">
+              <summary className="cursor-pointer text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">
                 {timer.sessions.length} Session
                 {timer.sessions.length > 1 ? "s" : ""} | Total:{" "}
                 {formatTime(timer.totalElapsed)}
@@ -782,30 +834,25 @@ const FloatingWindow: React.FC = () => {
 
   return (
     <div className="h-screen bg-transparent select-none">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
         <div
-          className="bg-gray-800 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
+          className="bg-gray-800 dark:bg-gray-900 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
           onMouseDown={(e) => {
             e.preventDefault();
             setIsDragging(true);
           }}
         >
           <div className="text-sm font-semibold">
-            Time Tracker{" "}
-            {selectedTicketNumber
-              ? `(${selectedTicketNumber})`
-              : timers.length > 0
-              ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
-              : ""}
+            <div>
+              Time Tracker{" "}
+              {selectedTicketNumber
+                ? `(${selectedTicketNumber})`
+                : timers.length > 0
+                ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
+                : ""}
+            </div>
           </div>
           <div className="flex space-x-2">
-            <button
-              onClick={handleMinimize}
-              className="hover:bg-gray-700 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"
-              title={isMinimized ? "Expand" : "Minimize"}
-            >
-              {isMinimized ? "□" : "−"}
-            </button>
             <button
               onClick={handleClose}
               className="hover:bg-red-500 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"
@@ -816,16 +863,15 @@ const FloatingWindow: React.FC = () => {
           </div>
         </div>
 
-        {!isMinimized && (
-          <div className="p-4 overflow-y-auto flex-grow">
+        <div className="p-4 overflow-y-auto flex-grow">
             {selectedTicketNumber && currentTimerDetails ? (
               renderTimerDetail(currentTimerDetails)
             ) : selectedTicketNumber && !currentTimerDetails ? (
-              <div className="text-center text-gray-500 p-4">
+              <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                 <p>Timer '{selectedTicketNumber}' not found.</p>
                 <button
                   onClick={() => setSelectedTicketNumber(null)}
-                  className="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded text-sm"
+                  className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
                 >
                   Back to Grid
                 </button>
@@ -833,7 +879,7 @@ const FloatingWindow: React.FC = () => {
             ) : (
               <div className="space-y-2">
                 {timers.length === 0 ? (
-                  <div className="text-center text-gray-500 p-4">
+                  <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                     No active timers. Start one from the main app.
                   </div>
                 ) : (
@@ -844,7 +890,7 @@ const FloatingWindow: React.FC = () => {
                         onClick={() =>
                           setSelectedTicketNumber(timer.ticketNumber)
                         }
-                        className="p-3 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="p-3 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         title={`View details for ${timer.ticketNumber}\n${
                           timer.ticketName
                         }\nStatus: ${getStatusText(
@@ -869,7 +915,7 @@ const FloatingWindow: React.FC = () => {
                             {formatTime(timer.totalElapsed)}
                           </span>
                         </div>
-                        <h4 className="font-medium text-gray-800 text-sm truncate">
+                        <h4 className="font-medium text-gray-800 dark:text-gray-200 text-sm truncate">
                           {timer.ticketNumber}
                         </h4>
                         <p
@@ -907,7 +953,6 @@ const FloatingWindow: React.FC = () => {
               </div>
             )}
           </div>
-        )}
       </div>
     </div>
   );

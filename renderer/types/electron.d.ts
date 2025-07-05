@@ -4,6 +4,8 @@ export interface JiraTicket {
   ticket_number: string;
   ticket_name: string;
   story_points: number;
+  isManual?: boolean;
+  createdAt?: string;
 }
 
 export interface TaskTimer {
@@ -44,6 +46,7 @@ export interface IpcHandler {
     channel: "run-github-action",
     value: { projectName: string; projectPath: string }
   ): void;
+  send(channel: "show-main-window"): void;
 
   // Add invoke method
   invoke(channel: "load-jira-data", value?: undefined): Promise<JiraTicket[]>;
@@ -61,6 +64,56 @@ export interface IpcHandler {
     data: { projectName: string; projectPath: string }
   ): Promise<{
     branch?: string;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-tray-status",
+    data: { activeTimers: number }
+  ): Promise<{ success: boolean }>;
+  invoke(
+    channel: "export-time-data",
+    data: {
+      format: 'csv' | 'json';
+      dateRange?: { start?: string; end?: string };
+      filterProject?: string;
+    }
+  ): Promise<{
+    success?: boolean;
+    canceled?: boolean;
+    error?: string;
+    filePath?: string;
+    recordCount?: number;
+  }>;
+  invoke(channel: "get-export-summary"): Promise<{
+    totalSessions: number;
+    totalTime: number;
+    totalProjects: number;
+    totalTickets: number;
+    error?: string;
+  }>;
+  invoke(channel: "get-manual-tasks"): Promise<JiraTicket[]>;
+  invoke(channel: "get-all-tasks"): Promise<JiraTicket[]>;
+  invoke(
+    channel: "add-manual-task",
+    data: { ticket_number: string; ticket_name: string; story_points?: number }
+  ): Promise<{
+    success: boolean;
+    task?: JiraTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "update-manual-task",
+    data: { taskId: string; updates: Partial<JiraTicket> }
+  ): Promise<{
+    success: boolean;
+    task?: JiraTicket;
+    error?: string;
+  }>;
+  invoke(
+    channel: "delete-manual-task",
+    taskId: string
+  ): Promise<{
+    success: boolean;
     error?: string;
   }>;
 
@@ -83,6 +136,10 @@ export interface IpcHandler {
   on(
     channel: "task-stopped",
     listener: (ticketNumber: string) => void
+  ): () => void;
+  on(
+    channel: "manual-tasks-updated",
+    listener: (manualTasks: JiraTicket[]) => void
   ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 

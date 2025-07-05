@@ -25,6 +25,21 @@ const validChannels = [
   "save-session",
   "sessions-updated",
   "jira-data-updated",
+  "refresh-jira-data",
+  // Manual task channels
+  "get-all-tasks",
+  "get-manual-tasks",
+  "add-manual-task",
+  "update-manual-task",
+  "delete-manual-task",
+  "manual-tasks-updated",
+  // Export functionality
+  "export-time-data",
+  "get-export-summary",
+  // Tray and window management
+  "update-tray-status",
+  "show-main-window",
+  "delete-task",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;

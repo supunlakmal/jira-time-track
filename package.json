@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
+  "name": "jira-time-tracker",
+  "description": "A cross-platform desktop application for tracking time spent on Jira tickets with floating timer, productivity features, and comprehensive reporting",
   "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "author": "Developer",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
@@ -17,7 +17,7 @@
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
+    "@types/node": "^20.19.1",
     "@types/react": "^18.2.52",
     "autoprefixer": "^10.4.19",
     "electron": "^34.0.0",

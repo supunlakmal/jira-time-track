@@ -2,8 +2,13 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
+import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ManualTaskDialog } from "../components/ManualTaskDialog";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
+import { TimerSession } from "../store/sessionsSlice";
 
 interface ProjectSummary {
   name: string;
@@ -41,6 +46,9 @@ export default function HomePage() {
   const [projectBranches, setProjectBranches] = useState<
     Record<string, string>
   >({});
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -152,16 +160,19 @@ export default function HomePage() {
       (sum, ticket) => sum + (ticket.story_points || 0),
       0
     );
-    const totalTimeTracked = Object.values(sessions).reduce(
-      (sum, session) => sum + (session.totalElapsed || 0),
-      0
-    );
+    const totalTimeTracked: number = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).reduce((sum, session) => sum + (session.totalElapsed || 0), 0);
 
-    const completedTickets = Object.values(sessions).filter((session) =>
+    const completedTickets = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).filter((session) =>
       session.sessions.some((s) => s.status === "completed")
     ).length;
 
-    const inProgressTickets = Object.values(sessions).filter((session) =>
+    const inProgressTickets = Object.values(
+      sessions as { [key: string]: TimerSession }
+    ).filter((session) =>
       session.sessions.some(
         (s) => s.status === "running" || s.status === "paused"
       )
@@ -285,6 +296,16 @@ export default function HomePage() {
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
 
+  // Keyboard shortcuts
+  useMainWindowShortcuts({
+    onToggleFloating: toggleFloatingWindow,
+    onShowExport: () => setShowExportDialog(true),
+    onRefreshData: () => {
+      // Refresh data functionality
+      window.location.reload();
+    },
+  });
+
   const handleProjectSelect = (projectName: string | null) => {
     setSelectedProject(projectName);
     setSearchTerm("");
@@ -344,12 +365,83 @@ export default function HomePage() {
     }
   };
 
+  // Manual task handlers
+  const handleAddManualTask = async (taskData: {
+    ticket_number: string;
+    ticket_name: string;
+    story_points?: number;
+  }) => {
+    try {
+      const result = await window.ipc.invoke("add-manual-task", taskData);
+      if (result.success) {
+        console.log("Manual task added successfully:", result.task);
+      } else {
+        alert(`Error adding task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error adding manual task:", error);
+      alert("Failed to add task. Please try again.");
+    }
+  };
+
+  const handleEditManualTask = async (taskData: {
+    ticket_number: string;
+    ticket_name: string;
+    story_points?: number;
+  }) => {
+    if (!editingTask) return;
+    
+    try {
+      const result = await window.ipc.invoke("update-manual-task", {
+        taskId: editingTask.ticket_number,
+        updates: taskData,
+      });
+      if (result.success) {
+        console.log("Manual task updated successfully:", result.task);
+        setEditingTask(null);
+      } else {
+        alert(`Error updating task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error updating manual task:", error);
+      alert("Failed to update task. Please try again.");
+    }
+  };
+
+  const handleDeleteManualTask = async (ticketNumber: string) => {
+    if (!confirm("Are you sure you want to delete this manual task?")) {
+      return;
+    }
+    
+    try {
+      const result = await window.ipc.invoke("delete-manual-task", ticketNumber);
+      if (result.success) {
+        console.log("Manual task deleted successfully");
+      } else {
+        alert(`Error deleting task: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("Error deleting manual task:", error);
+      alert("Failed to delete task. Please try again.");
+    }
+  };
+
+  const openEditDialog = (task: any) => {
+    setEditingTask(task);
+    setShowManualTaskDialog(true);
+  };
+
+  const closeManualTaskDialog = () => {
+    setShowManualTaskDialog(false);
+    setEditingTask(null);
+  };
+
   return (
     <React.Fragment>
       <Head>
         <title>Jira Time Tracker</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -360,7 +452,7 @@ export default function HomePage() {
               width={100}
               height={100}
             />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Jira Time Tracker Dashboard
             </h1>
             <div className="flex justify-center gap-4 mb-4">
@@ -370,6 +462,21 @@ export default function HomePage() {
               >
                 Toggle Floating Timer
               </button>
+              <button
+                onClick={() => setShowManualTaskDialog(true)}
+                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Add a manual task"
+              >
+                Add Manual Task
+              </button>
+              <button
+                onClick={() => setShowExportDialog(true)}
+                className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Export time tracking data"
+              >
+                Export Data
+              </button>
+              <ThemeToggle size="md" />
             </div>
           </div>
 
@@ -380,7 +487,7 @@ export default function HomePage() {
               {/* Dashboard Stats Cards */}
 
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Overview
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -562,6 +669,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+
 
               {/* Enhanced Project Summary Table */}
               {projectSummaryData.length > 0 && (
@@ -883,8 +991,15 @@ export default function HomePage() {
                                     )}
                                   </div>
                                   <div>
-                                    <div className="text-sm font-medium text-blue-600">
+                                    <div className={`text-sm font-medium flex items-center ${
+                                      ticket.isManual ? 'text-purple-600' : 'text-blue-600'
+                                    }`}>
                                       {ticket.ticket_number}
+                                      {ticket.isManual && (
+                                        <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                                          Manual
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       {getProjectName(ticket.ticket_number)}
@@ -975,6 +1090,24 @@ export default function HomePage() {
                                       Details
                                     </button>
                                   )}
+                                  {ticket.isManual && (
+                                    <>
+                                      <button
+                                        onClick={() => openEditDialog(ticket)}
+                                        className="text-purple-600 hover:text-purple-900 text-xs transition-colors"
+                                        title="Edit manual task"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteManualTask(ticket.ticket_number)}
+                                        className="text-red-600 hover:text-red-900 text-xs transition-colors"
+                                        title="Delete manual task"
+                                      >
+                                        Delete
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -1053,6 +1186,22 @@ export default function HomePage() {
             </>
           )}
         </div>
+
+        {/* Export Dialog */}
+        <ExportDialog
+          isOpen={showExportDialog}
+          onClose={() => setShowExportDialog(false)}
+          projects={projectSummaryData.map((p) => p.name)}
+        />
+
+        {/* Manual Task Dialog */}
+        <ManualTaskDialog
+          isOpen={showManualTaskDialog}
+          onClose={closeManualTaskDialog}
+          onSave={editingTask ? handleEditManualTask : handleAddManualTask}
+          editingTask={editingTask}
+          existingTickets={data.map((ticket) => ticket.ticket_number)}
+        />
       </div>
     </React.Fragment>
   );

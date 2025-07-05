@@ -601,8 +601,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Time Goals Widget */}
-              {/* <TimeGoalsWidget sessions={sessions} className="mb-8" /> */}
 
               {/* Enhanced Project Summary Table */}
               {projectSummaryData.length > 0 && (

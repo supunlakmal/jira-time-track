@@ -43,11 +43,6 @@ This project is a **Project Time Tracking application** built using **Nextron (N
     *   Automatically detects user inactivity (idle time is configurable).
     *   When idle, it automatically pauses any active timers to prevent inaccurate time tracking.
     *   Users need to manually resume timers after becoming active again.
-2.  **Time Goals Widget:**
-    *   Displays progress against user-defined time goals (e.g., daily work hours).
-    *   Shows visual progress bars and percentage completion.
-    *   Provides alerts for nearing goals, reaching goals, or exceeding goals (overtime).
-    *   Allows dismissing individual or all alerts.
 
 ## Data Management & Reporting
 

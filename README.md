@@ -60,12 +60,6 @@ A cross-platform desktop application built with Nextron (Next.js + Electron) for
 - **Accurate time logging** preventing overestimation due to breaks
 - **Manual resume** requirement to ensure intentional time tracking
 
-#### Time Goals Widget
-
-- **Daily and project-specific goals** with progress tracking
-- **Visual progress indicators** showing completion percentages
-- **Achievement notifications** for meeting or exceeding goals
-- **Overtime alerts** for work-life balance management
 
 ### 📈 Data Management & Reporting
 

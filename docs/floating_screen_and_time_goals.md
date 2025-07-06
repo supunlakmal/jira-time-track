@@ -1,41 +1,8 @@
-# Project Time Track - Key Features: Time Goals and Floating Screen
+# Project Time Track - Floating Screen
 
-This document explains two core features of the Project Time Track application: Time Goals and the Floating Screen.
+This document explains the Floating Screen feature of the Project Time Track application.
 
-## 1. Time Goals
-
-The "Time Goals" feature allows users to set specific targets for their work time, helping them monitor their progress and manage their hours effectively.
-
-### What are Time Goals?
-
-Time Goals are configurable targets for the amount of time a user wants to spend working. They can be set for different periods or entities:
-
-*   **Daily Goals:** For example, aiming to work 8 hours each day.
-*   **Weekly Goals:** For example, aiming for a 40-hour work week.
-*   **Project-specific Goals:** (Potentially, though not explicitly shown in the provided code, the `type: 'project'` and `targetEntity` fields suggest this capability)
-*   **Ticket-specific Goals:** (Potentially, similar to project goals)
-
-The `TimeGoalsWidget.tsx` component is responsible for displaying these goals, their progress, and any associated alerts to the user.
-
-### Logic Behind Time Goals
-
-The `useTimeGoals` hook (`renderer/hooks/useTimeGoals.ts`) manages the state and logic for time goals.
-
-*   **Goal Definition:** Each goal is defined by:
-    *   `id`: Unique identifier.
-    *   `type`: Scope of the goal (e.g., `daily`, `weekly`, `project`, `ticket`).
-    *   `target`: The target duration in milliseconds.
-    *   `targetEntity`: (Optional) Project name or ticket number for specific goals.
-    *   `description`: User-friendly description.
-    *   `enabled`: Whether the goal is active.
-*   **Default Goals:** The application includes default daily (8 hours) and weekly (40 hours) goals.
-*   **State Management:** Goals, progress, and alerts are managed using React's `useState` and persisted across sessions using `localStorage`.
-*   **Goal Actions:** Functions are provided to `addGoal`, `updateGoal`, and `removeGoal`.
-*   **Alerts:** The system generates alerts (warning, overtime, achieved) based on goal progress. These alerts can trigger native browser notifications if enabled. Functions to `addAlert`, `dismissAlert`, and `clearAllAlerts` are available.
-*   **Time Formatting:** A utility `formatTime` converts milliseconds into a human-readable "Xh Ym" format.
-*   **Progress Calculation:** The actual calculation of time spent against goals is derived from the user's tracking sessions, which are passed to the `useTimeGoals` hook.
-
-## 2. Floating Screen
+## Floating Screen
 
 The "Floating Screen" is a compact, always-on-top window that provides quick access to your active timers and related settings. It's designed to be a convenient overlay while you work, allowing you to monitor and control your time tracking without needing to switch back to the main application window.
 

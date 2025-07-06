@@ -75,19 +75,6 @@ class DataManager {
     return this.store.get("projectData");
   }
 
-  // Load initial Project data from file
-  async loadInitialProjectData() {
-    try {
-      const dataPath = path.join(__dirname, "../json/data.json");
-      const rawData = await fs.promises.readFile(dataPath, "utf8");
-      const projectData = JSON.parse(rawData);
-      this.setProjectData(projectData);
-      return projectData;
-    } catch (error) {
-      console.error("Error loading initial Project data:", error);
-      return [];
-    }
-  }
 
   // Manual task methods
   getManualTasks() {
@@ -196,8 +183,7 @@ const createFloatingWindow = async () => {
   // Create main window
   mainWindow = createMainWindow();
 
-  // Load initial data
-  await dataManager.loadInitialProjectData();
+  // Application starts with empty task list until CSV import
 
   await createFloatingWindow();
 
@@ -422,9 +408,9 @@ ipcMain.on("window-resize", (_, { height }) => {
 });
 
 // ==================== CENTRALIZED DATA IPC HANDLERS ====================
-// Replace old load-project-data handler
+// Get all tasks (project + manual)
 ipcMain.handle("load-project-data", async () => {
-  return dataManager.getProjectData();
+  return dataManager.getAllTasks();
 });
 
 // New centralized data handlers
@@ -436,9 +422,6 @@ ipcMain.on("save-session", (_, sessionData) => {
   dataManager.saveSession(sessionData);
 });
 
-ipcMain.handle("refresh-project-data", async () => {
-  return await dataManager.loadInitialProjectData();
-});
 
 // Manual task IPC handlers
 ipcMain.handle("get-manual-tasks", () => {

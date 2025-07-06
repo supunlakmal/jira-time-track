@@ -25,7 +25,6 @@ const validChannels = [
   "save-session",
   "sessions-updated",
   "project-data-updated",
-  "refresh-project-data",
   // Manual task channels
   "get-all-tasks",
   "get-manual-tasks",
@@ -55,28 +54,6 @@ const handler = {
   send(channel: string, ...args: any[]) {
     if (validChannels.includes(channel)) {
       console.log(`[IPC PRELOAD SEND] Channel: "${channel}"`, "Args:", args);
-      if (channel === "load-project-data") {
-        // For invoke, we need to return the promise
-        const promise = originalIpcRendererInvoke.apply(ipcRenderer, [
-          channel,
-          ...args,
-        ]);
-        promise.then(
-          (result) =>
-            console.log(
-              `[IPC PRELOAD INVOKE SUCCESS] Channel: "${channel}"`,
-              "Result:",
-              result
-            ),
-          (error) =>
-            console.error(
-              `[IPC PRELOAD INVOKE ERROR] Channel: "${channel}"`,
-              "Error:",
-              error
-            )
-        );
-        return promise;
-      }
       // For regular send
       return originalIpcRendererSend.apply(ipcRenderer, [channel, ...args]);
     } else {

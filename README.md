@@ -43,7 +43,7 @@ A cross-platform desktop application built with Nextron (Next.js + Electron) for
 
 - **System tray integration** with quick access to all functions
 - **Keyboard shortcuts** for rapid timer control
-- **Desktop notifications** for break reminders and timer updates
+- **Desktop notifications** for timer updates
 - **Git branch detection** for project-specific workflows
 
 ### 🎨 User Experience
@@ -53,13 +53,6 @@ A cross-platform desktop application built with Nextron (Next.js + Electron) for
 - **Intuitive controls** with clear visual feedback
 
 ### 💪 Productivity & Wellness Features
-
-#### Break Reminders (Pomodoro Technique)
-
-- **Configurable work/break cycles** with customizable durations
-- **Long break intervals** for extended work sessions
-- **Desktop notifications** with contextual productivity tips
-- **Flexible break management** with options to start, skip, or postpone breaks
 
 #### Idle Detection
 
@@ -216,7 +209,7 @@ All application data is stored locally using `electron-store`, which creates JSO
 ### Data Structure
 
 - **Sessions:** Timer sessions with start/end times, duration, and status
-- **Settings:** User preferences, theme settings, and break configurations
+- **Settings:** User preferences and theme settings
 - **Project Paths:** Local directory paths for Git integration
 - **Project Data:** Cached ticket information and story points
 
@@ -240,15 +233,6 @@ The `json/data.json` file should follow this structure:
   }
 ]
 ```
-
-### Break Timer Configuration
-
-- Work duration: 25 minutes (default)
-- Short break: 5 minutes (default)
-- Long break: 15 minutes (default)
-- Long break interval: Every 4 work sessions (default)
-
-All timing settings can be customized through the application interface.
 
 ## Contributing
 

@@ -44,7 +44,6 @@ The "Floating Screen" is a compact, always-on-top window that provides quick acc
 *   **Timer Display:** Shows a list of active Project task timers with details like ticket number, name, total elapsed time, current session time, status (Running, Paused, On Hold, Completed, Stopped, In Queue), and estimated time based on Story Points with a progress bar.
 *   **Timer Actions:** Allows users to directly control timers (Start, Pause, Resume, Hold, Complete, Stop, Delete).
 *   **Idle Detection Integration:** Automatically pauses active timers if the user becomes idle for a configurable duration. Displays a "Paused due to idle" message.
-*   **Break Reminder Integration:** Displays information about upcoming or active breaks, including time remaining. Provides quick access to break settings and options to end or skip breaks.
 *   **Keyboard Shortcuts:** Supports global keyboard shortcuts for controlling the floating window and timer actions.
 *   **Drag-and-Drop Movement:** The window can be freely repositioned on the screen.
 *   **IPC Communication:** Communicates with the main Electron process for data loading, sending timer commands, updating the tray icon, and handling window events.
@@ -57,9 +56,6 @@ While there isn't a single "Floating Screen Settings" panel, its configurable as
     *   **Enabled:** Toggle whether idle detection is active.
     *   **Idle Time:** Configure the duration of inactivity (e.g., 5 minutes) after which timers are paused.
     These settings are managed internally by the `float.tsx` component and the `useIdleDetection` hook.
-*   **Break Settings:**
-    *   These settings control the break reminder feature (e.g., break duration, frequency).
-    *   They are managed by the `useBreakTimer` hook and configured via the `BreakSettingsDialog` component, which can be accessed directly from the floating screen.
 
 ### Window Creation and Persistence Logic (`main/helpers/create-window.ts`)
 

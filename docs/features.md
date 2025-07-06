@@ -35,23 +35,15 @@ This project is a **Project Time Tracking application** built using **Nextron (N
 4.  **Theme Toggling:**
     *   Supports switching between 'light', 'dark', and 'system' themes for the application's interface.
 5.  **Keyboard Shortcuts:**
-    *   Provides keyboard shortcuts for common actions within the floating window, such as toggling its visibility, starting/pausing timers, and opening break settings.
+    *   Provides keyboard shortcuts for common actions within the floating window, such as toggling its visibility and starting/pausing timers.
 
 ## Productivity & Wellness Features
 
-1.  **Configurable Break Reminders (Pomodoro-like):**
-    *   **Enable/Disable:** Users can enable or disable the break reminder feature.
-    *   **Customizable Durations:** Set `workDuration`, `shortBreakDuration`, and `longBreakDuration` in minutes.
-    *   **Long Break Interval:** Configure after how many work sessions a long break should be suggested.
-    *   **Notifications:** Provides desktop notifications when a break is due or over.
-    *   **Break Tips:** Offers contextual tips during break reminders.
-    *   **Actions:** Users can choose to "Start Break" or "Skip Break" from the reminder.
-    *   **Persistent Settings:** Break timer settings are saved locally.
-2.  **Idle Detection:**
+1.  **Idle Detection:
     *   Automatically detects user inactivity (idle time is configurable).
     *   When idle, it automatically pauses any active timers to prevent inaccurate time tracking.
     *   Users need to manually resume timers after becoming active again.
-3.  **Time Goals Widget:**
+2.  **Time Goals Widget:**
     *   Displays progress against user-defined time goals (e.g., daily work hours).
     *   Shows visual progress bars and percentage completion.
     *   Provides alerts for nearing goals, reaching goals, or exceeding goals (overtime).

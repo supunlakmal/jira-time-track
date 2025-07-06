@@ -1,19 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface Session {
-  startTime: number;
-  endTime?: number;
-  duration: number;
-  status: string;
-}
-
-export interface TimerSession {
-  ticketNumber: string;
-  ticketName: string;
-  storyPoints?: number;
-  sessions: Session[];
-  totalElapsed: number;
-}
+import { Session, TimerSession } from "../../types";
 
 interface SessionsState {
   sessions: { [key: string]: TimerSession };

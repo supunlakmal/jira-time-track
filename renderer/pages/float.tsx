@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
+import { Task, Session } from "../../types";
 
 export interface TaskTimer {
   ticketNumber: string;
@@ -11,12 +12,7 @@ export interface TaskTimer {
   isRunning: boolean;
   status: "running" | "paused" | "hold" | "completed" | "stopped" | "queue";
   totalElapsed: number;
-  sessions: Array<{
-    startTime: number;
-    endTime?: number;
-    duration: number;
-    status: string;
-  }>;
+  sessions: Session[];
   storyPoints?: number;
 }
 
@@ -50,18 +46,12 @@ const FloatingWindow: React.FC = () => {
   useEffect(() => {
     const loadTicketData = async () => {
       try {
-        const data = (await window.ipc.send(
-          "load-project-data",
-          undefined
-        )) as Array<{
-          ticket_number: string;
-          ticket_name: string;
-        }>;
+        const data = await window.ipc.invoke("load-project-data");
         if (data && Array.isArray(data)) {
-          const ticketMap = data.reduce((acc, ticket) => {
+          const ticketMap = data.reduce((acc: { [key: string]: string }, ticket: Task) => {
             acc[ticket.ticket_number] = ticket.ticket_name;
             return acc;
-          }, {} as { [key: string]: string });
+          }, {});
           setTicketData(ticketMap);
         } else {
           console.warn("load-project-data did not return valid data", data);
@@ -185,7 +175,7 @@ const FloatingWindow: React.FC = () => {
               ...newSessions[lastSessionIndex],
               endTime: actionTime,
               duration: timer.elapsedTime,
-              status: action === "complete" ? "completed" : action,
+              status: action === "complete" ? "completed" : action === "hold" ? "paused" : action as 'running' | 'paused' | 'completed' | 'stopped',
             };
           } else if (
             !timer.isRunning &&
@@ -232,7 +222,7 @@ const FloatingWindow: React.FC = () => {
             newSessions.push({
               startTime: actionTime,
               duration: 0,
-              status: "running",
+              status: "running" as const,
             });
             break;
           case "hold":
@@ -322,7 +312,7 @@ const FloatingWindow: React.FC = () => {
               ...updatedSessions[lastSessionIdx],
               endTime: eventTime,
               duration: existingTimer.elapsedTime,
-              status: existingTimer.status,
+              status: existingTimer.status === 'hold' ? 'paused' : existingTimer.status === 'queue' ? 'stopped' : existingTimer.status as 'running' | 'paused' | 'completed' | 'stopped',
             };
           }
 
@@ -361,7 +351,7 @@ const FloatingWindow: React.FC = () => {
               status: "queue", // Initial status is queue
               totalElapsed: 0,
               sessions: [
-                { startTime: eventTime, duration: 0, status: "queue" },
+                { startTime: eventTime, duration: 0, status: "stopped" },
               ],
             },
           ];
@@ -410,8 +400,8 @@ const FloatingWindow: React.FC = () => {
             if (
               lastSessionIdx >= 0 &&
               !updatedSessions[lastSessionIdx].endTime &&
-              (updatedSessions[lastSessionIdx].status === "paused" ||
-                updatedSessions[lastSessionIdx].status === "hold")
+              (updatedSessions[lastSessionIdx].status === "running" ||
+                updatedSessions[lastSessionIdx].status === "stopped")
             ) {
               updatedSessions[lastSessionIdx] = {
                 ...updatedSessions[lastSessionIdx],

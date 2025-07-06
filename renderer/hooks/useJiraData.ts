@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { ProjectTicket } from "../types/electron";
+import { Task } from "../../types";
 
 export function useProjectData() {
-  const [data, setData] = useState<ProjectTicket[]>([]);
+  const [data, setData] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,7 +11,7 @@ export function useProjectData() {
 
     const loadData = async () => {
       try {
-        const result = await window.ipc.send("load-project-data", undefined);
+        const result = await window.ipc.invoke("load-project-data");
         if (mounted) {
           setData(result);
           setError(null);
@@ -38,7 +38,7 @@ export function useProjectData() {
   const refreshData = async () => {
     setLoading(true);
     try {
-      const result = await window.ipc.send("load-project-data", undefined);
+      const result = await window.ipc.invoke("load-project-data");
       setData(result);
       setError(null);
     } catch (err) {

@@ -9,48 +9,20 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import CsvImportDialog from "../components/CsvImportDialog";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
-import { TimerSession } from "../store/sessionsSlice";
+import { Task, TimerSession, ProjectSummary, DashboardStats, ManualTaskFormData } from "../../types";
 
-interface ProjectSummary {
-  name: string;
-  ticketCount: number;
-  location?: string;
-  currentBranch?: string;
-  totalStoryPoints: number;
-  averageStoryPoints: number;
-  completedTickets: number;
-  inProgressTickets: number;
-  totalTimeSpent: number; // in milliseconds
-}
-
-interface DashboardStats {
-  totalTickets: number;
-  totalStoryPoints: number;
-  averageStoryPoints: number;
-  totalProjects: number;
-  completedTickets: number;
-  inProgressTickets: number;
-  totalTimeTracked: number;
-  productivity: {
-    ticketsPerDay: number;
-    pointsPerDay: number;
-    averageTimePerTicket: number;
-    averageTimePerPoint: number;
-  };
-}
+// Types imported from global types file
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
-  const [projectBranches, setProjectBranches] = useState<
-    Record<string, string>
-  >({});
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
-  const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
-  const [editingTask, setEditingTask] = useState<any>(null);
+  const [projectBranches, setProjectBranches] = useState<Record<string, string>>({});
+  const [showExportDialog, setShowExportDialog] = useState<boolean>(false);
+  const [showManualTaskDialog, setShowManualTaskDialog] = useState<boolean>(false);
+  const [showCsvImportDialog, setShowCsvImportDialog] = useState<boolean>(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -368,15 +340,11 @@ export default function HomePage() {
   };
 
   // Manual task handlers
-  const handleAddManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
+  const handleAddManualTask = async (taskData: ManualTaskFormData) => {
     try {
       const result = await window.ipc.invoke("add-manual-task", taskData);
       if (result.success) {
-        console.log("Manual task added successfully:", result.task);
+        console.log("Manual task added successfully:", result.data);
       } else {
         alert(`Error adding task: ${result.error}`);
       }
@@ -386,11 +354,7 @@ export default function HomePage() {
     }
   };
 
-  const handleEditManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
+  const handleEditManualTask = async (taskData: ManualTaskFormData) => {
     if (!editingTask) return;
     
     try {
@@ -399,7 +363,7 @@ export default function HomePage() {
         updates: taskData,
       });
       if (result.success) {
-        console.log("Manual task updated successfully:", result.task);
+        console.log("Manual task updated successfully:", result.data);
         setEditingTask(null);
       } else {
         alert(`Error updating task: ${result.error}`);
@@ -428,7 +392,7 @@ export default function HomePage() {
     }
   };
 
-  const openEditDialog = (task: any) => {
+  const openEditDialog = (task: Task) => {
     setEditingTask(task);
     setShowManualTaskDialog(true);
   };

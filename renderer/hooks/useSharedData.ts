@@ -1,10 +1,11 @@
 // renderer/hooks/useSharedData.ts - NEW FILE
 import { useState, useEffect } from "react";
+import { Task, TimerSession, UseSharedDataReturn } from "../../types";
 
-export function useSharedData() {
-  const [projectData, setProjectData] = useState([]);
-  const [sessions, setSessions] = useState({});
-  const [loading, setLoading] = useState(true);
+export function useSharedData(): UseSharedDataReturn {
+  const [projectData, setProjectData] = useState<Task[]>([]);
+  const [sessions, setSessions] = useState<{ [ticketNumber: string]: TimerSession }>({});
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // Load initial data
@@ -41,7 +42,7 @@ export function useSharedData() {
     };
   }, []);
 
-  const saveSession = (sessionData: any) => {
+  const saveSession = (sessionData: TimerSession) => {
     window.ipc.send("save-session", sessionData);
   };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ExportSummary } from '../../types';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose, pro
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [filterProject, setFilterProject] = useState('');
   const [isExporting, setIsExporting] = useState(false);
-  const [exportSummary, setExportSummary] = useState<any>(null);
+  const [exportSummary, setExportSummary] = useState<ExportSummary | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -46,7 +47,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose, pro
         alert(`Export failed: ${result.error}`);
       }
     } catch (error) {
-      alert(`Export failed: ${error.message}`);
+      alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsExporting(false);
     }

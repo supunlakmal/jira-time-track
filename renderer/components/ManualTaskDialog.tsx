@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { ProjectTicket } from "../types/electron";
+import { Task, ManualTaskFormData } from "../../types";
 
 interface ManualTaskDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (task: { ticket_number: string; ticket_name: string; story_points?: number }) => void;
-  editingTask?: ProjectTicket | null;
+  onSave: (task: ManualTaskFormData) => void;
+  editingTask?: Task | null;
   existingTickets: string[];
 }
 

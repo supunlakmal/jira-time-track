@@ -44,7 +44,7 @@ export const useThemeState = (): ThemeContextType => {
       }
       return 'light'; // Default to light on server
     }
-    return currentTheme;
+    return currentTheme as 'light' | 'dark';
   };
 
   // Update resolved theme when theme changes or system preference changes
@@ -81,6 +81,8 @@ export const useThemeState = (): ThemeContextType => {
         mediaQuery.removeEventListener('change', handleChange);
       };
     }
+    // Return undefined if not in browser environment
+    return undefined;
   }, [theme]);
 
   // Save theme to localStorage when it changes

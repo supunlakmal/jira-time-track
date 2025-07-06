@@ -1,20 +1,17 @@
 // main/dataManager.ts - NEW FILE
-import Store from "electron-store";
-import * as fs from "fs/promises";
-import * as path from "path";
 import csvParser from "csv-parser";
+import Store from "electron-store";
 
 interface AppData {
   sessions: { [ticketNumber: string]: any };
   projectData: any[];
-  csvImportedData: any[];
-  dataSource: 'json' | 'csv' | 'mixed';
+  manualTasks: any[];
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, projectData: [], csvImportedData: [], dataSource: 'json' },
+    defaults: { sessions: {}, projectData: [], manualTasks: [] },
   });
 
   private windows: Set<Electron.BrowserWindow> = new Set();
@@ -55,28 +52,30 @@ class DataManager {
   }
 
   // CSV Import methods
-  async importFromCsv(csvData: any[]): Promise<{ success: boolean; error?: string; importedCount?: number }> {
+  async importFromCsv(
+    csvData: any[]
+  ): Promise<{ success: boolean; error?: string; importedCount?: number }> {
     try {
       // Validate CSV data structure
       const validatedData = csvData.map((row, index) => {
         if (!row.ticket_number || !row.ticket_name) {
-          throw new Error(`Row ${index + 1}: Missing required fields (ticket_number, ticket_name)`);
+          throw new Error(
+            `Row ${
+              index + 1
+            }: Missing required fields (ticket_number, ticket_name)`
+          );
         }
         return {
           ticket_number: row.ticket_number,
           ticket_name: row.ticket_name,
           story_points: row.story_points || null,
           isImported: true,
-          importedAt: new Date().toISOString()
+          importedAt: new Date().toISOString(),
         };
       });
 
-      // Store CSV data
-      this.store.set("csvImportedData", validatedData);
-      this.store.set("dataSource", "csv");
-
-      // Broadcast update
-      this.broadcast("project-data-updated", validatedData);
+      // Replace current project data with CSV data
+      this.setProjectData(validatedData);
 
       return { success: true, importedCount: validatedData.length };
     } catch (error) {
@@ -85,7 +84,9 @@ class DataManager {
     }
   }
 
-  async importFromCsvFile(filePath: string): Promise<{ success: boolean; error?: string; importedCount?: number }> {
+  async importFromCsvFile(
+    filePath: string
+  ): Promise<{ success: boolean; error?: string; importedCount?: number }> {
     try {
       const csvData = await this.parseCsvFile(filePath);
       return await this.importFromCsv(csvData);
@@ -98,48 +99,74 @@ class DataManager {
   private async parseCsvFile(filePath: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const results: any[] = [];
-      const stream = require('fs').createReadStream(filePath);
-      
+      const stream = require("fs").createReadStream(filePath);
+
       stream
         .pipe(csvParser())
-        .on('data', (data: any) => results.push(data))
-        .on('end', () => resolve(results))
-        .on('error', (error: Error) => reject(error));
+        .on("data", (data: any) => results.push(data))
+        .on("end", () => resolve(results))
+        .on("error", (error: Error) => reject(error));
     });
   }
 
-  // Get combined data (JSON + CSV + manual)
-  getCombinedProjectData() {
-    const jsonData = this.store.get("projectData");
-    const csvData = this.store.get("csvImportedData");
-    const dataSource = this.store.get("dataSource");
-
-    switch (dataSource) {
-      case 'csv':
-        return csvData;
-      case 'json':
-        return jsonData;
-      case 'mixed':
-        return [...jsonData, ...csvData];
-      default:
-        return jsonData;
-    }
+  // Manual task methods
+  getManualTasks() {
+    return this.store.get("manualTasks", []);
   }
 
-  // Clear imported CSV data
-  clearCsvData() {
-    this.store.set("csvImportedData", []);
-    this.store.set("dataSource", "json");
-    this.broadcast("project-data-updated", this.store.get("projectData"));
+  setManualTasks(tasks: any[]) {
+    this.store.set("manualTasks", tasks);
+    this.broadcast("manual-tasks-updated", tasks);
+  }
+
+  addManualTask(task: any) {
+    const manualTasks = this.getManualTasks();
+    const newTask = {
+      ...task,
+      isManual: true,
+      createdAt: new Date().toISOString(),
+    };
+    manualTasks.push(newTask);
+    this.setManualTasks(manualTasks);
+    return newTask;
+  }
+
+  updateManualTask(taskId: string, updates: any) {
+    const manualTasks = this.getManualTasks();
+    const index = manualTasks.findIndex((t) => t.ticket_number === taskId);
+    if (index !== -1) {
+      manualTasks[index] = { ...manualTasks[index], ...updates };
+      this.setManualTasks(manualTasks);
+      return manualTasks[index];
+    }
+    return null;
+  }
+
+  deleteManualTask(taskId: string) {
+    const manualTasks = this.getManualTasks();
+    const filtered = manualTasks.filter((t) => t.ticket_number !== taskId);
+    this.setManualTasks(filtered);
+    return filtered;
+  }
+
+  // Combined data method (Project + Manual)
+  getAllTasks() {
+    const projectData = this.getProjectData();
+    const manualTasks = this.getManualTasks();
+    return [...projectData, ...manualTasks];
   }
 
   // Get data source info
   getDataSourceInfo() {
+    const projectData = this.getProjectData();
+    const manualTasks = this.getManualTasks();
     return {
-      dataSource: this.store.get("dataSource"),
-      jsonDataCount: this.store.get("projectData").length,
-      csvDataCount: this.store.get("csvImportedData").length,
-      totalCount: this.getCombinedProjectData().length
+      projectDataCount: projectData.length,
+      manualTasksCount: manualTasks.length,
+      totalTasksCount: this.getAllTasks().length,
+      hasImportedData: projectData.some((task) => task.isImported),
+      lastImportDate:
+        projectData.find((task) => task.importedAt)?.importedAt || null,
     };
   }
 }

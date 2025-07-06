@@ -37,12 +37,6 @@ This project is a **Project Time Tracking application** built using **Nextron (N
 5.  **Keyboard Shortcuts:**
     *   Provides keyboard shortcuts for common actions within the floating window, such as toggling its visibility and starting/pausing timers.
 
-## Productivity & Wellness Features
-
-1.  **Idle Detection:
-    *   Automatically detects user inactivity (idle time is configurable).
-    *   When idle, it automatically pauses any active timers to prevent inaccurate time tracking.
-    *   Users need to manually resume timers after becoming active again.
 
 ## Data Management & Reporting
 

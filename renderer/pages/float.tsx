@@ -1,7 +1,6 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
-import { useIdleDetection } from "../hooks/useIdleDetection";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
 export interface TaskTimer {
@@ -30,11 +29,6 @@ const FloatingWindow: React.FC = () => {
   const [selectedTicketNumber, setSelectedTicketNumber] = useState<
     string | null
   >(null);
-  const [idleSettings, setIdleSettings] = useState({
-    enabled: true,
-    idleTime: 5 * 60 * 1000, // 5 minutes default
-  });
-  const [pausedDueToIdle, setPausedDueToIdle] = useState<Set<string>>(new Set());
 
   // Keyboard shortcuts
   useFloatingWindowShortcuts({
@@ -52,35 +46,6 @@ const FloatingWindow: React.FC = () => {
     }
   });
 
-  // Idle detection handlers
-  const handleUserIdle = () => {
-    console.log('User went idle, pausing active timers');
-    const activeTimers = timers.filter(t => t.isRunning && t.status === 'running');
-    
-    if (activeTimers.length > 0) {
-      const newPausedSet = new Set(pausedDueToIdle);
-      activeTimers.forEach(timer => {
-        newPausedSet.add(timer.ticketNumber);
-        handleTimerAction('pause', timer.ticketNumber);
-      });
-      setPausedDueToIdle(newPausedSet);
-    }
-  };
-
-  const handleUserActive = () => {
-    console.log('User became active');
-    // Note: We don't auto-resume timers, user needs to manually resume
-    // This prevents accidental time tracking when user returns
-  };
-
-  // Initialize idle detection
-  const hasActiveTimers = timers.some(t => t.isRunning && t.status === 'running');
-  const { isIdle } = useIdleDetection({
-    idleTime: idleSettings.idleTime,
-    onIdle: handleUserIdle,
-    onActive: handleUserActive,
-    enabled: idleSettings.enabled && hasActiveTimers
-  });
 
   useEffect(() => {
     const loadTicketData = async () => {
@@ -586,12 +551,6 @@ const FloatingWindow: React.FC = () => {
   const handleClose = () => window.ipc.window.hide();
 
 
-  const handleResumeFromIdle = (ticketNumber: string) => {
-    const newPausedSet = new Set(pausedDueToIdle);
-    newPausedSet.delete(ticketNumber);
-    setPausedDueToIdle(newPausedSet);
-    handleTimerAction('resume', ticketNumber);
-  };
 
   const renderTimerDetail = (timer: TaskTimer | undefined) => {
     if (!timer) {
@@ -608,7 +567,6 @@ const FloatingWindow: React.FC = () => {
       );
     }
 
-    const wasPausedByIdle = pausedDueToIdle.has(timer.ticketNumber);
 
     const estimatedTimeMs = (timer.storyPoints || 0) * 60 * 60 * 1000;
     let progressWidthPercentage = 0;
@@ -692,11 +650,6 @@ const FloatingWindow: React.FC = () => {
             >
               {getStatusIcon(timer.status, timer.isRunning)}{" "}
               {getStatusText(timer.status, timer.isRunning)}
-              {wasPausedByIdle && (
-                <div className="text-xs text-orange-600 mt-1">
-  Paused due to idle
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -740,10 +693,10 @@ const FloatingWindow: React.FC = () => {
           ) : timer.status === "paused" ? (
             <>
               <button
-                onClick={() => wasPausedByIdle ? handleResumeFromIdle(timer.ticketNumber) : handleTimerAction("resume", timer.ticketNumber)}
-                className={`${wasPausedByIdle ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'} text-white py-1 px-2 rounded text-xs font-medium`}
+                onClick={() => handleTimerAction("resume", timer.ticketNumber)}
+                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
               >
-                {wasPausedByIdle ? 'Resume from Idle' : 'Resume'}
+                Resume
               </button>
               <button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}

@@ -1,0 +1,8 @@
+renderer/components/Button.tsx:56:35 - error TS2322: Type '{ size: string; className: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'size' does not exist on type 'IntrinsicAttributes'.
+
+56       {loading && <LoadingSpinner size="sm" className="mr-2" />}
+                                     ~~~~
+
+
+Found 1 error in renderer/components/Button.tsx:56

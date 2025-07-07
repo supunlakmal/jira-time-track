@@ -15,3 +15,5 @@ CLAUDE.md
 .env
 .claude
 tsconfig.tsbuildinfo
+*storybook.log
+storybook-static

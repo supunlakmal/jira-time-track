@@ -340,4 +340,5 @@ EXAMPLE-3,"Third example ticket",`;
   );
 };
 
+export { CsvImportDialog };
 export default CsvImportDialog;

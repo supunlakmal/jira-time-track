@@ -2,6 +2,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
+import Button from "../components/Button";
 import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ManualTaskDialog } from "../components/ManualTaskDialog";
@@ -476,71 +477,82 @@ export default function HomePage() {
               Project Time Tracker Dashboard
             </h1>
             <div className="flex justify-center gap-4 mb-4">
-              <button
+              <Button
                 onClick={toggleFloatingWindow}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg transition-colors"
+                variant="primary"
+                size="lg"
               >
                 Toggle Floating Timer
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowManualTaskDialog(true)}
-                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-lg transition-colors"
+                variant="secondary"
+                size="lg"
                 title="Add a manual task"
               >
                 Add Manual Task
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowCsvImportDialog(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-lg transition-colors"
+                variant="warning"
+                size="lg"
                 title="Import tasks from CSV file"
               >
                 Import CSV
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowExportDialog(true)}
-                className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
+                variant="success"
+                size="lg"
                 title="Export time tracking data"
               >
                 Export Data
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowResetDialog(true)}
-                className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg transition-colors"
+                variant="danger"
+                size="lg"
                 title="Reset application data"
               >
                 Reset Data
-              </button>
+              </Button>
               <ThemeToggle size="md" />
               
               {/* Zoom Controls */}
               <div className="flex items-center gap-2 border border-gray-300 rounded-lg p-1 bg-white dark:bg-gray-800 dark:border-gray-600">
-                <button
+                <Button
                   onClick={() => window.ipc?.zoom?.out()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  variant="gray"
+                  size="icon"
+                  className="w-10 h-10"
                   title="Zoom out (Ctrl+-)"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                   </svg>
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => window.ipc?.zoom?.reset()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  variant="gray"
+                  size="icon"
+                  className="w-10 h-10"
                   title="Reset zoom (Ctrl+0)"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => window.ipc?.zoom?.in()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  variant="gray"
+                  size="icon"
+                  className="w-10 h-10"
                   title="Zoom in (Ctrl+=)"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -744,12 +756,13 @@ export default function HomePage() {
                       Projects Overview
                     </h2>
                     {selectedProject && (
-                      <button
+                      <Button
                         onClick={() => handleProjectSelect(null)}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        variant="link"
+                        size="sm"
                       >
                         View All Projects
-                      </button>
+                      </Button>
                     )}
                   </div>
                   <div className="bg-white shadow-sm rounded-b-lg overflow-hidden">
@@ -844,16 +857,18 @@ export default function HomePage() {
                                   >
                                     {proj.location || "Path not set"}
                                   </span>
-                                  <button
+                                  <Button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleChooseProjectPath(proj.name);
                                     }}
-                                    className="ml-2 py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100 text-gray-700"
+                                    variant="gray"
+                                    size="sm"
+                                    className="ml-2"
                                     title="Choose project directory"
                                   >
                                     Choose Path
-                                  </button>
+                                  </Button>
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -880,7 +895,7 @@ export default function HomePage() {
                                       (proj.location ? "..." : "No path")}
                                   </span>
                                   {proj.location && (
-                                    <button
+                                    <Button
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         refreshBranch(
@@ -888,11 +903,13 @@ export default function HomePage() {
                                           proj.location!
                                         );
                                       }}
-                                      className="ml-2 text-xs py-1 px-2 rounded border border-gray-300 hover:bg-gray-100 text-gray-600"
+                                      variant="gray"
+                                      size="sm"
+                                      className="ml-2"
                                       title="Refresh branch information"
                                     >
                                       ↻
-                                    </button>
+                                    </Button>
                                   )}
                                 </div>
                               </td>
@@ -916,13 +933,14 @@ export default function HomePage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 />
-                <button
+                <Button
                   // onClick={refreshData}
                   disabled={loading}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                  variant="gray"
+                  size="md"
                 >
                   ↻ Refresh All Data
-                </button>
+                </Button>
               </div>
 
               {/* Enhanced Main Ticket Table */}
@@ -1126,7 +1144,7 @@ export default function HomePage() {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <div className="flex space-x-2">
-                                  <button
+                                  <Button
                                     onClick={() => {
                                       window.ipc?.send("start-task", {
                                         ticket: ticket.ticket_number,
@@ -1134,13 +1152,14 @@ export default function HomePage() {
                                         storyPoints: ticket.story_points,
                                       });
                                     }}
-                                    className="text-blue-600 hover:text-blue-900 font-medium transition-colors"
+                                    variant="link"
+                                    size="sm"
                                     title="Start tracking time for this ticket"
                                   >
                                     {isActive ? "Resume" : "Start Timer"}
-                                  </button>
+                                  </Button>
                                   {isTracked && (
-                                    <button
+                                    <Button
                                       onClick={() => {
                                         // View session details - could open a modal or expand row
                                         console.log(
@@ -1149,28 +1168,34 @@ export default function HomePage() {
                                           ticketSession
                                         );
                                       }}
-                                      className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
+                                      variant="gray"
+                                      size="sm"
+                                      className="text-xs"
                                       title="View time tracking details"
                                     >
                                       Details
-                                    </button>
+                                    </Button>
                                   )}
                                   {ticket.isManual && (
                                     <>
-                                      <button
+                                      <Button
                                         onClick={() => openEditDialog(ticket)}
-                                        className="text-purple-600 hover:text-purple-900 text-xs transition-colors"
+                                        variant="secondary"
+                                        size="sm"
+                                        className="text-xs"
                                         title="Edit manual task"
                                       >
                                         Edit
-                                      </button>
-                                      <button
+                                      </Button>
+                                      <Button
                                         onClick={() => handleDeleteManualTask(ticket.ticket_number)}
-                                        className="text-red-600 hover:text-red-900 text-xs transition-colors"
+                                        variant="danger"
+                                        size="sm"
+                                        className="text-xs"
                                         title="Delete manual task"
                                       >
                                         Delete
-                                      </button>
+                                      </Button>
                                     </>
                                   )}
                                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Button from './Button';
 
 interface CsvImportDialogProps {
   isOpen: boolean;
@@ -155,14 +156,16 @@ EXAMPLE-3,"Third example ticket",`;
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Import Tasks from CSV
           </h2>
-          <button
+          <Button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            variant="gray"
+            size="icon"
+            className="w-8 h-8"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
@@ -198,15 +201,17 @@ EXAMPLE-3,"Third example ticket",`;
                           className="hidden"
                         />
                       </label>
-                      <button
+                      <Button
                         onClick={downloadTemplate}
-                        className="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                        variant="success"
+                        size="md"
+                        className="inline-flex items-center"
                       >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Download Template
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -266,12 +271,13 @@ EXAMPLE-3,"Third example ticket",`;
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Preview ({csvData.length} tasks)
                 </h3>
-                <button
+                <Button
                   onClick={() => setShowPreview(false)}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  variant="link"
+                  size="sm"
                 >
                   ← Back to file selection
-                </button>
+                </Button>
               </div>
 
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -320,19 +326,21 @@ EXAMPLE-3,"Third example ticket",`;
         </div>
 
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
-          <button
+          <Button
             onClick={handleClose}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            variant="gray"
+            size="md"
           >
             Cancel
-          </button>
+          </Button>
           {showPreview && (
-            <button
+            <Button
               onClick={handleImport}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              variant="primary"
+              size="md"
             >
               Import {csvData.length} Tasks
-            </button>
+            </Button>
           )}
         </div>
       </div>

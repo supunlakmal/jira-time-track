@@ -1,5 +1,6 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
+import Button from "../components/Button";
 import { useSharedData } from "../hooks/useSharedData";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 
@@ -557,12 +558,14 @@ const FloatingWindow: React.FC = () => {
       return (
         <div className="p-4 text-center text-gray-500 dark:text-gray-400">
           Timer details not available.
-          <button
+          <Button
             onClick={() => setSelectedTicketNumber(null)}
-            className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
+            variant="gray"
+            size="sm"
+            className="mt-2"
           >
             Back to Grid
-          </button>
+          </Button>
         </div>
       );
     }
@@ -598,20 +601,24 @@ const FloatingWindow: React.FC = () => {
         }`}
       >
         <div className="flex justify-between items-center mb-2">
-          <button
+          <Button
             onClick={() => setSelectedTicketNumber(null)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mr-2"
+            variant="link"
+            size="sm"
+            className="mr-2"
             title="Back to Grid"
           >
             ← Back
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDeleteTimer(timer.ticketNumber)}
-            className="text-red-500 hover:text-red-700 text-sm font-medium p-1 rounded hover:bg-red-50"
+            variant="danger"
+            size="icon"
+            className="w-8 h-8 hover:bg-red-50"
             title="Delete Timer"
           >
             🗑️
-          </button>
+          </Button>
         </div>
         <div className="flex justify-between items-start mb-1">
           {" "}
@@ -667,88 +674,100 @@ const FloatingWindow: React.FC = () => {
           {" "}
           {timer.status === "queue" ? (
             <>
-              <button
+              <Button
                 onClick={() => handleTimerAction("start", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
+                variant="primary"
+                size="sm"
+                className="col-span-2"
               >
                 Start Timer
-              </button>
+              </Button>
               {/* No Complete/Stop buttons for queued tasks */}
             </>
           ) : timer.isRunning && timer.status === "running" ? (
             <>
-              <button
+              <Button
                 onClick={() => handleTimerAction("pause", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Pause
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Hold
-              </button>
+              </Button>
             </>
           ) : timer.status === "paused" ? (
             <>
-              <button
+              <Button
                 onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Resume
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Hold
-              </button>
+              </Button>
             </>
           ) : timer.status === "hold" ? (
             <>
-              <button
+              <Button
                 onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Resume
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTimerAction("start", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Start New Session
-              </button>
+              </Button>
             </>
           ) : timer.status === "completed" || timer.status === "stopped" ? (
-            <button
+            <Button
               onClick={() => handleTimerAction("start", timer.ticketNumber)}
-              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium col-span-2"
+              variant="primary"
+              size="sm"
+              className="col-span-2"
             >
               Start New Session
-            </button>
+            </Button>
           ) : null}{" "}
           {timer.status !== "completed" &&
             timer.status !== "stopped" &&
             timer.status !== "queue" && (
-              <button
+              <Button
                 onClick={() =>
                   handleTimerAction("complete", timer.ticketNumber)
                 }
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Complete
-              </button>
+              </Button>
             )}
           {timer.status !== "completed" &&
             timer.status !== "stopped" &&
             timer.status !== "queue" && (
-              <button
+              <Button
                 onClick={() => handleTimerAction("stop", timer.ticketNumber)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded text-xs font-medium"
+                variant="primary"
+                size="sm"
               >
                 Stop
-              </button>
+              </Button>
             )}
         </div>
         {timer.sessions.length > 0 && (
@@ -808,35 +827,43 @@ const FloatingWindow: React.FC = () => {
           <div className="flex space-x-2">
             {/* Zoom Controls */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded px-1">
-              <button
+              <Button
                 onClick={() => window.ipc?.zoom?.out()}
-                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                variant="gray"
+                size="icon"
+                className="w-5 h-5 text-xs"
                 title="Zoom out (Ctrl+-)"
               >
                 -
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => window.ipc?.zoom?.reset()}
-                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                variant="gray"
+                size="icon"
+                className="w-5 h-5 text-xs"
                 title="Reset zoom (Ctrl+0)"
               >
                 ⊙
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => window.ipc?.zoom?.in()}
-                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                variant="gray"
+                size="icon"
+                className="w-5 h-5 text-xs"
                 title="Zoom in (Ctrl+=)"
               >
                 +
-              </button>
+              </Button>
             </div>
-            <button
+            <Button
               onClick={handleClose}
-              className="hover:bg-red-500 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"
+              variant="danger"
+              size="icon"
+              className="w-6 h-6 text-xs hover:bg-red-500"
               title="Close"
             >
               ×
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -846,12 +873,14 @@ const FloatingWindow: React.FC = () => {
             ) : selectedTicketNumber && !currentTimerDetails ? (
               <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                 <p>Timer '{selectedTicketNumber}' not found.</p>
-                <button
+                <Button
                   onClick={() => setSelectedTicketNumber(null)}
-                  className="mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-1 px-3 rounded text-sm"
+                  variant="gray"
+                  size="sm"
+                  className="mt-2"
                 >
                   Back to Grid
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-2">
@@ -862,12 +891,13 @@ const FloatingWindow: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-3 gap-3">
                     {timers.map((timer) => (
-                      <button
+                      <Button
                         key={timer.ticketNumber}
                         onClick={() =>
                           setSelectedTicketNumber(timer.ticketNumber)
                         }
-                        className="p-3 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        variant="gray"
+                        className="p-3 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors h-auto flex flex-col items-start justify-start"
                         title={`View details for ${timer.ticketNumber}\n${
                           timer.ticketName
                         }\nStatus: ${getStatusText(
@@ -923,7 +953,7 @@ const FloatingWindow: React.FC = () => {
                             ? ` (${timer.storyPoints.toFixed(1)} SP)`
                             : ""}
                         </p>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}

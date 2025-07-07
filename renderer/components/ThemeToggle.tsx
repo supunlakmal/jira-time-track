@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from './Button';
 import { useTheme } from '../hooks/useTheme';
 
 interface ThemeToggleProps {
@@ -47,21 +48,14 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   return (
-    <button
+    <Button
       onClick={cycleTheme}
-      className={`
-        inline-flex items-center space-x-2 rounded-lg border border-gray-300 
-        bg-white dark:bg-gray-800 dark:border-gray-600 
-        text-gray-700 dark:text-gray-200 
-        hover:bg-gray-50 dark:hover:bg-gray-700 
-        transition-colors duration-200
-        ${sizeClasses[size]} 
-        ${className}
-      `}
+      variant="gray"
+      className={`inline-flex items-center space-x-2 ${sizeClasses[size]} ${className}`}
       title={`Current theme: ${getLabel()}. Click to cycle through themes.`}
     >
       <span className="text-xs font-mono">{getIcon()}</span>
       <span className="text-xs">{getLabel()}</span>
-    </button>
+    </Button>
   );
 };

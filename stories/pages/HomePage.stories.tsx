@@ -90,7 +90,7 @@ const MockHomePage: React.FC<{ mockData: any }> = ({ mockData }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Time Tracked</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatTime(dashboardStats.totalTimeTracked)}</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatTime(dashboardStats.totalTimeTracked as number)}</p>
               </div>
             </div>
           </div>

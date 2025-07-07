@@ -1,25 +1,14 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
-import Button from "../components/Button";
 import { useSharedData } from "../hooks/useSharedData";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
+import { TaskTimer } from "../types/dashboard";
+import TimerGrid from "../components/TimerGrid";
+import FloatingWindowHeader from "../components/FloatingWindowHeader";
+import Button from "../components/Button";
+import TimerDetail from "../components/TimerDetail";
 
-export interface TaskTimer {
-  ticketNumber: string;
-  ticketName: string;
-  startTime: number;
-  elapsedTime: number;
-  isRunning: boolean;
-  status: "running" | "paused" | "hold" | "completed" | "stopped" | "queue";
-  totalElapsed: number;
-  sessions: Array<{
-    startTime: number;
-    endTime?: number;
-    duration: number;
-    status: string;
-  }>;
-  storyPoints?: number;
-}
+
 
 const FloatingWindow: React.FC = () => {
   const { saveSession } = useSharedData();
@@ -552,254 +541,6 @@ const FloatingWindow: React.FC = () => {
   const handleClose = () => window.ipc.window.hide();
 
 
-
-  const renderTimerDetail = (timer: TaskTimer | undefined) => {
-    if (!timer) {
-      return (
-        <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-          Timer details not available.
-          <Button
-            onClick={() => setSelectedTicketNumber(null)}
-            variant="gray"
-            size="sm"
-            className="mt-2"
-          >
-            Back to Grid
-          </Button>
-        </div>
-      );
-    }
-
-
-    const estimatedTimeMs = (timer.storyPoints || 0) * 60 * 60 * 1000;
-    let progressWidthPercentage = 0;
-    let progressBarColorClass = "bg-blue-600";
-
-    if (estimatedTimeMs > 0) {
-      // This also implies timer.storyPoints is > 0
-      const rawPercentage = (timer.totalElapsed / estimatedTimeMs) * 100;
-      if (rawPercentage > 100) {
-        progressWidthPercentage = 100;
-        progressBarColorClass = "bg-red-600";
-      } else {
-        progressWidthPercentage = rawPercentage;
-      }
-    }
-
-    return (
-      <div
-        className={`p-3 rounded-lg border-l-4 ${
-          timer.status === "running" && timer.isRunning
-            ? "bg-green-50 border-green-500"
-            : timer.status === "paused"
-            ? "bg-yellow-50 border-yellow-500"
-            : timer.status === "hold"
-            ? "bg-orange-50 border-orange-500"
-            : timer.status === "completed"
-            ? "bg-blue-50 border-blue-500"
-            : "bg-gray-50 border-gray-500"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-2">
-          <Button
-            onClick={() => setSelectedTicketNumber(null)}
-            variant="link"
-            size="sm"
-            className="mr-2"
-            title="Back to Grid"
-          >
-            ← Back
-          </Button>
-          <Button
-            onClick={() => handleDeleteTimer(timer.ticketNumber)}
-            variant="danger"
-            size="icon"
-            className="w-8 h-8 hover:bg-red-50"
-            title="Delete Timer"
-          >
-            🗑️
-          </Button>
-        </div>
-        <div className="flex justify-between items-start mb-1">
-          {" "}
-          {/* Reduced mb */}
-          <div className="flex-1 mr-3">
-            <h3
-              className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate"
-              title={timer.ticketNumber}
-            >
-              {timer.ticketNumber}
-            </h3>
-            <p
-              className="text-xs text-gray-500 line-clamp-2"
-              title={timer.ticketName}
-            >
-              {timer.ticketName}
-            </p>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-lg font-mono font-medium text-gray-900 dark:text-gray-100">
-              {formatTime(timer.totalElapsed)}
-            </div>
-            <div className="text-xs text-gray-400">
-              Session: {formatTime(timer.elapsedTime)}
-            </div>
-            {timer.storyPoints && timer.storyPoints > 0 && (
-              <div className="text-xs text-gray-500 mt-0.5">
-                Est: {formatTime(estimatedTimeMs)}
-              </div>
-            )}
-            <div
-              className={`text-xs font-semibold ${getStatusColor(
-                timer.status,
-                timer.isRunning
-              )}`}
-            >
-              {getStatusIcon(timer.status, timer.isRunning)}{" "}
-              {getStatusText(timer.status, timer.isRunning)}
-            </div>
-          </div>
-        </div>
-        {/* START: Progress Bar */}
-        {timer.storyPoints && timer.storyPoints > 0 && estimatedTimeMs > 0 && (
-          <div className="w-full bg-gray-200 rounded-full h-2.5 my-2 dark:bg-gray-700">
-            <div
-              className={`${progressBarColorClass} h-2.5 rounded-full transition-all duration-300 ease-in-out`}
-              style={{ width: `${progressWidthPercentage}%` }}
-            ></div>
-          </div>
-        )}
-        {/* END: Progress Bar */}{" "}
-        <div className="grid grid-cols-2 gap-1 mt-3">
-          {" "}
-          {timer.status === "queue" ? (
-            <>
-              <Button
-                onClick={() => handleTimerAction("start", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-                className="col-span-2"
-              >
-                Start Timer
-              </Button>
-              {/* No Complete/Stop buttons for queued tasks */}
-            </>
-          ) : timer.isRunning && timer.status === "running" ? (
-            <>
-              <Button
-                onClick={() => handleTimerAction("pause", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Pause
-              </Button>
-              <Button
-                onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Hold
-              </Button>
-            </>
-          ) : timer.status === "paused" ? (
-            <>
-              <Button
-                onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Resume
-              </Button>
-              <Button
-                onClick={() => handleTimerAction("hold", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Hold
-              </Button>
-            </>
-          ) : timer.status === "hold" ? (
-            <>
-              <Button
-                onClick={() => handleTimerAction("resume", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Resume
-              </Button>
-              <Button
-                onClick={() => handleTimerAction("start", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Start New Session
-              </Button>
-            </>
-          ) : timer.status === "completed" || timer.status === "stopped" ? (
-            <Button
-              onClick={() => handleTimerAction("start", timer.ticketNumber)}
-              variant="primary"
-              size="sm"
-              className="col-span-2"
-            >
-              Start New Session
-            </Button>
-          ) : null}{" "}
-          {timer.status !== "completed" &&
-            timer.status !== "stopped" &&
-            timer.status !== "queue" && (
-              <Button
-                onClick={() =>
-                  handleTimerAction("complete", timer.ticketNumber)
-                }
-                variant="primary"
-                size="sm"
-              >
-                Complete
-              </Button>
-            )}
-          {timer.status !== "completed" &&
-            timer.status !== "stopped" &&
-            timer.status !== "queue" && (
-              <Button
-                onClick={() => handleTimerAction("stop", timer.ticketNumber)}
-                variant="primary"
-                size="sm"
-              >
-                Stop
-              </Button>
-            )}
-        </div>
-        {timer.sessions.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-            <details className="text-xs">
-              <summary className="cursor-pointer text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">
-                {timer.sessions.length} Session
-                {timer.sessions.length > 1 ? "s" : ""} | Total:{" "}
-                {formatTime(timer.totalElapsed)}
-              </summary>
-              <ul className="mt-1 list-disc list-inside pl-2 text-gray-500 max-h-20 overflow-y-auto">
-                {timer.sessions
-                  .slice()
-                  .reverse()
-                  .map((session, idx) => (
-                    <li key={idx}>
-                      Session {timer.sessions.length - idx}:{" "}
-                      {formatTime(session.duration)} ({session.status})
-                      {session.endTime &&
-                        ` (Ended: ${new Date(
-                          session.endTime
-                        ).toLocaleTimeString()})`}
-                    </li>
-                  ))}
-              </ul>
-            </details>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const currentTimerDetails = selectedTicketNumber
     ? timers.find((t) => t.ticketNumber === selectedTicketNumber)
     : null;
@@ -807,69 +548,25 @@ const FloatingWindow: React.FC = () => {
   return (
     <div className="h-screen bg-transparent select-none">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
-        <div
-          className="bg-gray-800 dark:bg-gray-900 text-white p-2 flex justify-between items-center cursor-move flex-shrink-0"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-        >
-          <div className="text-sm font-semibold">
-            <div>
-              Time Tracker{" "}
-              {selectedTicketNumber
-                ? `(${selectedTicketNumber})`
-                : timers.length > 0
-                ? `(${timers.length} task${timers.length > 1 ? "s" : ""})`
-                : ""}
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            {/* Zoom Controls */}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded px-1">
-              <Button
-                onClick={() => window.ipc?.zoom?.out()}
-                variant="gray"
-                size="icon"
-                className="w-5 h-5 text-xs"
-                title="Zoom out (Ctrl+-)"
-              >
-                -
-              </Button>
-              <Button
-                onClick={() => window.ipc?.zoom?.reset()}
-                variant="gray"
-                size="icon"
-                className="w-5 h-5 text-xs"
-                title="Reset zoom (Ctrl+0)"
-              >
-                ⊙
-              </Button>
-              <Button
-                onClick={() => window.ipc?.zoom?.in()}
-                variant="gray"
-                size="icon"
-                className="w-5 h-5 text-xs"
-                title="Zoom in (Ctrl+=)"
-              >
-                +
-              </Button>
-            </div>
-            <Button
-              onClick={handleClose}
-              variant="danger"
-              size="icon"
-              className="w-6 h-6 text-xs hover:bg-red-500"
-              title="Close"
-            >
-              ×
-            </Button>
-          </div>
-        </div>
+        <FloatingWindowHeader
+          selectedTicketNumber={selectedTicketNumber}
+          timersLength={timers.length}
+          setIsDragging={setIsDragging}
+          handleClose={handleClose}
+        />
 
         <div className="p-4 overflow-y-auto flex-grow">
             {selectedTicketNumber && currentTimerDetails ? (
-              renderTimerDetail(currentTimerDetails)
+              <TimerDetail
+                timer={currentTimerDetails}
+                formatTime={formatTime}
+                getStatusColor={getStatusColor}
+                getStatusIcon={getStatusIcon}
+                getStatusText={getStatusText}
+                handleDeleteTimer={handleDeleteTimer}
+                handleTimerAction={handleTimerAction}
+                setSelectedTicketNumber={setSelectedTicketNumber}
+              />
             ) : selectedTicketNumber && !currentTimerDetails ? (
               <div className="text-center text-gray-500 dark:text-gray-400 p-4">
                 <p>Timer '{selectedTicketNumber}' not found.</p>
@@ -883,81 +580,13 @@ const FloatingWindow: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
-                {timers.length === 0 ? (
-                  <div className="text-center text-gray-500 dark:text-gray-400 p-4">
-                    No active timers. Start one from the main app.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-3 gap-3">
-                    {timers.map((timer) => (
-                      <Button
-                        key={timer.ticketNumber}
-                        onClick={() =>
-                          setSelectedTicketNumber(timer.ticketNumber)
-                        }
-                        variant="gray"
-                        className="p-3 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors h-auto flex flex-col items-start justify-start"
-                        title={`View details for ${timer.ticketNumber}\n${
-                          timer.ticketName
-                        }\nStatus: ${getStatusText(
-                          timer.status,
-                          timer.isRunning
-                        )}${
-                          timer.storyPoints
-                            ? `\nEst: ${formatTime(
-                                timer.storyPoints * 3600000
-                              )}`
-                            : ""
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span
-                            className={`w-3 h-3 rounded-full ${getMinimalStatusColorClass(
-                              timer.status,
-                              timer.isRunning
-                            )}`}
-                          ></span>
-                          <span className="text-xs text-gray-500">
-                            {formatTime(timer.totalElapsed)}
-                          </span>
-                        </div>
-                        <h4 className="font-medium text-gray-800 dark:text-gray-200 text-sm truncate">
-                          {timer.ticketNumber}
-                        </h4>
-                        <p
-                          className="text-xs text-gray-500 truncate"
-                          title={
-                            timer.ticketName +
-                            (timer.storyPoints
-                              ? ` (Est: ${formatTime(
-                                  timer.storyPoints * 3600000
-                                )})`
-                              : "")
-                          }
-                        >
-                          {timer.ticketName.startsWith(timer.ticketNumber) &&
-                          timer.ticketName !== timer.ticketNumber
-                            ? timer.ticketName
-                                .substring(timer.ticketNumber.length)
-                                .trim()
-                                .startsWith("-")
-                              ? timer.ticketName
-                                  .substring(timer.ticketNumber.length + 2)
-                                  .trim()
-                              : timer.ticketName
-                            : timer.ticketName === timer.ticketNumber
-                            ? ""
-                            : timer.ticketName}
-                          {timer.storyPoints
-                            ? ` (${timer.storyPoints.toFixed(1)} SP)`
-                            : ""}
-                        </p>
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <TimerGrid
+                timers={timers}
+                formatTime={formatTime}
+                getMinimalStatusColorClass={getMinimalStatusColorClass}
+                getStatusText={getStatusText}
+                setSelectedTicketNumber={setSelectedTicketNumber}
+              />
             )}
           </div>
       </div>
@@ -966,3 +595,5 @@ const FloatingWindow: React.FC = () => {
 };
 
 export default FloatingWindow;
+
+  

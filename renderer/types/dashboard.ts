@@ -26,3 +26,20 @@ export interface DashboardStats {
     averageTimePerPoint: number;
   };
 }
+
+export interface TaskTimer {
+  ticketNumber: string;
+  ticketName: string;
+  startTime: number;
+  elapsedTime: number;
+  isRunning: boolean;
+  status: "running" | "paused" | "hold" | "completed" | "stopped" | "queue";
+  totalElapsed: number;
+  sessions: Array<{
+    startTime: number;
+    endTime?: number;
+    duration: number;
+    status: string;
+  }>;
+  storyPoints?: number;
+}

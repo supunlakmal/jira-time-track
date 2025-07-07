@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Button from './Button';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -65,12 +66,14 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose, pro
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">Export Time Data</h2>
-          <button
+          <Button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl"
+            variant="gray"
+            size="icon"
+            className="w-8 h-8 text-xl"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {exportSummary && (
@@ -157,20 +160,23 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ isOpen, onClose, pro
         </div>
 
         <div className="flex justify-end space-x-3 mt-6">
-          <button
+          <Button
             onClick={onClose}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+            variant="gray"
+            size="md"
             disabled={isExporting}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleExport}
             disabled={isExporting}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            variant="primary"
+            size="md"
+            loading={isExporting}
           >
             {isExporting ? 'Exporting...' : 'Export'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

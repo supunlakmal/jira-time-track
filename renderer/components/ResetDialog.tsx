@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Button from './Button';
 
 interface ResetDialogProps {
   isOpen: boolean;
@@ -155,12 +156,14 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
           <h2 className={`text-xl font-bold ${textClass}`}>
             Reset Application Data
           </h2>
-          <button
+          <Button
             onClick={onClose}
-            className={`${textSecondaryClass} hover:${textClass} text-xl`}
+            variant="gray"
+            size="icon"
+            className="w-8 h-8 text-xl"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Step 1: Select Reset Options */}
@@ -286,39 +289,44 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
         <div className="flex justify-between mt-6">
           <div>
             {step > 1 && (
-              <button
+              <Button
                 onClick={handleBack}
-                className={`px-4 py-2 ${buttonSecondaryClass} rounded transition-colors`}
+                variant="gray"
+                size="md"
                 disabled={isResetting}
               >
                 Back
-              </button>
+              </Button>
             )}
           </div>
           <div className="flex space-x-3">
-            <button
+            <Button
               onClick={onClose}
-              className={`px-4 py-2 ${buttonSecondaryClass} rounded transition-colors`}
+              variant="gray"
+              size="md"
               disabled={isResetting}
             >
               Cancel
-            </button>
+            </Button>
             {step < 3 ? (
-              <button
+              <Button
                 onClick={handleNext}
                 disabled={step === 1 && getSelectedOptionsCount() === 0}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                variant="primary"
+                size="md"
               >
                 Next
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={handleReset}
                 disabled={confirmationText !== 'RESET' || isResetting}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 transition-colors"
+                variant="danger"
+                size="md"
+                loading={isResetting}
               >
                 {isResetting ? 'Resetting...' : 'Reset Data'}
-              </button>
+              </Button>
             )}
           </div>
         </div>

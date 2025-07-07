@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Button from "./Button";
 import { ProjectTicket } from "../types/electron";
 
 interface ManualTaskDialogProps {
@@ -106,14 +107,16 @@ export const ManualTaskDialog: React.FC<ManualTaskDialogProps> = ({
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {editingTask ? "Edit Manual Task" : "Add Manual Task"}
           </h2>
-          <button
+          <Button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            variant="gray"
+            size="icon"
+            className="w-8 h-8"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -185,19 +188,21 @@ export const ManualTaskDialog: React.FC<ManualTaskDialogProps> = ({
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
-            <button
+            <Button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+              variant="gray"
+              size="md"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              variant="primary"
+              size="md"
             >
               {editingTask ? "Update Task" : "Add Task"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

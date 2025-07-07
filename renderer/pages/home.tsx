@@ -2,6 +2,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
+import Button from "../components/Button";
 import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ManualTaskDialog } from "../components/ManualTaskDialog";
@@ -11,34 +12,12 @@ import CsvImportDialog from "../components/CsvImportDialog";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";
-
-interface ProjectSummary {
-  name: string;
-  ticketCount: number;
-  location?: string;
-  currentBranch?: string;
-  totalStoryPoints: number;
-  averageStoryPoints: number;
-  completedTickets: number;
-  inProgressTickets: number;
-  totalTimeSpent: number; // in milliseconds
-}
-
-interface DashboardStats {
-  totalTickets: number;
-  totalStoryPoints: number;
-  averageStoryPoints: number;
-  totalProjects: number;
-  completedTickets: number;
-  inProgressTickets: number;
-  totalTimeTracked: number;
-  productivity: {
-    ticketsPerDay: number;
-    pointsPerDay: number;
-    averageTimePerTicket: number;
-    averageTimePerPoint: number;
-  };
-}
+import Overview from "../components/Overview";
+import { DashboardStats, ProjectSummary } from "../types/dashboard";
+import ProjectsOverview from "../components/ProjectsOverview";
+import TicketTableActions from "../components/TicketTableActions";
+import TicketTable from "../components/TicketTable";
+import Header from "../components/Header";
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();
@@ -394,7 +373,7 @@ export default function HomePage() {
     story_points?: number;
   }) => {
     if (!editingTask) return;
-    
+
     try {
       const result = await window.ipc.invoke("update-manual-task", {
         taskId: editingTask.ticket_number,
@@ -416,9 +395,12 @@ export default function HomePage() {
     if (!confirm("Are you sure you want to delete this manual task?")) {
       return;
     }
-    
+
     try {
-      const result = await window.ipc.invoke("delete-manual-task", ticketNumber);
+      const result = await window.ipc.invoke(
+        "delete-manual-task",
+        ticketNumber
+      );
       if (result.success) {
         console.log("Manual task deleted successfully");
       } else {
@@ -445,7 +427,9 @@ export default function HomePage() {
     try {
       const result = await window.ipc.invoke("import-csv-data", csvData);
       if (result.success) {
-        console.log(`Successfully imported ${result.importedCount} tasks from CSV`);
+        console.log(
+          `Successfully imported ${result.importedCount} tasks from CSV`
+        );
         // Data will be automatically refreshed via the shared data hook
       } else {
         alert(`Error importing CSV: ${result.error}`);
@@ -463,791 +447,53 @@ export default function HomePage() {
       </Head>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <Image
-              className="mx-auto mb-4"
-              src="/images/logo.png"
-              alt="Logo"
-              width={100}
-              height={100}
-            />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Project Time Tracker Dashboard
-            </h1>
-            <div className="flex justify-center gap-4 mb-4">
-              <button
-                onClick={toggleFloatingWindow}
-                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg transition-colors"
-              >
-                Toggle Floating Timer
-              </button>
-              <button
-                onClick={() => setShowManualTaskDialog(true)}
-                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-lg transition-colors"
-                title="Add a manual task"
-              >
-                Add Manual Task
-              </button>
-              <button
-                onClick={() => setShowCsvImportDialog(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-lg transition-colors"
-                title="Import tasks from CSV file"
-              >
-                Import CSV
-              </button>
-              <button
-                onClick={() => setShowExportDialog(true)}
-                className="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg transition-colors"
-                title="Export time tracking data"
-              >
-                Export Data
-              </button>
-              <button
-                onClick={() => setShowResetDialog(true)}
-                className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg transition-colors"
-                title="Reset application data"
-              >
-                Reset Data
-              </button>
-              <ThemeToggle size="md" />
-              
-              {/* Zoom Controls */}
-              <div className="flex items-center gap-2 border border-gray-300 rounded-lg p-1 bg-white dark:bg-gray-800 dark:border-gray-600">
-                <button
-                  onClick={() => window.ipc?.zoom?.out()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                  title="Zoom out (Ctrl+-)"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => window.ipc?.zoom?.reset()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                  title="Reset zoom (Ctrl+0)"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => window.ipc?.zoom?.in()}
-                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                  title="Zoom in (Ctrl+=)"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
+          <Header
+            toggleFloatingWindow={toggleFloatingWindow}
+            setShowManualTaskDialog={setShowManualTaskDialog}
+            setShowCsvImportDialog={setShowCsvImportDialog}
+            setShowExportDialog={setShowExportDialog}
+            setShowResetDialog={setShowResetDialog}
+          />
 
           {loading ? (
             <LoadingSpinner />
           ) : (
             <>
               {/* Dashboard Stats Cards */}
+              <Overview
+                dashboardStats={dashboardStats}
+                projectSummaryData={projectSummaryData}
+                formatTime={formatTime}
+              />
 
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Overview
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  {/* Total Tickets */}
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Total Tickets
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {dashboardStats.totalTickets}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-blue-100 rounded-full">
-                        <svg
-                          className="w-6 h-6 text-blue-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex items-center text-sm text-gray-600">
-                      <span className="text-green-600 font-medium">
-                        {dashboardStats.completedTickets} completed
-                      </span>
-                      <span className="mx-2">•</span>
-                      <span className="text-blue-600 font-medium">
-                        {dashboardStats.inProgressTickets} in progress
-                      </span>
-                    </div>
-                  </div>
+              <ProjectsOverview
+                projectSummaryData={projectSummaryData}
+                selectedProject={selectedProject}
+                handleProjectSelect={handleProjectSelect}
+                handleChooseProjectPath={handleChooseProjectPath}
+                refreshBranch={refreshBranch}
+                formatTime={formatTime}
+              />
 
-                  {/* Story Points */}
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Story Points
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {dashboardStats.totalStoryPoints.toFixed(1)}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-green-100 rounded-full">
-                        <svg
-                          className="w-6 h-6 text-green-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-600">
-                      Avg: {dashboardStats.averageStoryPoints.toFixed(1)}{" "}
-                      pts/ticket
-                    </div>
-                  </div>
+              <TicketTableActions
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                selectedProject={selectedProject}
+                loading={loading}
+                refreshData={() => window.location.reload()}
+              />
 
-                  {/* Time Tracked */}
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Time Tracked
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {formatTime(dashboardStats.totalTimeTracked)}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-purple-100 rounded-full">
-                        <svg
-                          className="w-6 h-6 text-purple-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-600">
-                      Avg:{" "}
-                      {formatTime(
-                        dashboardStats.productivity.averageTimePerTicket
-                      )}
-                      /ticket
-                    </div>
-                  </div>
-
-                  {/* Projects */}
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">
-                          Active Projects
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {dashboardStats.totalProjects}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-orange-100 rounded-full">
-                        <svg
-                          className="w-6 h-6 text-orange-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-600">
-                      {projectSummaryData.filter((p) => p.location).length} with
-                      local paths
-                    </div>
-                  </div>
-                </div>
-
-                {/* Productivity Metrics */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Productivity Metrics (30 days)
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {dashboardStats.productivity.ticketsPerDay.toFixed(1)}
-                      </p>
-                      <p className="text-sm text-gray-600">Tickets/Day</p>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {dashboardStats.productivity.pointsPerDay.toFixed(1)}
-                      </p>
-                      <p className="text-sm text-gray-600">Points/Day</p>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {formatTime(
-                          dashboardStats.productivity.averageTimePerTicket
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-600">Time/Ticket</p>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        {formatTime(
-                          dashboardStats.productivity.averageTimePerPoint
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-600">Time/Point</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* Enhanced Project Summary Table */}
-              {projectSummaryData.length > 0 && (
-                <div className="mb-8">
-                  <div className="p-4 border-b bg-white rounded-t-lg shadow-sm flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      Projects Overview
-                    </h2>
-                    {selectedProject && (
-                      <button
-                        onClick={() => handleProjectSelect(null)}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        View All Projects
-                      </button>
-                    )}
-                  </div>
-                  <div className="bg-white shadow-sm rounded-b-lg overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Project
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tickets
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Story Points
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Progress
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Time Spent
-                            </th>
-
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
-                              Local Path
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Current Branch
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {projectSummaryData.map((proj) => (
-                            <tr
-                              key={proj.name}
-                              className={`${
-                                selectedProject === proj.name
-                                  ? "bg-blue-50"
-                                  : "hover:bg-gray-50"
-                              } cursor-pointer`}
-                              onClick={() => handleProjectSelect(proj.name)}
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {proj.name}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div className="flex flex-col">
-                                  <span className="font-medium">
-                                    {proj.ticketCount}
-                                  </span>
-                                  <span className="text-xs text-gray-400">
-                                    Avg: {proj.averageStoryPoints.toFixed(1)}{" "}
-                                    pts
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
-                                {proj.totalStoryPoints.toFixed(1)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div className="flex flex-col space-y-1">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                    <span className="text-xs">
-                                      {proj.completedTickets} completed
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                    <span className="text-xs">
-                                      {proj.inProgressTickets} in progress
-                                    </span>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
-                                {formatTime(proj.totalTimeSpent)}
-                              </td>
-
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <div className="flex items-center justify-between group">
-                                  <span
-                                    className={`truncate flex-grow ${
-                                      !proj.location
-                                        ? "italic text-gray-400"
-                                        : ""
-                                    }`}
-                                    title={
-                                      proj.location ||
-                                      "Click 'Choose Path' to set"
-                                    }
-                                  >
-                                    {proj.location || "Path not set"}
-                                  </span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleChooseProjectPath(proj.name);
-                                    }}
-                                    className="ml-2 py-1 px-2 text-xs border border-gray-300 rounded hover:bg-gray-100 text-gray-700"
-                                    title="Choose project directory"
-                                  >
-                                    Choose Path
-                                  </button>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <div className="flex items-center justify-between">
-                                  <span
-                                    className={`text-xs px-2 py-1 rounded-full ${
-                                      proj.currentBranch === "main" ||
-                                      proj.currentBranch === "master"
-                                        ? "bg-green-100 text-green-800"
-                                        : proj.currentBranch === "Error"
-                                        ? "bg-red-100 text-red-800"
-                                        : proj.currentBranch === "Unknown"
-                                        ? "bg-gray-100 text-gray-800"
-                                        : proj.currentBranch
-                                        ? "bg-blue-100 text-blue-800"
-                                        : "bg-gray-100 text-gray-400"
-                                    }`}
-                                    title={
-                                      proj.currentBranch ||
-                                      "No branch information"
-                                    }
-                                  >
-                                    {proj.currentBranch ||
-                                      (proj.location ? "..." : "No path")}
-                                  </span>
-                                  {proj.location && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        refreshBranch(
-                                          proj.name,
-                                          proj.location!
-                                        );
-                                      }}
-                                      className="ml-2 text-xs py-1 px-2 rounded border border-gray-300 hover:bg-gray-100 text-gray-600"
-                                      title="Refresh branch information"
-                                    >
-                                      ↻
-                                    </button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Search and Refresh for Main Ticket Table */}
-              <div className="mb-6 flex gap-4 items-center">
-                <input
-                  type="text"
-                  placeholder={`Search tickets in ${
-                    selectedProject || "all projects"
-                  }...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button
-                  // onClick={refreshData}
-                  disabled={loading}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
-                >
-                  ↻ Refresh All Data
-                </button>
-              </div>
-
-              {/* Enhanced Main Ticket Table */}
-              <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {selectedProject
-                      ? `${selectedProject} Tickets`
-                      : "All Tickets"}
-                    {searchTerm && (
-                      <span className="text-sm font-normal text-gray-600 ml-2">
-                        (filtered by "{searchTerm}")
-                      </span>
-                    )}
-                  </h3>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span>{ticketsToDisplay.length} tickets</span>
-                    <span>
-                      {ticketsToDisplay
-                        .reduce((sum, t) => sum + (t.story_points || 0), 0)
-                        .toFixed(1)}{" "}
-                      points
-                    </span>
-                  </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Ticket
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Description
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Story Points
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Time Spent
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {ticketsToDisplay.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan={6}
-                            className="px-6 py-8 text-center text-gray-500"
-                          >
-                            <div className="flex flex-col items-center">
-                              <svg
-                                className="w-12 h-12 text-gray-300 mb-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                                />
-                              </svg>
-                              <p className="text-lg font-medium mb-2">
-                                {data.length === 0
-                                  ? "No tickets available"
-                                  : selectedProject && searchTerm
-                                  ? "No matching tickets found"
-                                  : selectedProject
-                                  ? `No tickets found for ${selectedProject}`
-                                  : searchTerm
-                                  ? "No tickets match your search"
-                                  : "No tickets in current filter"}
-                              </p>
-                              {data.length === 0 && (
-                                <p className="text-sm text-gray-400">
-                                  Load your Project data to see tickets here
-                                </p>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        ticketsToDisplay.map((ticket) => {
-                          const ticketSession = sessions[ticket.ticket_number];
-                          const isTracked = !!ticketSession;
-                          const isActive = ticketSession?.sessions?.some(
-                            (s) => s.status === "running"
-                          );
-                          const isCompleted = ticketSession?.sessions?.some(
-                            (s) => s.status === "completed"
-                          );
-                          const isPaused = ticketSession?.sessions?.some(
-                            (s) => s.status === "paused"
-                          );
-
-                          let statusColor = "bg-gray-100 text-gray-800";
-                          let statusText = "Not Started";
-
-                          if (isActive) {
-                            statusColor = "bg-green-100 text-green-800";
-                            statusText = "Active";
-                          } else if (isPaused) {
-                            statusColor = "bg-yellow-100 text-yellow-800";
-                            statusText = "Paused";
-                          } else if (isCompleted) {
-                            statusColor = "bg-blue-100 text-blue-800";
-                            statusText = "Completed";
-                          } else if (isTracked) {
-                            statusColor = "bg-purple-100 text-purple-800";
-                            statusText = "Tracked";
-                          }
-
-                          return (
-                            <tr
-                              key={ticket.ticket_number}
-                              className="hover:bg-gray-50 transition-colors"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="flex-shrink-0">
-                                    {isActive && (
-                                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-3"></div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    <div className={`text-sm font-medium flex items-center ${
-                                      ticket.isManual ? 'text-purple-600' : 'text-blue-600'
-                                    }`}>
-                                      {ticket.ticket_number}
-                                      {ticket.isManual && (
-                                        <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
-                                          Manual
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                      {getProjectName(ticket.ticket_number)}
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-900">
-                                <div
-                                  className="max-w-xs truncate"
-                                  title={ticket.ticket_name}
-                                >
-                                  {ticket.ticket_name}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900 font-mono">
-                                  {ticket.story_points?.toFixed(1) || "-"}
-                                </div>
-                                {ticket.story_points && (
-                                  <div className="text-xs text-gray-500">
-                                    {ticket.story_points <= 1
-                                      ? "XS"
-                                      : ticket.story_points <= 3
-                                      ? "S"
-                                      : ticket.story_points <= 5
-                                      ? "M"
-                                      : ticket.story_points <= 8
-                                      ? "L"
-                                      : "XL"}
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span
-                                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColor}`}
-                                >
-                                  {statusText}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <div className="flex flex-col">
-                                  <span className="font-mono text-gray-900">
-                                    {isTracked
-                                      ? formatTime(
-                                          ticketSession.totalElapsed || 0
-                                        )
-                                      : "-"}
-                                  </span>
-                                  {isTracked && ticketSession.sessions && (
-                                    <span className="text-xs text-gray-500">
-                                      {ticketSession.sessions.length} session
-                                      {ticketSession.sessions.length !== 1
-                                        ? "s"
-                                        : ""}
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => {
-                                      window.ipc?.send("start-task", {
-                                        ticket: ticket.ticket_number,
-                                        name: ticket.ticket_name,
-                                        storyPoints: ticket.story_points,
-                                      });
-                                    }}
-                                    className="text-blue-600 hover:text-blue-900 font-medium transition-colors"
-                                    title="Start tracking time for this ticket"
-                                  >
-                                    {isActive ? "Resume" : "Start Timer"}
-                                  </button>
-                                  {isTracked && (
-                                    <button
-                                      onClick={() => {
-                                        // View session details - could open a modal or expand row
-                                        console.log(
-                                          "View sessions for:",
-                                          ticket.ticket_number,
-                                          ticketSession
-                                        );
-                                      }}
-                                      className="text-gray-600 hover:text-gray-900 text-xs transition-colors"
-                                      title="View time tracking details"
-                                    >
-                                      Details
-                                    </button>
-                                  )}
-                                  {ticket.isManual && (
-                                    <>
-                                      <button
-                                        onClick={() => openEditDialog(ticket)}
-                                        className="text-purple-600 hover:text-purple-900 text-xs transition-colors"
-                                        title="Edit manual task"
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteManualTask(ticket.ticket_number)}
-                                        className="text-red-600 hover:text-red-900 text-xs transition-colors"
-                                        title="Delete manual task"
-                                      >
-                                        Delete
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Table Footer with Summary */}
-                {ticketsToDisplay.length > 0 && (
-                  <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-                    <div className="flex justify-between items-center text-sm text-gray-600">
-                      <div className="flex space-x-6">
-                        <span>
-                          <strong>{ticketsToDisplay.length}</strong> tickets
-                          shown
-                        </span>
-                        <span>
-                          <strong>
-                            {ticketsToDisplay
-                              .reduce(
-                                (sum, t) => sum + (t.story_points || 0),
-                                0
-                              )
-                              .toFixed(1)}
-                          </strong>{" "}
-                          total story points
-                        </span>
-                      </div>
-                      <div className="flex space-x-6">
-                        <span>
-                          <strong>
-                            {
-                              ticketsToDisplay.filter((t) =>
-                                sessions[t.ticket_number]?.sessions?.some(
-                                  (s) => s.status === "completed"
-                                )
-                              ).length
-                            }
-                          </strong>{" "}
-                          completed
-                        </span>
-                        <span>
-                          <strong>
-                            {
-                              ticketsToDisplay.filter((t) =>
-                                sessions[t.ticket_number]?.sessions?.some(
-                                  (s) => s.status === "running"
-                                )
-                              ).length
-                            }
-                          </strong>{" "}
-                          active
-                        </span>
-                        <span>
-                          <strong>
-                            {formatTime(
-                              ticketsToDisplay.reduce(
-                                (sum, t) =>
-                                  sum +
-                                  (sessions[t.ticket_number]?.totalElapsed ||
-                                    0),
-                                0
-                              )
-                            )}
-                          </strong>{" "}
-                          total time
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <TicketTable
+                ticketsToDisplay={ticketsToDisplay}
+                sessions={sessions}
+                selectedProject={selectedProject}
+                searchTerm={searchTerm}
+                formatTime={formatTime}
+                getProjectName={getProjectName}
+                openEditDialog={openEditDialog}
+                handleDeleteManualTask={handleDeleteManualTask}
+                data={data}
+              />
             </>
           )}
         </div>

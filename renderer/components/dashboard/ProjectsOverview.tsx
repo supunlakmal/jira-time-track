@@ -1,7 +1,7 @@
-// renderer/components/ProjectsOverview.tsx
+// renderer/components/dashboard/ProjectsOverview.tsx
 import React from "react";
-import Button from "./Button";
-import { ProjectSummary } from "../types/dashboard";
+import Button from "../ui/Button";
+import { ProjectSummary } from "../../types/dashboard";
 
 interface ProjectsOverviewProps {
   projectSummaryData: ProjectSummary[];
@@ -26,8 +26,8 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
 
   return (
     <div className="mb-8">
-      <div className="p-4 border-b bg-white rounded-t-lg shadow-sm flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">
+      <div className="p-4 border-b bg-white dark:bg-gray-800 dark:border-gray-600 rounded-t-lg shadow-sm flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
           Projects Overview
         </h2>
         {selectedProject && (
@@ -40,60 +40,60 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
           </Button>
         )}
       </div>
-      <div className="bg-white shadow-sm rounded-b-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-b-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Project
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Tickets
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Story Points
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Progress
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Time Spent
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-2/5">
                   Local Path
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Current Branch
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
               {projectSummaryData.map((proj) => (
                 <tr
                   key={proj.name}
                   className={`${
                     selectedProject === proj.name
-                      ? "bg-blue-50"
-                      : "hover:bg-gray-50"
+                      ? "bg-blue-50 dark:bg-blue-900"
+                      : "hover:bg-gray-50 dark:hover:bg-gray-700"
                   } cursor-pointer`}
                   onClick={() => handleProjectSelect(proj.name)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {proj.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     <div className="flex flex-col">
                       <span className="font-medium">{proj.ticketCount}</span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         Avg: {proj.averageStoryPoints.toFixed(1)} pts
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
                     {proj.totalStoryPoints.toFixed(1)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center space-x-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -109,14 +109,14 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
                     {formatTime(proj.totalTimeSpent)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     <div className="flex items-center justify-between group">
                       <span
                         className={`truncate flex-grow ${
-                          !proj.location ? "italic text-gray-400" : ""
+                          !proj.location ? "italic text-gray-400 dark:text-gray-500" : ""
                         }`}
                         title={proj.location || "Click 'Choose Path' to set"}
                       >
@@ -142,14 +142,14 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
                         className={`text-xs px-2 py-1 rounded-full ${
                           proj.currentBranch === "main" ||
                           proj.currentBranch === "master"
-                            ? "bg-green-100 text-green-800"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                             : proj.currentBranch === "Error"
-                            ? "bg-red-100 text-red-800"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                             : proj.currentBranch === "Unknown"
-                            ? "bg-gray-100 text-gray-800"
+                            ? "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                             : proj.currentBranch
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-400"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                            : "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
                         }`}
                         title={proj.currentBranch || "No branch information"}
                       >

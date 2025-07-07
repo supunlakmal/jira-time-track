@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TicketTable from '../../renderer/components/TicketTable';
+import TicketTable from '../../renderer/components/tickets/TicketTable';
 import { TimerSession } from '../../renderer/store/sessionsSlice';
 
 const meta: Meta<typeof TicketTable> = {

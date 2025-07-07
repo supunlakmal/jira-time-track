@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 
 import { mockTimers } from '../mocks/mockData';
 import { createMockIpc } from '../mocks/mockHooks';
-import FloatingWindowHeader from '../../renderer/components/FloatingWindowHeader';
-import TimerGrid from '../../renderer/components/TimerGrid';
+import FloatingWindowHeader from '../../renderer/components/layout/FloatingWindowHeader';
+import TimerGrid from '../../renderer/components/timers/TimerGrid';
 import { TaskTimer } from '../../renderer/types/dashboard';
 
 

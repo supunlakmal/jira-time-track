@@ -47,6 +47,7 @@ export interface IpcHandler {
     value: { projectName: string; projectPath: string }
   ): void;
   send(channel: "show-main-window"): void;
+  send(channel: "theme-changed", value: string): void;
 
   // Add invoke method
   invoke(channel: "load-project-data", value?: undefined): Promise<ProjectTicket[]>;
@@ -140,6 +141,10 @@ export interface IpcHandler {
   on(
     channel: "manual-tasks-updated",
     listener: (manualTasks: ProjectTicket[]) => void
+  ): () => void;
+  on(
+    channel: "theme-changed",
+    listener: (theme: string) => void
   ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 

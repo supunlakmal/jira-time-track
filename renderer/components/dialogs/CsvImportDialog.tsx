@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import Button from './Button';
+import Button from '../ui/Button';
+import { ModalWrapper } from '../ui/ModalWrapper';
 
 interface CsvImportDialogProps {
   isOpen: boolean;
@@ -147,28 +148,38 @@ EXAMPLE-3,"Third example ticket",`;
     URL.revokeObjectURL(url);
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex justify-end space-x-3">
+      <Button
+        onClick={handleClose}
+        variant="gray"
+        size="md"
+      >
+        Cancel
+      </Button>
+      {showPreview && (
+        <Button
+          onClick={handleImport}
+          variant="primary"
+          size="md"
+          disabled={isValidating || csvData.length === 0}
+          loading={isValidating}
+        >
+          Import {csvData.length} Tasks
+        </Button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Import Tasks from CSV
-          </h2>
-          <Button
-            onClick={handleClose}
-            variant="gray"
-            size="icon"
-            className="w-8 h-8"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </Button>
-        </div>
-
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Import Tasks from CSV"
+      size="xl"
+      footer={footerContent}
+    >
+      <div className="p-6 overflow-y-auto flex-1">
           {!showPreview ? (
             <div className="space-y-6">
               <div className="text-center">
@@ -323,28 +334,8 @@ EXAMPLE-3,"Third example ticket",`;
               </div>
             </div>
           )}
-        </div>
-
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            onClick={handleClose}
-            variant="gray"
-            size="md"
-          >
-            Cancel
-          </Button>
-          {showPreview && (
-            <Button
-              onClick={handleImport}
-              variant="primary"
-              size="md"
-            >
-              Import {csvData.length} Tasks
-            </Button>
-          )}
-        </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };
 

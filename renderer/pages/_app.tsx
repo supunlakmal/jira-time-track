@@ -2,7 +2,7 @@ import React from "react";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
-import { ThemeProvider } from "../components/ThemeProvider";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
 
 import "../styles/globals.css";
 

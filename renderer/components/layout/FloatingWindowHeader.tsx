@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "./Button";
-import { IpcHandler } from "../types/electron";
+import Button from "../ui/Button";
+import { IpcHandler } from "../../types/electron";
 
 interface FloatingWindowHeaderProps {
   selectedTicketNumber: string | null;

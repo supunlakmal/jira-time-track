@@ -10,6 +10,7 @@ module.exports = {
   theme: {
     colors: {
       // use colors only specified
+      black: colors.black,
       white: colors.white,
       gray: colors.gray,
       blue: colors.blue,

@@ -2,6 +2,12 @@
 
 A cross-platform desktop application built with Nextron (Next.js + Electron) for tracking time spent on Project tickets. The application provides a rich interface featuring both a comprehensive main dashboard and a compact floating timer, designed to help developers and teams accurately track time across multiple projects and tickets.
 
+## Screenshots
+
+![Application Screenshot](promo/screenshot.png)
+
+*Main dashboard with project overview and floating timer window showing the application's dual interface design*
+
 ## Key Features
 
 ### 🎯 Ticket-Based Time Tracking

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TimerGridItem from '../../renderer/components/TimerGridItem';
+import TimerGridItem from '../../renderer/components/timers/TimerGridItem';
 import { TaskTimer } from '../../renderer/types/dashboard';
 
 const meta: Meta<typeof TimerGridItem> = {

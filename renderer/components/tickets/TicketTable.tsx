@@ -1,7 +1,7 @@
 
 import React from 'react';
-import Button from './Button';
-import { TimerSession } from '../store/sessionsSlice';
+import Button from '../ui/Button';
+import { TimerSession } from '../../store/sessionsSlice';
 
 interface Ticket {
   ticket_number: string;
@@ -34,17 +34,17 @@ const TicketTable: React.FC<TicketTableProps> = ({
   data,
 }) => {
   return (
-    <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">
+    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+      <div className="p-4 border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           {selectedProject ? `${selectedProject} Tickets` : 'All Tickets'}
           {searchTerm && (
-            <span className="text-sm font-normal text-gray-600 ml-2">
+            <span className="text-sm font-normal text-gray-600 dark:text-gray-300 ml-2">
               (filtered by "{searchTerm}")
             </span>
           )}
         </h3>
-        <div className="flex items-center space-x-4 text-sm text-gray-600">
+        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
           <span>{ticketsToDisplay.length} tickets</span>
           <span>
             {ticketsToDisplay
@@ -55,36 +55,36 @@ const TicketTable: React.FC<TicketTableProps> = ({
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Ticket
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Description
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Story Points
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Time Spent
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
             {ticketsToDisplay.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
                   <div className="flex flex-col items-center">
                     <svg
-                      className="w-12 h-12 text-gray-300 mb-4"
+                      className="w-12 h-12 text-gray-300 dark:text-gray-500 mb-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -96,7 +96,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
                         d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
                       />
                     </svg>
-                    <p className="text-lg font-medium mb-2">
+                    <p className="text-lg font-medium mb-2 dark:text-gray-100">
                       {data.length === 0
                         ? 'No tickets available'
                         : selectedProject && searchTerm
@@ -108,7 +108,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
                         : 'No tickets in current filter'}
                     </p>
                     {data.length === 0 && (
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-400 dark:text-gray-500">
                         Load your Project data to see tickets here
                       </p>
                     )}
@@ -129,27 +129,27 @@ const TicketTable: React.FC<TicketTableProps> = ({
                   (s) => s.status === 'paused'
                 );
 
-                let statusColor = 'bg-gray-100 text-gray-800';
+                let statusColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
                 let statusText = 'Not Started';
 
                 if (isActive) {
-                  statusColor = 'bg-green-100 text-green-800';
+                  statusColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
                   statusText = 'Active';
                 } else if (isPaused) {
-                  statusColor = 'bg-yellow-100 text-yellow-800';
+                  statusColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
                   statusText = 'Paused';
                 } else if (isCompleted) {
-                  statusColor = 'bg-blue-100 text-blue-800';
+                  statusColor = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
                   statusText = 'Completed';
                 } else if (isTracked) {
-                  statusColor = 'bg-purple-100 text-purple-800';
+                  statusColor = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
                   statusText = 'Tracked';
                 }
 
                 return (
                   <tr
                     key={ticket.ticket_number}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -162,24 +162,24 @@ const TicketTable: React.FC<TicketTableProps> = ({
                           <div
                             className={`text-sm font-medium flex items-center ${
                               ticket.isManual
-                                ? 'text-purple-600'
-                                : 'text-blue-600'
+                                ? 'text-purple-600 dark:text-purple-400'
+                                : 'text-blue-600 dark:text-blue-400'
                             }`}
                           >
                             {ticket.ticket_number}
                             {ticket.isManual && (
-                              <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                              <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 rounded-full">
                                 Manual
                               </span>
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {getProjectName(ticket.ticket_number)}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                       <div
                         className="max-w-xs truncate"
                         title={ticket.ticket_name}
@@ -188,11 +188,11 @@ const TicketTable: React.FC<TicketTableProps> = ({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-mono">
+                      <div className="text-sm text-gray-900 dark:text-white font-mono">
                         {ticket.story_points?.toFixed(1) || '-'}
                       </div>
                       {ticket.story_points && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
                           {ticket.story_points <= 1
                             ? 'XS'
                             : ticket.story_points <= 3
@@ -214,13 +214,13 @@ const TicketTable: React.FC<TicketTableProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex flex-col">
-                        <span className="font-mono text-gray-900">
+                        <span className="font-mono text-gray-900 dark:text-white">
                           {isTracked
                             ? formatTime(ticketSession.totalElapsed || 0)
                             : '-'}
                         </span>
                         {isTracked && ticketSession.sessions && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {ticketSession.sessions.length} session
                             {ticketSession.sessions.length !== 1 ? 's' : ''}
                           </span>
@@ -295,8 +295,8 @@ const TicketTable: React.FC<TicketTableProps> = ({
         </table>
       </div>
       {ticketsToDisplay.length > 0 && (
-        <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm text-gray-600">
+        <div className="bg-gray-50 dark:bg-gray-700 px-6 py-3 border-t border-gray-200 dark:border-gray-600">
+          <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300">
             <div className="flex space-x-6">
               <span>
                 <strong>{ticketsToDisplay.length}</strong> tickets shown

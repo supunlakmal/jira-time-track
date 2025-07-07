@@ -1,5 +1,5 @@
 import React from "react";
-import { TaskTimer } from "../types/dashboard";
+import { TaskTimer } from "../../types/dashboard";
 import TimerGridItem from "./TimerGridItem";
 
 interface TimerGridProps {

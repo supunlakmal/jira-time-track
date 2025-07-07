@@ -10,14 +10,10 @@ const meta: Meta<typeof CsvImportDialog> = {
   tags: ['autodocs'],
   argTypes: {
     isOpen: {
-      control: { type: 'boolean' },
+      control: 'boolean',
     },
-    onClose: {
-      action: 'onClose',
-    },
-    onImport: {
-      action: 'onImport',
-    },
+    onClose: { action: 'closed' },
+    onImport: { action: 'imported' },
   },
 };
 
@@ -27,15 +23,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     isOpen: true,
-    onClose: () => {},
-    onImport: (data) => console.log('Importing CSV data:', data),
-  },
-};
-
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    onClose: () => {},
-    onImport: (data) => console.log('Importing CSV data:', data),
+    onClose: () => console.log('Close clicked'),
+    onImport: (data) => console.log('Import data:', data),
   },
 };

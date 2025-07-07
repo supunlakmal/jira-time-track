@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ManualTaskDialog } from '../../renderer/components/ManualTaskDialog';
-import { ProjectTicket } from '../../renderer/types/electron';
 
 const meta: Meta<typeof ManualTaskDialog> = {
   title: 'Components/ManualTaskDialog',
@@ -11,13 +10,15 @@ const meta: Meta<typeof ManualTaskDialog> = {
   tags: ['autodocs'],
   argTypes: {
     isOpen: {
-      control: { type: 'boolean' },
+      control: 'boolean',
     },
-    onClose: {
-      action: 'onClose',
+    onClose: { action: 'closed' },
+    onSave: { action: 'saved' },
+    editingTask: {
+      control: 'object',
     },
-    onSave: {
-      action: 'onSave',
+    existingTickets: {
+      control: 'object',
     },
   },
 };
@@ -25,61 +26,39 @@ const meta: Meta<typeof ManualTaskDialog> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockExistingTickets = ['PROJ-001', 'PROJ-002', 'MANUAL-001'];
-
-export const Default: Story = {
+export const AddNewTask: Story = {
   args: {
     isOpen: true,
-    onClose: () => {},
-    onSave: (task) => console.log('Saving task:', task),
-    existingTickets: mockExistingTickets,
+    onClose: () => console.log('Close clicked'),
+    onSave: (task) => console.log('Save new task:', task),
+    editingTask: null,
+    existingTickets: ['PROJECT-001', 'PROJECT-002'],
   },
 };
 
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    onClose: () => {},
-    onSave: (task) => console.log('Saving task:', task),
-    existingTickets: mockExistingTickets,
-  },
-};
-
-const mockEditingTask: ProjectTicket = {
-  ticket_number: 'MANUAL-001',
-  ticket_name: 'Fix login validation bug',
-  story_points: 3,
-};
-
-export const EditingMode: Story = {
+export const EditExistingTask: Story = {
   args: {
     isOpen: true,
-    onClose: () => {},
-    onSave: (task) => console.log('Updating task:', task),
-    editingTask: mockEditingTask,
-    existingTickets: mockExistingTickets,
-  },
-};
-
-export const WithLongTicketName: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    onSave: (task) => console.log('Saving task:', task),
+    onClose: () => console.log('Close clicked'),
+    onSave: (task) => console.log('Save updated task:', task),
     editingTask: {
-      ticket_number: 'MANUAL-002',
-      ticket_name: 'Implement comprehensive user authentication system with multi-factor authentication and session management',
-      story_points: 13,
+      ticket_number: 'MANUAL-001',
+      ticket_name: 'Existing Manual Task',
+      story_points: 5,
     },
-    existingTickets: mockExistingTickets,
+    existingTickets: ['PROJECT-001', 'PROJECT-002', 'MANUAL-001'],
   },
 };
 
-export const EmptyState: Story = {
+export const WithValidationErrors: Story = {
   args: {
     isOpen: true,
-    onClose: () => {},
-    onSave: (task) => console.log('Saving task:', task),
-    existingTickets: [],
+    onClose: () => console.log('Close clicked'),
+    onSave: (task) => console.log('Save task (should not happen):', task),
+    editingTask: null,
+    existingTickets: ['PROJECT-001', 'PROJECT-002'],
   },
+  
 };
+
+

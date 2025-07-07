@@ -203,9 +203,7 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
           timer.status !== "stopped" &&
           timer.status !== "queue" && (
             <Button
-              onClick={() =>
-                handleTimerAction("complete", timer.ticketNumber)
-              }
+              onClick={() => handleTimerAction("complete", timer.ticketNumber)}
               variant="primary"
               size="sm"
             >

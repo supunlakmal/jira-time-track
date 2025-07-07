@@ -8,19 +8,40 @@ const meta: Meta<typeof LoadingSpinner> = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+    },
+    className: {
+      control: 'text',
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    size: 'md',
+  },
+};
 
-export const WithCustomContainer: Story = {
-  decorators: [
-    (Story) => (
-      <div className="w-64 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <Story />
-      </div>
-    ),
-  ],
+export const Small: Story = {
+  args: {
+    size: 'sm',
+  },
+};
+
+export const Large: Story = {
+  args: {
+    size: 'lg',
+  },
+};
+
+export const CustomClass: Story = {
+  args: {
+    className: 'text-red-500',
+  },
 };

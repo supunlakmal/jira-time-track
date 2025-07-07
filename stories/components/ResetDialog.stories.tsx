@@ -1,33 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ResetDialog } from '../../renderer/components/ResetDialog';
 
-// Mock the window.ipc for Storybook
-const mockIpc = {
-  invoke: (channel: string, ...args: any[]) => {
-    if (channel === 'get-reset-preview') {
-      return Promise.resolve({
-        totalSessions: 25,
-        totalProjectData: 8,
-        totalManualTasks: 3,
-        totalProjectPaths: 2
-      });
-    }
-    if (channel === 'reset-application-data') {
-      return Promise.resolve({
-        success: true,
-        message: 'Application data reset successfully'
-      });
-    }
-    return Promise.resolve({});
-  }
-};
-
-// Mock window.ipc for Storybook
-(global as any).window = {
-  ...global.window,
-  ipc: mockIpc
-};
-
 const meta: Meta<typeof ResetDialog> = {
   title: 'Components/ResetDialog',
   component: ResetDialog,
@@ -37,11 +10,9 @@ const meta: Meta<typeof ResetDialog> = {
   tags: ['autodocs'],
   argTypes: {
     isOpen: {
-      control: { type: 'boolean' },
+      control: 'boolean',
     },
-    onClose: {
-      action: 'onClose',
-    },
+    onClose: { action: 'closed' },
   },
 };
 
@@ -51,13 +22,30 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     isOpen: true,
-    onClose: () => {},
+    onClose: () => console.log('Close clicked'),
   },
-};
-
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    onClose: () => {},
+  render: (args) => {
+    // Mock window.ipc for Storybook environment
+    if (typeof window !== 'undefined') {
+      window.ipc = {
+        ...window.ipc, // Keep existing ipc mocks if any
+        invoke: async (channel, ...invokeArgs) => {
+          console.log(`IPC Invoke: ${channel}`, invokeArgs);
+          if (channel === 'get-reset-preview') {
+            return {
+              totalSessions: 10,
+              totalProjectData: 5,
+              totalManualTasks: 3,
+              totalProjectPaths: 2,
+            };
+          } else if (channel === 'reset-data') {
+            console.log('Resetting data with options:', invokeArgs[0]);
+            return { success: true };
+          }
+          return Promise.resolve({});
+        },
+      };
+    }
+    return <ResetDialog {...args} />;
   },
 };

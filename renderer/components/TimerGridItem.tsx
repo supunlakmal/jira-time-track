@@ -57,7 +57,7 @@ const TimerGridItem: React.FC<TimerGridItemProps> = ({
             : "")
         }
       >
-        {timer.ticketName.startsWith(timer.ticketNumber) &&
+        {/* {timer.ticketName.startsWith(timer.ticketNumber) &&
         timer.ticketName !== timer.ticketNumber
           ? timer.ticketName
               .substring(timer.ticketNumber.length)
@@ -67,7 +67,7 @@ const TimerGridItem: React.FC<TimerGridItemProps> = ({
             : timer.ticketName
           : timer.ticketName === timer.ticketNumber
           ? ""
-          : timer.ticketName}
+          : timer.ticketName} */}
         {timer.storyPoints ? ` (${timer.storyPoints.toFixed(1)} SP)` : ""}
       </p>
     </Button>

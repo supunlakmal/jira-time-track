@@ -1,5 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj, StoryContext } from '@storybook/react';
 import { ThemeToggle } from '../../renderer/components/ThemeToggle';
+import { useTheme } from '../../renderer/hooks/useTheme';
+
+interface ThemeToggleStoryArgs extends React.ComponentProps<typeof ThemeToggle> {
+  initialTheme?: 'light' | 'dark' | 'system';
+  initialResolvedTheme?: 'light' | 'dark';
+}
 
 const meta: Meta<typeof ThemeToggle> = {
   title: 'Components/ThemeToggle',
@@ -10,50 +16,70 @@ const meta: Meta<typeof ThemeToggle> = {
   tags: ['autodocs'],
   argTypes: {
     size: {
-      control: { type: 'select' },
+      control: 'select',
       options: ['sm', 'md', 'lg'],
     },
     className: {
-      control: { type: 'text' },
+      control: 'text',
     },
   },
+  decorators: [
+    (Story, context: StoryContext<ThemeToggleStoryArgs>) => {
+      // Mock the useTheme hook for each story
+      (useTheme as any).mockReturnValue({
+        theme: context.args.initialTheme || 'system',
+        resolvedTheme: context.args.initialResolvedTheme || 'light',
+        setTheme: (newTheme: any) => console.log('Set theme:', newTheme),
+        mounted: true,
+      });
+      return <Story />;
+    },
+  ],
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ThemeToggleStoryArgs>;
 
-export const Default: Story = {};
+export const LightTheme: Story = {
+  args: {
+    initialTheme: 'light',
+    initialResolvedTheme: 'light',
+  },
+};
 
-export const Small: Story = {
+export const DarkTheme: Story = {
+  args: {
+    initialTheme: 'dark',
+    initialResolvedTheme: 'dark',
+  },
+};
+
+export const SystemThemeLight: Story = {
+  args: {
+    initialTheme: 'system',
+    initialResolvedTheme: 'light',
+  },
+};
+
+export const SystemThemeDark: Story = {
+  args: {
+    initialTheme: 'system',
+    initialResolvedTheme: 'dark',
+  },
+};
+
+export const SmallSize: Story = {
   args: {
     size: 'sm',
+    initialTheme: 'light',
+    initialResolvedTheme: 'light',
   },
 };
 
-export const Medium: Story = {
-  args: {
-    size: 'md',
-  },
-};
-
-export const Large: Story = {
+export const LargeSize: Story = {
   args: {
     size: 'lg',
+    initialTheme: 'dark',
+    initialResolvedTheme: 'dark',
   },
-};
-
-export const WithCustomClass: Story = {
-  args: {
-    className: 'shadow-lg',
-  },
-};
-
-export const AllSizes: Story = {
-  render: () => (
-    <div className="flex items-center space-x-4">
-      <ThemeToggle size="sm" />
-      <ThemeToggle size="md" />
-      <ThemeToggle size="lg" />
-    </div>
-  ),
 };

@@ -169,6 +169,71 @@ class DataManager {
         projectData.find((task) => task.importedAt)?.importedAt || null,
     };
   }
+
+  // Reset methods
+  getResetPreview() {
+    const sessions = this.getSessions();
+    const projectData = this.getProjectData();
+    const manualTasks = this.getManualTasks();
+    
+    // Get project paths from separate store
+    const projectPathsStore = new Store({ name: "project-paths" });
+    const projectPaths = projectPathsStore.store;
+    
+    return {
+      totalSessions: Object.keys(sessions).length,
+      totalProjectData: projectData.length,
+      totalManualTasks: manualTasks.length,
+      totalProjectPaths: Object.keys(projectPaths).length,
+    };
+  }
+
+  resetSessions() {
+    this.store.set("sessions", {});
+    this.broadcast("sessions-updated", {});
+  }
+
+  resetProjectData() {
+    this.store.set("projectData", []);
+    this.broadcast("project-data-updated", []);
+  }
+
+  resetManualTasks() {
+    this.store.set("manualTasks", []);
+    this.broadcast("manual-tasks-updated", []);
+  }
+
+  resetProjectPaths() {
+    const projectPathsStore = new Store({ name: "project-paths" });
+    projectPathsStore.clear();
+  }
+
+  resetAll() {
+    this.resetSessions();
+    this.resetProjectData();
+    this.resetManualTasks();
+    this.resetProjectPaths();
+  }
+
+  resetData(options: {
+    sessions?: boolean;
+    projectData?: boolean;
+    manualTasks?: boolean;
+    projectPaths?: boolean;
+  }) {
+    if (options.sessions) {
+      this.resetSessions();
+    }
+    if (options.projectData) {
+      this.resetProjectData();
+    }
+    if (options.manualTasks) {
+      this.resetManualTasks();
+    }
+    if (options.projectPaths) {
+      this.resetProjectPaths();
+    }
+  }
 }
 
 export const dataManager = new DataManager();

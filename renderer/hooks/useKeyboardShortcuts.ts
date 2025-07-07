@@ -72,6 +72,36 @@ export const useFloatingWindowShortcuts = ({
       ctrlKey: true,
       action: onPauseTimer || (() => {}),
       description: 'Pause current timer'
+    },
+    {
+      key: '=',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.in) {
+          window.ipc.zoom.in();
+        }
+      },
+      description: 'Zoom in'
+    },
+    {
+      key: '-',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.out) {
+          window.ipc.zoom.out();
+        }
+      },
+      description: 'Zoom out'
+    },
+    {
+      key: '0',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.reset) {
+          window.ipc.zoom.reset();
+        }
+      },
+      description: 'Reset zoom'
     }
   ].filter(shortcut => shortcut.action !== (() => {}));
 
@@ -106,6 +136,36 @@ export const useMainWindowShortcuts = ({
       ctrlKey: true,
       action: onRefreshData || (() => {}),
       description: 'Refresh data'
+    },
+    {
+      key: '=',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.in) {
+          window.ipc.zoom.in();
+        }
+      },
+      description: 'Zoom in'
+    },
+    {
+      key: '-',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.out) {
+          window.ipc.zoom.out();
+        }
+      },
+      description: 'Zoom out'
+    },
+    {
+      key: '0',
+      ctrlKey: true,
+      action: () => {
+        if (window.ipc?.zoom?.reset) {
+          window.ipc.zoom.reset();
+        }
+      },
+      description: 'Reset zoom'
     },
     {
       key: '?',

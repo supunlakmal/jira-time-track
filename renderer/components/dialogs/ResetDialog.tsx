@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../ui/Button';
+import { ModalWrapper } from '../ui/ModalWrapper';
 
 interface ResetDialogProps {
   isOpen: boolean;
@@ -138,33 +139,67 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
     return counts;
   };
 
-  if (!isOpen) return null;
-
-  const bgClass = isDarkMode ? 'bg-gray-800' : 'bg-white';
   const textClass = isDarkMode ? 'text-white' : 'text-gray-900';
   const textSecondaryClass = isDarkMode ? 'text-gray-300' : 'text-gray-700';
   const borderClass = isDarkMode ? 'border-gray-600' : 'border-gray-300';
   const inputBgClass = isDarkMode ? 'bg-gray-700' : 'bg-white';
-  const buttonSecondaryClass = isDarkMode 
-    ? 'bg-gray-600 hover:bg-gray-500 text-white' 
-    : 'bg-gray-200 hover:bg-gray-300 text-gray-700';
+
+  const footerContent = (
+    <div className="flex justify-between w-full">
+      <div>
+        {step > 1 && (
+          <Button
+            onClick={handleBack}
+            variant="gray"
+            size="md"
+            disabled={isResetting}
+          >
+            Back
+          </Button>
+        )}
+      </div>
+      <div className="flex space-x-3">
+        <Button
+          onClick={onClose}
+          variant="gray"
+          size="md"
+          disabled={isResetting}
+        >
+          Cancel
+        </Button>
+        {step < 3 ? (
+          <Button
+            onClick={handleNext}
+            disabled={step === 1 && getSelectedOptionsCount() === 0}
+            variant="primary"
+            size="md"
+          >
+            Next
+          </Button>
+        ) : (
+          <Button
+            onClick={handleReset}
+            disabled={confirmationText !== 'RESET' || isResetting}
+            variant="danger"
+            size="md"
+            loading={isResetting}
+          >
+            {isResetting ? 'Resetting...' : 'Reset Data'}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className={`${bgClass} rounded-lg p-6 max-w-md w-full mx-4`}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-xl font-bold ${textClass}`}>
-            Reset Application Data
-          </h2>
-          <Button
-            onClick={onClose}
-            variant="gray"
-            size="icon"
-            className="w-8 h-8 text-xl"
-          >
-            ×
-          </Button>
-        </div>
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Reset Application Data"
+      size="md"
+      footer={footerContent}
+    >
+      <div className="p-6">
 
         {/* Step 1: Select Reset Options */}
         {step === 1 && (
@@ -285,52 +320,7 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
           </div>
         )}
 
-        {/* Buttons */}
-        <div className="flex justify-between mt-6">
-          <div>
-            {step > 1 && (
-              <Button
-                onClick={handleBack}
-                variant="gray"
-                size="md"
-                disabled={isResetting}
-              >
-                Back
-              </Button>
-            )}
-          </div>
-          <div className="flex space-x-3">
-            <Button
-              onClick={onClose}
-              variant="gray"
-              size="md"
-              disabled={isResetting}
-            >
-              Cancel
-            </Button>
-            {step < 3 ? (
-              <Button
-                onClick={handleNext}
-                disabled={step === 1 && getSelectedOptionsCount() === 0}
-                variant="primary"
-                size="md"
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                onClick={handleReset}
-                disabled={confirmationText !== 'RESET' || isResetting}
-                variant="danger"
-                size="md"
-                loading={isResetting}
-              >
-                {isResetting ? 'Resetting...' : 'Reset Data'}
-              </Button>
-            )}
-          </div>
-        </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };

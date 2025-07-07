@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../ui/Button";
+import { ModalWrapper } from "../ui/ModalWrapper";
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -65,22 +66,37 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     return `${hours}h ${minutes}m`;
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex justify-end space-x-3">
+      <Button
+        onClick={onClose}
+        variant="gray"
+        size="md"
+        disabled={isExporting}
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={handleExport}
+        disabled={isExporting}
+        variant="primary"
+        size="md"
+        loading={isExporting}
+      >
+        {isExporting ? "Exporting..." : "Export"}
+      </Button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Export Time Data</h2>
-          <Button
-            onClick={onClose}
-            variant="gray"
-            size="icon"
-            className="w-8 h-8 text-xl"
-          >
-            ×
-          </Button>
-        </div>
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Export Time Data"
+      size="md"
+      footer={footerContent}
+    >
+      <div className="p-6">
 
         {exportSummary && (
           <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -191,26 +207,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
-          <Button
-            onClick={onClose}
-            variant="gray"
-            size="md"
-            disabled={isExporting}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleExport}
-            disabled={isExporting}
-            variant="primary"
-            size="md"
-            loading={isExporting}
-          >
-            {isExporting ? "Exporting..." : "Export"}
-          </Button>
-        </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };

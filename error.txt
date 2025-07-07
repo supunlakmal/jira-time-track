@@ -1,10 +1,19 @@
-PS C:\Users\hp\Documents\GitHub\jira-time-track> npx tsc --noEmit
-renderer/components/FloatingWindowHeader.tsx:9:9 - error TS2304: Cannot find name 'ElectronApi'.
+renderer/components/dialogs/CsvImportDialog.tsx:338:9 - error TS17002: Expected corresponding JSX closing tag for 'ModalWrapper'.
 
-9   ipc?: ElectronApi; // Add optional ipc prop
-          ~~~~~~~~~~~
+338       </div>
+            ~~~
 
+renderer/components/dialogs/CsvImportDialog.tsx:339:5 - error TS1005: ')' expected.
 
-Found 1 error in renderer/components/FloatingWindowHeader.tsx:9
+339     </ModalWrapper>
+        ~~
 
-PS C:\Users\hp\Documents\GitHub\jira-time-track> 
+renderer/components/dialogs/CsvImportDialog.tsx:340:3 - error TS1109: Expression expected.
+
+340   );
+      ~
+
+renderer/components/dialogs/CsvImportDialog.tsx:341:1 - error TS1128: Declaration or statement expected.
+
+341 };
+    ~

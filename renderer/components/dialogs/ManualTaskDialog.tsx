@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../ui/Button";
+import { ModalWrapper } from "../ui/ModalWrapper";
 import { ProjectTicket } from "../../types/electron";
 
 interface ManualTaskDialogProps {
@@ -98,28 +99,38 @@ export const ManualTaskDialog: React.FC<ManualTaskDialogProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex justify-end space-x-3">
+      <Button
+        type="button"
+        onClick={handleClose}
+        variant="gray"
+        size="md"
+      >
+        Cancel
+      </Button>
+      <Button
+        type="submit"
+        variant="primary"
+        size="md"
+        form="manual-task-form"
+      >
+        {editingTask ? "Update Task" : "Add Task"}
+      </Button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {editingTask ? "Edit Manual Task" : "Add Manual Task"}
-          </h2>
-          <Button
-            onClick={handleClose}
-            variant="gray"
-            size="icon"
-            className="w-8 h-8"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </Button>
-        </div>
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={editingTask ? "Edit Manual Task" : "Add Manual Task"}
+      size="md"
+      footer={footerContent}
+    >
+      <div className="p-6">
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form id="manual-task-form" onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="ticket_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Ticket Number *
@@ -187,25 +198,8 @@ export const ManualTaskDialog: React.FC<ManualTaskDialogProps> = ({
             </p>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="button"
-              onClick={handleClose}
-              variant="gray"
-              size="md"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-            >
-              {editingTask ? "Update Task" : "Add Task"}
-            </Button>
-          </div>
         </form>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };

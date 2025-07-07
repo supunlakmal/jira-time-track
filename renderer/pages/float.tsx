@@ -806,6 +806,30 @@ const FloatingWindow: React.FC = () => {
             </div>
           </div>
           <div className="flex space-x-2">
+            {/* Zoom Controls */}
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded px-1">
+              <button
+                onClick={() => window.ipc?.zoom?.out()}
+                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                title="Zoom out (Ctrl+-)"
+              >
+                -
+              </button>
+              <button
+                onClick={() => window.ipc?.zoom?.reset()}
+                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                title="Reset zoom (Ctrl+0)"
+              >
+                ⊙
+              </button>
+              <button
+                onClick={() => window.ipc?.zoom?.in()}
+                className="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs w-5 h-5 flex items-center justify-center"
+                title="Zoom in (Ctrl+=)"
+              >
+                +
+              </button>
+            </div>
             <button
               onClick={handleClose}
               className="hover:bg-red-500 p-1 rounded text-xs w-6 h-6 flex items-center justify-center"

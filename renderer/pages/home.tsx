@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ExportDialog } from "../components/ExportDialog";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ManualTaskDialog } from "../components/ManualTaskDialog";
+import { ResetDialog } from "../components/ResetDialog";
 import { ThemeToggle } from "../components/ThemeToggle";
 import CsvImportDialog from "../components/CsvImportDialog";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
@@ -50,6 +51,7 @@ export default function HomePage() {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
   const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Load project paths from main process on component mount
@@ -501,7 +503,45 @@ export default function HomePage() {
               >
                 Export Data
               </button>
+              <button
+                onClick={() => setShowResetDialog(true)}
+                className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg transition-colors"
+                title="Reset application data"
+              >
+                Reset Data
+              </button>
               <ThemeToggle size="md" />
+              
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-2 border border-gray-300 rounded-lg p-1 bg-white dark:bg-gray-800 dark:border-gray-600">
+                <button
+                  onClick={() => window.ipc?.zoom?.out()}
+                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Zoom out (Ctrl+-)"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.reset()}
+                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Reset zoom (Ctrl+0)"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.in()}
+                  className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Zoom in (Ctrl+=)"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1217,6 +1257,12 @@ export default function HomePage() {
           isOpen={showExportDialog}
           onClose={() => setShowExportDialog(false)}
           projects={projectSummaryData.map((p) => p.name)}
+        />
+
+        {/* Reset Dialog */}
+        <ResetDialog
+          isOpen={showResetDialog}
+          onClose={() => setShowResetDialog(false)}
         />
 
         {/* CSV Import Dialog */}

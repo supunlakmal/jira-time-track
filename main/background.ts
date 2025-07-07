@@ -18,6 +18,12 @@ const projectPathsStore = new Store<Record<string, string>>({
   defaults: {},
 });
 
+// Store for zoom levels
+const zoomStore = new Store<Record<string, number>>({
+  name: "zoom-levels",
+  defaults: { main: 0, float: 0 },
+});
+
 // ==================== CENTRALIZED DATA MANAGER ====================
 interface AppData {
   sessions: { [ticketNumber: string]: any };
@@ -119,6 +125,46 @@ class DataManager {
     const manualTasks = this.getManualTasks();
     return [...projectData, ...manualTasks];
   }
+
+  // Reset methods
+  getResetPreview() {
+    const sessions = this.getSessions();
+    const projectData = this.getProjectData();
+    const manualTasks = this.getManualTasks();
+    
+    // Get project paths from separate store
+    const projectPaths = projectPathsStore.store;
+    
+    return {
+      totalSessions: Object.keys(sessions).length,
+      totalProjectData: projectData.length,
+      totalManualTasks: manualTasks.length,
+      totalProjectPaths: Object.keys(projectPaths).length,
+    };
+  }
+
+  resetData(options: {
+    sessions?: boolean;
+    projectData?: boolean;
+    manualTasks?: boolean;
+    projectPaths?: boolean;
+  }) {
+    if (options.sessions) {
+      this.store.set("sessions", {});
+      this.broadcast("sessions-updated", {});
+    }
+    if (options.projectData) {
+      this.store.set("projectData", []);
+      this.broadcast("project-data-updated", []);
+    }
+    if (options.manualTasks) {
+      this.store.set("manualTasks", []);
+      this.broadcast("manual-tasks-updated", []);
+    }
+    if (options.projectPaths) {
+      projectPathsStore.clear();
+    }
+  }
 }
 
 const dataManager = new DataManager();
@@ -164,6 +210,10 @@ const createFloatingWindow = async () => {
 
   floatingWindow.once("ready-to-show", () => {
     if (floatingWindow) {
+      // Restore zoom level
+      const savedZoom = zoomStore.get('float', 0);
+      floatingWindow.webContents.setZoomLevel(savedZoom);
+      
       floatingWindow.show();
       floatingWindow.focus();
     }
@@ -288,6 +338,55 @@ function createTray() {
     },
     { type: 'separator' },
     {
+      label: 'Zoom',
+      submenu: [
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => {
+            const focusedWindow = BrowserWindow.getFocusedWindow();
+            if (focusedWindow) {
+              const currentZoom = focusedWindow.webContents.getZoomLevel();
+              const newZoom = Math.min(currentZoom + 0.5, 3);
+              focusedWindow.webContents.setZoomLevel(newZoom);
+              
+              const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+              zoomStore.set(windowType, newZoom);
+            }
+          }
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => {
+            const focusedWindow = BrowserWindow.getFocusedWindow();
+            if (focusedWindow) {
+              const currentZoom = focusedWindow.webContents.getZoomLevel();
+              const newZoom = Math.max(currentZoom - 0.5, -3);
+              focusedWindow.webContents.setZoomLevel(newZoom);
+              
+              const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+              zoomStore.set(windowType, newZoom);
+            }
+          }
+        },
+        {
+          label: 'Reset Zoom',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => {
+            const focusedWindow = BrowserWindow.getFocusedWindow();
+            if (focusedWindow) {
+              focusedWindow.webContents.setZoomLevel(0);
+              
+              const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+              zoomStore.set(windowType, 0);
+            }
+          }
+        }
+      ]
+    },
+    { type: 'separator' },
+    {
       label: 'Quit',
       click: () => {
         app.quit();
@@ -345,6 +444,14 @@ function createMainWindow() {
 
   // Register main window with data manager
   dataManager.registerWindow(mainWindow);
+
+  // Restore zoom level
+  const savedZoom = zoomStore.get('main', 0);
+  mainWindow.once('ready-to-show', () => {
+    if (mainWindow) {
+      mainWindow.webContents.setZoomLevel(savedZoom);
+    }
+  });
 
   return mainWindow;
 }
@@ -979,6 +1086,82 @@ ipcMain.handle("get-data-source-info", () => {
     console.error("Error getting data source info:", error);
     return { error: error.message };
   }
+});
+
+// Reset data handlers
+ipcMain.handle("get-reset-preview", () => {
+  try {
+    return dataManager.getResetPreview();
+  } catch (error) {
+    console.error("Error getting reset preview:", error);
+    return { error: error.message };
+  }
+});
+
+ipcMain.handle("reset-data", (event, options) => {
+  try {
+    dataManager.resetData(options);
+    return { success: true };
+  } catch (error) {
+    console.error("Error resetting data:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// ==================== ZOOM IPC HANDLERS ====================
+ipcMain.handle("zoom-in", (event) => {
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  if (focusedWindow) {
+    const currentZoom = focusedWindow.webContents.getZoomLevel();
+    const newZoom = Math.min(currentZoom + 0.5, 3); // Max zoom level 3
+    focusedWindow.webContents.setZoomLevel(newZoom);
+    
+    // Save zoom level
+    const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+    zoomStore.set(windowType, newZoom);
+    
+    return { success: true, zoomLevel: newZoom };
+  }
+  return { success: false, error: "No focused window" };
+});
+
+ipcMain.handle("zoom-out", (event) => {
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  if (focusedWindow) {
+    const currentZoom = focusedWindow.webContents.getZoomLevel();
+    const newZoom = Math.max(currentZoom - 0.5, -3); // Min zoom level -3
+    focusedWindow.webContents.setZoomLevel(newZoom);
+    
+    // Save zoom level
+    const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+    zoomStore.set(windowType, newZoom);
+    
+    return { success: true, zoomLevel: newZoom };
+  }
+  return { success: false, error: "No focused window" };
+});
+
+ipcMain.handle("zoom-reset", (event) => {
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  if (focusedWindow) {
+    focusedWindow.webContents.setZoomLevel(0);
+    
+    // Save zoom level
+    const windowType = focusedWindow === mainWindow ? 'main' : 'float';
+    zoomStore.set(windowType, 0);
+    
+    return { success: true, zoomLevel: 0 };
+  }
+  return { success: false, error: "No focused window" };
+});
+
+ipcMain.handle("get-zoom-level", (event) => {
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  if (focusedWindow) {
+    const zoomLevel = focusedWindow.webContents.getZoomLevel();
+    return { success: true, zoomLevel };
+  }
+  return { success: false, error: "No focused window" };
 });
 
 // Legacy IPC channel (kept for compatibility)

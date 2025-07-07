@@ -39,10 +39,18 @@ const validChannels = [
   "import-csv-data",
   "import-csv-file",
   "get-data-source-info",
+  // Reset functionality
+  "get-reset-preview",
+  "reset-data",
   // Tray and window management
   "update-tray-status",
   "show-main-window",
   "delete-task",
+  // Zoom functionality
+  "zoom-in",
+  "zoom-out",
+  "zoom-reset",
+  "get-zoom-level",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;
@@ -149,6 +157,24 @@ const handler = {
     show: () => {
       console.log("[IPC PRELOAD WINDOW] Show");
       ipcRenderer.send("window-control", "show");
+    },
+  },
+  zoom: {
+    in: async () => {
+      console.log("[IPC PRELOAD ZOOM] Zoom In");
+      return await ipcRenderer.invoke("zoom-in");
+    },
+    out: async () => {
+      console.log("[IPC PRELOAD ZOOM] Zoom Out");
+      return await ipcRenderer.invoke("zoom-out");
+    },
+    reset: async () => {
+      console.log("[IPC PRELOAD ZOOM] Reset Zoom");
+      return await ipcRenderer.invoke("zoom-reset");
+    },
+    getLevel: async () => {
+      console.log("[IPC PRELOAD ZOOM] Get Zoom Level");
+      return await ipcRenderer.invoke("get-zoom-level");
     },
   },
 };

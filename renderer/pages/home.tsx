@@ -11,7 +11,6 @@ import ProjectsOverview from "../components/dashboard/ProjectsOverview";
 import { ResetDialog } from "../components/dialogs/ResetDialog";
 import TicketTable from "../components/tickets/TicketTable";
 import TicketTableActions from "../components/tickets/TicketTableActions";
-import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
@@ -276,16 +275,6 @@ export default function HomePage() {
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
 
-  // Keyboard shortcuts
-  useMainWindowShortcuts({
-    onToggleFloating: toggleFloatingWindow,
-    onShowExport: () => setShowExportDialog(true),
-    onRefreshData: () => {
-      // Refresh data functionality
-      window.location.reload();
-    },
-  });
-
   const handleProjectSelect = (projectName: string | null) => {
     setSelectedProject(projectName);
     setSearchTerm("");
@@ -496,33 +485,37 @@ export default function HomePage() {
         </div>
 
         {/* Export Dialog */}
-        <ExportDialog
-          isOpen={showExportDialog}
-          onClose={() => setShowExportDialog(false)}
-          projects={projectSummaryData.map((p) => p.name)}
-        />
+        {showExportDialog && (
+          <ExportDialog
+            onClose={() => setShowExportDialog(false)}
+            projects={projectSummaryData.map((p) => p.name)}
+          />
+        )}
 
         {/* Reset Dialog */}
-        <ResetDialog
-          isOpen={showResetDialog}
-          onClose={() => setShowResetDialog(false)}
-        />
+        {showResetDialog && (
+          <ResetDialog
+            onClose={() => setShowResetDialog(false)}
+          />
+        )}
 
         {/* CSV Import Dialog */}
-        <CsvImportDialog
-          isOpen={showCsvImportDialog}
-          onClose={() => setShowCsvImportDialog(false)}
-          onImport={handleCsvImport}
-        />
+        {showCsvImportDialog && (
+          <CsvImportDialog
+            onClose={() => setShowCsvImportDialog(false)}
+            onImport={handleCsvImport}
+          />
+        )}
 
         {/* Manual Task Dialog */}
-        <ManualTaskDialog
-          isOpen={showManualTaskDialog}
-          onClose={closeManualTaskDialog}
-          onSave={editingTask ? handleEditManualTask : handleAddManualTask}
-          editingTask={editingTask}
-          existingTickets={data.map((ticket) => ticket.ticket_number)}
-        />
+        {showManualTaskDialog && (
+          <ManualTaskDialog
+            onClose={closeManualTaskDialog}
+            onSave={editingTask ? handleEditManualTask : handleAddManualTask}
+            editingTask={editingTask}
+            existingTickets={data.map((ticket) => ticket.ticket_number)}
+          />
+        )}
       </div>
     </React.Fragment>
   );

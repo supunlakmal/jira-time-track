@@ -3,13 +3,11 @@ import Button from "../ui/Button";
 import { ModalWrapper } from "../ui/ModalWrapper";
 
 interface ExportDialogProps {
-  isOpen: boolean;
   onClose: () => void;
   projects: string[];
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
-  isOpen,
   onClose,
   projects,
 }) => {
@@ -20,10 +18,8 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const [exportSummary, setExportSummary] = useState<any>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      loadExportSummary();
-    }
-  }, [isOpen]);
+    loadExportSummary();
+  }, []);
 
   const loadExportSummary = async () => {
     try {
@@ -90,7 +86,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
   return (
     <ModalWrapper
-      isOpen={isOpen}
       onClose={onClose}
       title="Export Time Data"
       size="md"

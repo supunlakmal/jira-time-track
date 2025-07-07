@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Button from '../ui/Button';
-import { ModalWrapper } from '../ui/ModalWrapper';
-import { TimerSession } from '../../store/sessionsSlice';
+import React, { useState, useEffect, useMemo } from "react";
+import Button from "../ui/Button";
+import { ModalWrapper } from "../ui/ModalWrapper";
+import { TimerSession } from "../../store/sessionsSlice";
 
 interface Ticket {
   ticket_number: string;
@@ -11,7 +11,6 @@ interface Ticket {
 }
 
 interface TicketSearchModalProps {
-  isOpen: boolean;
   onClose: () => void;
   tickets: Ticket[];
   sessions: { [key: string]: TimerSession };
@@ -20,16 +19,15 @@ interface TicketSearchModalProps {
 }
 
 export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
-  isOpen,
   onClose,
   tickets,
   sessions,
   formatTime,
   getProjectName,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   // Debounce search term
   useEffect(() => {
@@ -42,18 +40,16 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
   // Reset search state when modal opens
   useEffect(() => {
-    if (isOpen) {
-      setSearchTerm('');
-      setSelectedProject('');
-    }
-  }, [isOpen]);
+    setSearchTerm("");
+    setSelectedProject("");
+  }, []);
 
   // Get unique projects from tickets
   const availableProjects = useMemo(() => {
     const projects = new Set<string>();
-    tickets.forEach(ticket => {
+    tickets.forEach((ticket) => {
       const projectName = getProjectName(ticket.ticket_number);
-      if (projectName !== 'N/A') {
+      if (projectName !== "N/A") {
         projects.add(projectName);
       }
     });
@@ -66,17 +62,18 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
     // Filter by project
     if (selectedProject) {
-      filtered = filtered.filter(ticket => 
-        getProjectName(ticket.ticket_number) === selectedProject
+      filtered = filtered.filter(
+        (ticket) => getProjectName(ticket.ticket_number) === selectedProject
       );
     }
 
     // Filter by search term
     if (debouncedSearchTerm) {
       const searchLower = debouncedSearchTerm.toLowerCase();
-      filtered = filtered.filter(ticket =>
-        ticket.ticket_number.toLowerCase().includes(searchLower) ||
-        ticket.ticket_name.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (ticket) =>
+          ticket.ticket_number.toLowerCase().includes(searchLower) ||
+          ticket.ticket_name.toLowerCase().includes(searchLower)
       );
     }
 
@@ -85,17 +82,24 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
   // Calculate stats for filtered tickets
   const stats = useMemo(() => {
-    const totalStoryPoints = filteredTickets.reduce((sum, ticket) => 
-      sum + (ticket.story_points || 0), 0
+    const totalStoryPoints = filteredTickets.reduce(
+      (sum, ticket) => sum + (ticket.story_points || 0),
+      0
     );
-    const totalTimeTracked = filteredTickets.reduce((sum, ticket) => 
-      sum + (sessions[ticket.ticket_number]?.totalElapsed || 0), 0
+    const totalTimeTracked = filteredTickets.reduce(
+      (sum, ticket) =>
+        sum + (sessions[ticket.ticket_number]?.totalElapsed || 0),
+      0
     );
-    const activeTickets = filteredTickets.filter(ticket =>
-      sessions[ticket.ticket_number]?.sessions?.some(s => s.status === 'running')
+    const activeTickets = filteredTickets.filter((ticket) =>
+      sessions[ticket.ticket_number]?.sessions?.some(
+        (s) => s.status === "running"
+      )
     ).length;
-    const completedTickets = filteredTickets.filter(ticket =>
-      sessions[ticket.ticket_number]?.sessions?.some(s => s.status === 'completed')
+    const completedTickets = filteredTickets.filter((ticket) =>
+      sessions[ticket.ticket_number]?.sessions?.some(
+        (s) => s.status === "completed"
+      )
     ).length;
 
     return {
@@ -109,39 +113,73 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
   const getTicketStatus = (ticket: Ticket) => {
     const ticketSession = sessions[ticket.ticket_number];
-    if (!ticketSession) return { text: 'Not Started', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' };
+    if (!ticketSession)
+      return {
+        text: "Not Started",
+        color: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      };
 
-    const isActive = ticketSession.sessions?.some(s => s.status === 'running');
-    const isPaused = ticketSession.sessions?.some(s => s.status === 'paused');
-    const isCompleted = ticketSession.sessions?.some(s => s.status === 'completed');
+    const isActive = ticketSession.sessions?.some(
+      (s) => s.status === "running"
+    );
+    const isPaused = ticketSession.sessions?.some((s) => s.status === "paused");
+    const isCompleted = ticketSession.sessions?.some(
+      (s) => s.status === "completed"
+    );
 
     if (isActive) {
-      return { text: 'Active', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' };
+      return {
+        text: "Active",
+        color:
+          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      };
     } else if (isPaused) {
-      return { text: 'Paused', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' };
+      return {
+        text: "Paused",
+        color:
+          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      };
     } else if (isCompleted) {
-      return { text: 'Completed', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' };
+      return {
+        text: "Completed",
+        color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      };
     }
-    return { text: 'Tracked', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' };
+    return {
+      text: "Tracked",
+      color:
+        "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    };
   };
 
   const highlightSearchTerm = (text: string, term: string) => {
     if (!term) return text;
-    
-    const regex = new RegExp(`(${term})`, 'gi');
+
+    const regex = new RegExp(`(${term})`, "gi");
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
-      regex.test(part) ? 
-        <span key={index} className="bg-yellow-200 dark:bg-yellow-800 font-medium">{part}</span> : 
+
+    return parts.map((part, index) =>
+      regex.test(part) ? (
+        <span
+          key={index}
+          className="bg-yellow-200 dark:bg-yellow-800 font-medium"
+        >
+          {part}
+        </span>
+      ) : (
         part
+      )
     );
   };
 
   const footerContent = (
     <div className="flex justify-between w-full">
       <div className="text-sm text-gray-600 dark:text-gray-300">
-        Press <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">Esc</kbd> to close
+        Press{" "}
+        <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
+          Esc
+        </kbd>{" "}
+        to close
       </div>
       <Button onClick={onClose} variant="gray" size="md">
         Close
@@ -151,7 +189,6 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
   return (
     <ModalWrapper
-      isOpen={isOpen}
       onClose={onClose}
       title="Search Tickets"
       size="full"
@@ -179,8 +216,10 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Projects</option>
-                {availableProjects.map(project => (
-                  <option key={project} value={project}>{project}</option>
+                {availableProjects.map((project) => (
+                  <option key={project} value={project}>
+                    {project}
+                  </option>
                 ))}
               </select>
             </div>
@@ -188,11 +227,21 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
 
           {/* Stats */}
           <div className="flex flex-wrap gap-6 text-sm text-gray-600 dark:text-gray-300">
-            <span><strong>{stats.totalTickets}</strong> tickets</span>
-            <span><strong>{stats.totalStoryPoints.toFixed(1)}</strong> story points</span>
-            <span><strong>{formatTime(stats.totalTimeTracked)}</strong> tracked</span>
-            <span><strong>{stats.activeTickets}</strong> active</span>
-            <span><strong>{stats.completedTickets}</strong> completed</span>
+            <span>
+              <strong>{stats.totalTickets}</strong> tickets
+            </span>
+            <span>
+              <strong>{stats.totalStoryPoints.toFixed(1)}</strong> story points
+            </span>
+            <span>
+              <strong>{formatTime(stats.totalTimeTracked)}</strong> tracked
+            </span>
+            <span>
+              <strong>{stats.activeTickets}</strong> active
+            </span>
+            <span>
+              <strong>{stats.completedTickets}</strong> completed
+            </span>
           </div>
         </div>
 
@@ -215,10 +264,9 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
               </svg>
               <p className="text-lg font-medium mb-2">No tickets found</p>
               <p className="text-sm">
-                {searchTerm || selectedProject ? 
-                  'Try adjusting your search criteria' : 
-                  'Start typing to search for tickets'
-                }
+                {searchTerm || selectedProject
+                  ? "Try adjusting your search criteria"
+                  : "Start typing to search for tickets"}
               </p>
             </div>
           ) : (
@@ -250,7 +298,9 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                   {filteredTickets.map((ticket) => {
                     const ticketSession = sessions[ticket.ticket_number];
                     const status = getTicketStatus(ticket);
-                    const isActive = ticketSession?.sessions?.some(s => s.status === 'running');
+                    const isActive = ticketSession?.sessions?.some(
+                      (s) => s.status === "running"
+                    );
 
                     return (
                       <tr
@@ -265,12 +315,17 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                               )}
                             </div>
                             <div>
-                              <div className={`text-sm font-medium flex items-center ${
-                                ticket.isManual
-                                  ? 'text-purple-600 dark:text-purple-400'
-                                  : 'text-blue-600 dark:text-blue-400'
-                              }`}>
-                                {highlightSearchTerm(ticket.ticket_number, debouncedSearchTerm)}
+                              <div
+                                className={`text-sm font-medium flex items-center ${
+                                  ticket.isManual
+                                    ? "text-purple-600 dark:text-purple-400"
+                                    : "text-blue-600 dark:text-blue-400"
+                                }`}
+                              >
+                                {highlightSearchTerm(
+                                  ticket.ticket_number,
+                                  debouncedSearchTerm
+                                )}
                                 {ticket.isManual && (
                                   <span className="ml-2 px-2 py-1 text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 rounded-full">
                                     Manual
@@ -284,28 +339,39 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                          <div className="max-w-xs truncate" title={ticket.ticket_name}>
-                            {highlightSearchTerm(ticket.ticket_name, debouncedSearchTerm)}
+                          <div
+                            className="max-w-xs truncate"
+                            title={ticket.ticket_name}
+                          >
+                            {highlightSearchTerm(
+                              ticket.ticket_name,
+                              debouncedSearchTerm
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-white font-mono">
-                            {ticket.story_points?.toFixed(1) || '-'}
+                            {ticket.story_points?.toFixed(1) || "-"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${status.color}`}>
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${status.color}`}
+                          >
                             {status.text}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <div className="flex flex-col">
                             <span className="font-mono text-gray-900 dark:text-white">
-                              {ticketSession ? formatTime(ticketSession.totalElapsed || 0) : '-'}
+                              {ticketSession
+                                ? formatTime(ticketSession.totalElapsed || 0)
+                                : "-"}
                             </span>
                             {ticketSession?.sessions && (
                               <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {ticketSession.sessions.length} session{ticketSession.sessions.length !== 1 ? 's' : ''}
+                                {ticketSession.sessions.length} session
+                                {ticketSession.sessions.length !== 1 ? "s" : ""}
                               </span>
                             )}
                           </div>
@@ -313,7 +379,7 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <Button
                             onClick={() => {
-                              window.ipc?.send('start-task', {
+                              window.ipc?.send("start-task", {
                                 ticket: ticket.ticket_number,
                                 name: ticket.ticket_name,
                                 storyPoints: ticket.story_points,
@@ -323,7 +389,7 @@ export const TicketSearchModal: React.FC<TicketSearchModalProps> = ({
                             size="sm"
                             title="Start tracking time for this ticket"
                           >
-                            {isActive ? 'Resume' : 'Start Timer'}
+                            {isActive ? "Resume" : "Start Timer"}
                           </Button>
                         </td>
                       </tr>

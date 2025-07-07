@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useEffect } from 'react';
 import HomePage from '../../renderer/pages/home';
-import { createMockUseSharedData, mockUseMainWindowShortcuts, createMockIpc } from '../mocks/mockHooks';
+import { createMockUseSharedData, createMockIpc } from '../mocks/mockHooks';
 import { mockProjectTickets, mockSessions } from '../mocks/mockData';
 
 // Create a wrapper component to provide mocked hooks and ipc
@@ -17,8 +17,6 @@ const MockedHomePage: React.FC<{
     sessions,
   });
 
-  // Mock useMainWindowShortcuts hook
-  const useMainWindowShortcuts = mockUseMainWindowShortcuts;
 
   // Mock window.ipc
   useEffect(() => {

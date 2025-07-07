@@ -3,7 +3,6 @@ import Button from '../ui/Button';
 import { ModalWrapper } from '../ui/ModalWrapper';
 
 interface CsvImportDialogProps {
-  isOpen: boolean;
   onClose: () => void;
   onImport: (data: any[]) => void;
 }
@@ -14,7 +13,7 @@ interface CsvPreviewData {
   story_points: number | null;
 }
 
-const CsvImportDialog: React.FC<CsvImportDialogProps> = ({ isOpen, onClose, onImport }) => {
+const CsvImportDialog: React.FC<CsvImportDialogProps> = ({ onClose, onImport }) => {
   const [csvData, setCsvData] = useState<CsvPreviewData[]>([]);
   const [isValidating, setIsValidating] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -173,7 +172,6 @@ EXAMPLE-3,"Third example ticket",`;
 
   return (
     <ModalWrapper
-      isOpen={isOpen}
       onClose={handleClose}
       title="Import Tasks from CSV"
       size="xl"

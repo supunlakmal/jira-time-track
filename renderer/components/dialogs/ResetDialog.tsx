@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import Button from '../ui/Button';
-import { ModalWrapper } from '../ui/ModalWrapper';
+import React, { useState, useEffect } from "react";
+import Button from "../ui/Button";
+import { ModalWrapper } from "../ui/ModalWrapper";
 
 interface ResetDialogProps {
-  isOpen: boolean;
   onClose: () => void;
 }
 
@@ -21,61 +20,59 @@ interface ResetOptions {
   projectPaths: boolean;
 }
 
-export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => {
+export const ResetDialog: React.FC<ResetDialogProps> = ({ onClose }) => {
   const [step, setStep] = useState(1);
   const [resetOptions, setResetOptions] = useState<ResetOptions>({
     sessions: false,
     projectData: false,
     manualTasks: false,
-    projectPaths: false
+    projectPaths: false,
   });
   const [resetPreview, setResetPreview] = useState<ResetPreview | null>(null);
-  const [confirmationText, setConfirmationText] = useState('');
+  const [confirmationText, setConfirmationText] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     // Check for dark mode
     const checkDarkMode = () => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
     };
     checkDarkMode();
-    
+
     // Watch for theme changes
     const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['class'] 
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      loadResetPreview();
-      setStep(1);
-      setResetOptions({
-        sessions: false,
-        projectData: false,
-        manualTasks: false,
-        projectPaths: false
-      });
-      setConfirmationText('');
-    }
-  }, [isOpen]);
+    loadResetPreview();
+    setStep(1);
+    setResetOptions({
+      sessions: false,
+      projectData: false,
+      manualTasks: false,
+      projectPaths: false,
+    });
+    setConfirmationText("");
+  }, []);
 
   const loadResetPreview = async () => {
     try {
-      const preview = await window.ipc.invoke('get-reset-preview');
+      const preview = await window.ipc.invoke("get-reset-preview");
       setResetPreview(preview);
     } catch (error) {
-      console.error('Failed to load reset preview:', error);
+      console.error("Failed to load reset preview:", error);
     }
   };
 
   const handleOptionChange = (option: keyof ResetOptions) => {
-    setResetOptions(prev => ({ ...prev, [option]: !prev[option] }));
+    setResetOptions((prev) => ({ ...prev, [option]: !prev[option] }));
   };
 
   const getSelectedOptionsCount = () => {
@@ -97,16 +94,16 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
   };
 
   const handleReset = async () => {
-    if (confirmationText !== 'RESET') {
+    if (confirmationText !== "RESET") {
       return;
     }
 
     setIsResetting(true);
     try {
-      const result = await window.ipc.invoke('reset-data', resetOptions);
-      
+      const result = await window.ipc.invoke("reset-data", resetOptions);
+
       if (result.success) {
-        alert('Application data has been successfully reset!');
+        alert("Application data has been successfully reset!");
         onClose();
       } else {
         alert(`Reset failed: ${result.error}`);
@@ -120,29 +117,46 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
 
   const getDataCounts = () => {
     if (!resetPreview) return null;
-    
-    const counts: Array<{ label: string; count: number; selected: boolean }> = [];
-    
+
+    const counts: Array<{ label: string; count: number; selected: boolean }> =
+      [];
+
     if (resetOptions.sessions) {
-      counts.push({ label: 'Timer Sessions', count: resetPreview.totalSessions, selected: true });
+      counts.push({
+        label: "Timer Sessions",
+        count: resetPreview.totalSessions,
+        selected: true,
+      });
     }
     if (resetOptions.projectData) {
-      counts.push({ label: 'Project Data (CSV)', count: resetPreview.totalProjectData, selected: true });
+      counts.push({
+        label: "Project Data (CSV)",
+        count: resetPreview.totalProjectData,
+        selected: true,
+      });
     }
     if (resetOptions.manualTasks) {
-      counts.push({ label: 'Manual Tasks', count: resetPreview.totalManualTasks, selected: true });
+      counts.push({
+        label: "Manual Tasks",
+        count: resetPreview.totalManualTasks,
+        selected: true,
+      });
     }
     if (resetOptions.projectPaths) {
-      counts.push({ label: 'Project Paths', count: resetPreview.totalProjectPaths, selected: true });
+      counts.push({
+        label: "Project Paths",
+        count: resetPreview.totalProjectPaths,
+        selected: true,
+      });
     }
-    
+
     return counts;
   };
 
-  const textClass = isDarkMode ? 'text-white' : 'text-gray-900';
-  const textSecondaryClass = isDarkMode ? 'text-gray-300' : 'text-gray-700';
-  const borderClass = isDarkMode ? 'border-gray-600' : 'border-gray-300';
-  const inputBgClass = isDarkMode ? 'bg-gray-700' : 'bg-white';
+  const textClass = isDarkMode ? "text-white" : "text-gray-900";
+  const textSecondaryClass = isDarkMode ? "text-gray-300" : "text-gray-700";
+  const borderClass = isDarkMode ? "border-gray-600" : "border-gray-300";
+  const inputBgClass = isDarkMode ? "bg-gray-700" : "bg-white";
 
   const footerContent = (
     <div className="flex justify-between w-full">
@@ -179,12 +193,12 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
         ) : (
           <Button
             onClick={handleReset}
-            disabled={confirmationText !== 'RESET' || isResetting}
+            disabled={confirmationText !== "RESET" || isResetting}
             variant="danger"
             size="md"
             loading={isResetting}
           >
-            {isResetting ? 'Resetting...' : 'Reset Data'}
+            {isResetting ? "Resetting..." : "Reset Data"}
           </Button>
         )}
       </div>
@@ -193,28 +207,36 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
 
   return (
     <ModalWrapper
-      isOpen={isOpen}
       onClose={onClose}
       title="Reset Application Data"
       size="md"
       footer={footerContent}
     >
       <div className="p-6">
-
         {/* Step 1: Select Reset Options */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className={`p-4 bg-red-50 ${isDarkMode ? 'bg-red-900' : ''} rounded-lg border border-red-200`}>
+            <div
+              className={`p-4 bg-red-50 ${
+                isDarkMode ? "bg-red-900" : ""
+              } rounded-lg border border-red-200`}
+            >
               <div className="flex items-center">
                 <span className="text-red-500 mr-2">⚠️</span>
-                <span className={`text-sm font-medium ${isDarkMode ? 'text-red-200' : 'text-red-800'}`}>
+                <span
+                  className={`text-sm font-medium ${
+                    isDarkMode ? "text-red-200" : "text-red-800"
+                  }`}
+                >
                   Warning: This action cannot be undone
                 </span>
               </div>
             </div>
 
             <div>
-              <label className={`block text-sm font-medium ${textSecondaryClass} mb-3`}>
+              <label
+                className={`block text-sm font-medium ${textSecondaryClass} mb-3`}
+              >
                 Select data to reset:
               </label>
               <div className="space-y-3">
@@ -222,7 +244,7 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
                   <input
                     type="checkbox"
                     checked={resetOptions.sessions}
-                    onChange={() => handleOptionChange('sessions')}
+                    onChange={() => handleOptionChange("sessions")}
                     className="mr-3"
                   />
                   <span className={textSecondaryClass}>
@@ -233,18 +255,19 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
                   <input
                     type="checkbox"
                     checked={resetOptions.projectData}
-                    onChange={() => handleOptionChange('projectData')}
+                    onChange={() => handleOptionChange("projectData")}
                     className="mr-3"
                   />
                   <span className={textSecondaryClass}>
-                    Project Data from CSV ({resetPreview?.totalProjectData || 0})
+                    Project Data from CSV ({resetPreview?.totalProjectData || 0}
+                    )
                   </span>
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={resetOptions.manualTasks}
-                    onChange={() => handleOptionChange('manualTasks')}
+                    onChange={() => handleOptionChange("manualTasks")}
                     className="mr-3"
                   />
                   <span className={textSecondaryClass}>
@@ -255,7 +278,7 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
                   <input
                     type="checkbox"
                     checked={resetOptions.projectPaths}
-                    onChange={() => handleOptionChange('projectPaths')}
+                    onChange={() => handleOptionChange("projectPaths")}
                     className="mr-3"
                   />
                   <span className={textSecondaryClass}>
@@ -270,10 +293,18 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
         {/* Step 2: Preview */}
         {step === 2 && (
           <div className="space-y-4">
-            <div className={`p-4 bg-yellow-50 ${isDarkMode ? 'bg-yellow-900' : ''} rounded-lg border border-yellow-200`}>
+            <div
+              className={`p-4 bg-yellow-50 ${
+                isDarkMode ? "bg-yellow-900" : ""
+              } rounded-lg border border-yellow-200`}
+            >
               <div className="flex items-center">
                 <span className="text-yellow-500 mr-2">⚠️</span>
-                <span className={`text-sm font-medium ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
+                <span
+                  className={`text-sm font-medium ${
+                    isDarkMode ? "text-yellow-200" : "text-yellow-800"
+                  }`}
+                >
                   The following data will be permanently deleted:
                 </span>
               </div>
@@ -281,9 +312,14 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
 
             <div className="space-y-2">
               {getDataCounts()?.map((item, index) => (
-                <div key={index} className={`flex justify-between p-3 rounded border ${borderClass}`}>
+                <div
+                  key={index}
+                  className={`flex justify-between p-3 rounded border ${borderClass}`}
+                >
                   <span className={textSecondaryClass}>{item.label}</span>
-                  <span className={`font-medium ${textClass}`}>{item.count} items</span>
+                  <span className={`font-medium ${textClass}`}>
+                    {item.count} items
+                  </span>
                 </div>
               ))}
             </div>
@@ -293,20 +329,35 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
         {/* Step 3: Final Confirmation */}
         {step === 3 && (
           <div className="space-y-4">
-            <div className={`p-4 bg-red-50 ${isDarkMode ? 'bg-red-900' : ''} rounded-lg border border-red-200`}>
+            <div
+              className={`p-4 bg-red-50 ${
+                isDarkMode ? "bg-red-900" : ""
+              } rounded-lg border border-red-200`}
+            >
               <div className="flex items-center mb-2">
                 <span className="text-red-500 mr-2">🚨</span>
-                <span className={`text-sm font-medium ${isDarkMode ? 'text-red-200' : 'text-red-800'}`}>
+                <span
+                  className={`text-sm font-medium ${
+                    isDarkMode ? "text-red-200" : "text-red-800"
+                  }`}
+                >
                   Final Confirmation Required
                 </span>
               </div>
-              <p className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
-                This action cannot be undone. All selected data will be permanently deleted.
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-red-300" : "text-red-700"
+                }`}
+              >
+                This action cannot be undone. All selected data will be
+                permanently deleted.
               </p>
             </div>
 
             <div>
-              <label className={`block text-sm font-medium ${textSecondaryClass} mb-2`}>
+              <label
+                className={`block text-sm font-medium ${textSecondaryClass} mb-2`}
+              >
                 Type "RESET" to confirm (case-sensitive):
               </label>
               <input
@@ -319,7 +370,6 @@ export const ResetDialog: React.FC<ResetDialogProps> = ({ isOpen, onClose }) => 
             </div>
           </div>
         )}
-
       </div>
     </ModalWrapper>
   );

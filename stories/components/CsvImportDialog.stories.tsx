@@ -1,19 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { CsvImportDialog } from '../../renderer/components/dialogs/CsvImportDialog';
+import type { Meta, StoryObj } from "@storybook/react";
+import { CsvImportDialog } from "../../renderer/components/dialogs/CsvImportDialog";
 
 const meta: Meta<typeof CsvImportDialog> = {
-  title: 'Components/CsvImportDialog',
+  title: "Components/CsvImportDialog",
   component: CsvImportDialog,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
-    isOpen: {
-      control: 'boolean',
-    },
-    onClose: { action: 'closed' },
-    onImport: { action: 'imported' },
+    onClose: { action: "closed" },
+    onImport: { action: "imported" },
   },
 };
 
@@ -22,8 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    isOpen: true,
-    onClose: () => console.log('Close clicked'),
-    onImport: (data) => console.log('Import data:', data),
+    onClose: () => console.log("Close clicked"),
+    onImport: (data) => console.log("Import data:", data),
   },
 };

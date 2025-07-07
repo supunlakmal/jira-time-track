@@ -41,18 +41,6 @@ export const createMockUseSharedData = (options: {
   };
 };
 
-// Mock keyboard shortcuts hooks
-export const mockUseMainWindowShortcuts = (handlers: any = {}) => {
-  useEffect(() => {
-    console.log('Mock main window shortcuts registered:', Object.keys(handlers));
-  }, []);
-};
-
-export const mockUseFloatingWindowShortcuts = (handlers: any = {}) => {
-  useEffect(() => {
-    console.log('Mock floating window shortcuts registered:', Object.keys(handlers));
-  }, []);
-};
 
 // Mock IPC implementation
 export const createMockIpc = (overrides: any = {}) => {

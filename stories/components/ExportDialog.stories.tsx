@@ -1,20 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ExportDialog } from '../../renderer/components/dialogs/ExportDialog';
+import type { Meta, StoryObj } from "@storybook/react";
+import { ExportDialog } from "../../renderer/components/dialogs/ExportDialog";
 
 const meta: Meta<typeof ExportDialog> = {
-  title: 'Components/ExportDialog',
+  title: "Components/ExportDialog",
   component: ExportDialog,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
-    isOpen: {
-      control: 'boolean',
-    },
-    onClose: { action: 'closed' },
+    onClose: { action: "closed" },
     projects: {
-      control: 'object',
+      control: "object",
     },
   },
 };
@@ -24,8 +21,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    isOpen: true,
-    onClose: () => console.log('Close clicked'),
-    projects: ['ProjectA', 'ProjectB', 'ProjectC'],
+    onClose: () => console.log("Close clicked"),
+    projects: ["ProjectA", "ProjectB", "ProjectC"],
   },
 };

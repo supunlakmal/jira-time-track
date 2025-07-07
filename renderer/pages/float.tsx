@@ -1,7 +1,6 @@
 // renderer/pages/float.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
-import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { TaskTimer } from "../types/dashboard";
 import TimerGrid from "../components/timers/TimerGrid";
 import FloatingWindowHeader from "../components/layout/FloatingWindowHeader";
@@ -21,21 +20,6 @@ const FloatingWindow: React.FC = () => {
     string | null
   >(null);
 
-  // Keyboard shortcuts
-  useFloatingWindowShortcuts({
-    onToggleFloating: () => window.ipc?.send('toggle-float-window'),
-    onStartTimer: () => {
-      const runningTimer = timers.find(t => t.isRunning && t.status === 'running');
-      if (runningTimer) {
-        handleTimerAction('pause', runningTimer.ticketNumber);
-      } else {
-        const pausedTimer = timers.find(t => t.status === 'paused');
-        if (pausedTimer) {
-          handleTimerAction('resume', pausedTimer.ticketNumber);
-        }
-      }
-    }
-  });
 
 
   useEffect(() => {

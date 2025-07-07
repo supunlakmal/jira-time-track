@@ -1,8 +1,10 @@
-renderer/components/Button.tsx:56:35 - error TS2322: Type '{ size: string; className: string; }' is not assignable to type 'IntrinsicAttributes'.
-  Property 'size' does not exist on type 'IntrinsicAttributes'.
+PS C:\Users\hp\Documents\GitHub\jira-time-track> npx tsc --noEmit
+renderer/components/FloatingWindowHeader.tsx:9:9 - error TS2304: Cannot find name 'ElectronApi'.
 
-56       {loading && <LoadingSpinner size="sm" className="mr-2" />}
-                                     ~~~~
+9   ipc?: ElectronApi; // Add optional ipc prop
+          ~~~~~~~~~~~
 
 
-Found 1 error in renderer/components/Button.tsx:56
+Found 1 error in renderer/components/FloatingWindowHeader.tsx:9
+
+PS C:\Users\hp\Documents\GitHub\jira-time-track> 

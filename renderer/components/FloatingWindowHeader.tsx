@@ -1,11 +1,13 @@
 import React from "react";
 import Button from "./Button";
+import { IpcHandler } from "../types/electron";
 
 interface FloatingWindowHeaderProps {
   selectedTicketNumber: string | null;
   timersLength: number;
   setIsDragging: (isDragging: boolean) => void;
   handleClose: () => void;
+  ipc?: IpcHandler; // Add optional ipc prop
 }
 
 const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
@@ -13,6 +15,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
   timersLength,
   setIsDragging,
   handleClose,
+  ipc, // Destructure ipc prop
 }) => {
   return (
     <div
@@ -36,7 +39,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
         {/* REUSABLE COMPONENT: ZoomControls */}
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded px-1">
           <Button
-            onClick={() => window.ipc?.zoom?.out()}
+            onClick={() => (ipc || window.ipc)?.zoom?.out()}
             variant="gray"
             size="icon"
             className="w-5 h-5 text-xs"
@@ -45,7 +48,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
             -
           </Button>
           <Button
-            onClick={() => window.ipc?.zoom?.reset()}
+            onClick={() => (ipc || window.ipc)?.zoom?.reset()}
             variant="gray"
             size="icon"
             className="w-5 h-5 text-xs"
@@ -54,7 +57,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
             ⊙
           </Button>
           <Button
-            onClick={() => window.ipc?.zoom?.in()}
+            onClick={() => (ipc || window.ipc)?.zoom?.in()}
             variant="gray"
             size="icon"
             className="w-5 h-5 text-xs"

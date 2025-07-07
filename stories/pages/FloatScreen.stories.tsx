@@ -1,36 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState, useEffect } from 'react';
-import { setupMockWindow } from '../mocks/mockHooks';
+
 import { mockTimers } from '../mocks/mockData';
+import { createMockIpc } from '../mocks/mockHooks';
+import FloatingWindowHeader from '../../renderer/components/FloatingWindowHeader';
+import TimerGrid from '../../renderer/components/TimerGrid';
+import { TaskTimer } from '../../renderer/types/dashboard';
 
-// Setup window mocks
-setupMockWindow();
 
-interface TimerData {
-  ticketNumber: string;
-  ticketName: string;
-  startTime: number;
-  elapsedTime: number;
-  isRunning: boolean;
-  status: "running" | "paused" | "hold" | "completed" | "stopped" | "queue";
-  totalElapsed: number;
-  storyPoints?: number;
-  sessions: Array<{
-    startTime: number;
-    endTime?: number;
-    duration: number;
-    status: string;
-  }>;
-}
 
-// Create a simplified version of FloatScreen for Storybook
-const MockFloatScreen: React.FC<{ timers: TimerData[] }> = ({ timers: initialTimers }) => {
-  const [timers, setTimers] = useState<TimerData[]>(initialTimers);
+const MockFloatScreen: React.FC<{ timers: TaskTimer[] }> = ({ timers: initialTimers }) => {
+  const [timers, setTimers] = useState<TaskTimer[]>(initialTimers);
   const [selectedTicketNumber, setSelectedTicketNumber] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimers(prevTimers => 
+      setTimers(prevTimers =>
         prevTimers.map(timer => {
           if (timer.isRunning && timer.status === 'running') {
             return {
@@ -54,181 +40,61 @@ const MockFloatScreen: React.FC<{ timers: TimerData[] }> = ({ timers: initialTim
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const handleTimerAction = (action: string, ticketNumber: string) => {
-    setTimers(prevTimers => 
-      prevTimers.map(timer => {
-        if (timer.ticketNumber === ticketNumber) {
-          switch (action) {
-            case 'start':
-              return { ...timer, isRunning: true, status: 'running' as const, startTime: Date.now() };
-            case 'pause':
-              return { ...timer, isRunning: false, status: 'paused' as const };
-            case 'resume':
-              return { ...timer, isRunning: true, status: 'running' as const, startTime: Date.now() };
-            case 'stop':
-              return { ...timer, isRunning: false, status: 'stopped' as const };
-            case 'complete':
-              return { ...timer, isRunning: false, status: 'completed' as const };
-            default:
-              return timer;
-          }
-        }
-        return timer;
-      })
-    );
+  const getMinimalStatusColorClass = (status: TaskTimer['status'], isRunning: boolean) => {
+    if (isRunning) return 'bg-green-500';
+    switch (status) {
+      case 'paused':
+        return 'bg-yellow-500';
+      case 'completed':
+        return 'bg-blue-500';
+      case 'stopped':
+        return 'bg-red-500';
+      case 'queue':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
   };
 
-  const runningTimer = timers.find(t => t.isRunning && t.status === 'running');
-  const pausedTimer = timers.find(t => t.status === 'paused');
-  const queuedTimers = timers.filter(t => t.status === 'queue');
+  const getStatusText = (status: TaskTimer['status'], isRunning: boolean) => {
+    if (isRunning) return 'Running';
+    switch (status) {
+      case 'paused':
+        return 'Paused';
+      case 'completed':
+        return 'Completed';
+      case 'stopped':
+        return 'Stopped';
+      case 'queue':
+        return 'Queued';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const handleClose = () => {
+    console.log('Close button clicked');
+    // In a real app, this would close the window
+  };
 
   return (
     <div className="w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden">
-      {/* Header */}
-      <div className="bg-blue-500 dark:bg-blue-600 text-white p-3">
-        <div className="flex justify-between items-center">
-          <h2 className="text-sm font-semibold">Time Tracker</h2>
-          <div className="flex space-x-1">
-            <button className="text-white hover:text-gray-200 text-xs">
-              _
-            </button>
-            <button className="text-white hover:text-gray-200 text-xs">
-              ×
-            </button>
-          </div>
-        </div>
-      </div>
+      <FloatingWindowHeader
+        selectedTicketNumber={selectedTicketNumber}
+        timersLength={timers.length}
+        setIsDragging={setIsDragging}
+        handleClose={handleClose}
+        ipc={createMockIpc()} // Pass mock ipc
+      />
 
       <div className="p-4 space-y-4">
-        {/* Active Timer Display */}
-        {runningTimer ? (
-          <div className="text-center">
-            <div className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-              {formatTime(runningTimer.elapsedTime)}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 truncate" title={runningTimer.ticketName}>
-              {runningTimer.ticketNumber}: {runningTimer.ticketName}
-            </div>
-            {runningTimer.storyPoints && (
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                {runningTimer.storyPoints} points
-              </div>
-            )}
-            <div className="flex justify-center space-x-2 mt-3">
-              <button
-                onClick={() => handleTimerAction('pause', runningTimer.ticketNumber)}
-                className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
-              >
-                Pause
-              </button>
-              <button
-                onClick={() => handleTimerAction('complete', runningTimer.ticketNumber)}
-                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-              >
-                Complete
-              </button>
-              <button
-                onClick={() => handleTimerAction('stop', runningTimer.ticketNumber)}
-                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-              >
-                Stop
-              </button>
-            </div>
-          </div>
-        ) : pausedTimer ? (
-          <div className="text-center">
-            <div className="text-2xl font-mono font-bold text-yellow-600 dark:text-yellow-400">
-              {formatTime(pausedTimer.totalElapsed)}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 truncate" title={pausedTimer.ticketName}>
-              {pausedTimer.ticketNumber}: {pausedTimer.ticketName}
-            </div>
-            <div className="text-xs text-yellow-600 dark:text-yellow-400 font-semibold">
-              PAUSED
-            </div>
-            <div className="flex justify-center space-x-2 mt-3">
-              <button
-                onClick={() => handleTimerAction('resume', pausedTimer.ticketNumber)}
-                className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-              >
-                Resume
-              </button>
-              <button
-                onClick={() => handleTimerAction('complete', pausedTimer.ticketNumber)}
-                className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-              >
-                Complete
-              </button>
-              <button
-                onClick={() => handleTimerAction('stop', pausedTimer.ticketNumber)}
-                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-              >
-                Stop
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center">
-            <div className="text-2xl font-mono font-bold text-gray-400 dark:text-gray-500">
-              00:00:00
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              No active timer
-            </div>
-          </div>
-        )}
-
-        {/* Timer Queue */}
-        {queuedTimers.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Queue ({queuedTimers.length})
-            </h3>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {queuedTimers.map((timer) => (
-                <div
-                  key={timer.ticketNumber}
-                  className="p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {timer.ticketNumber}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400 truncate" title={timer.ticketName}>
-                        {timer.ticketName}
-                      </div>
-                      {timer.storyPoints && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {timer.storyPoints} pts
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleTimerAction('start', timer.ticketNumber)}
-                      className="ml-2 px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 flex-shrink-0"
-                    >
-                      Start
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Add New Timer */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-          <button className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-200 dark:hover:bg-gray-600">
-            + Add Task to Queue
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {timers.length} task{timers.length !== 1 ? 's' : ''} • 
-          Total: {formatTime(timers.reduce((sum, timer) => sum + timer.totalElapsed, 0))}
-        </div>
+        <TimerGrid
+          timers={timers}
+          formatTime={formatTime}
+          getMinimalStatusColorClass={getMinimalStatusColorClass}
+          getStatusText={getStatusText}
+          setSelectedTicketNumber={setSelectedTicketNumber}
+        />
       </div>
     </div>
   );

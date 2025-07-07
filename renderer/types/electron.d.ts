@@ -150,6 +150,11 @@ export interface IpcHandler {
     hide(): void;
     show(): void;
   };
+  zoom: {
+    in(): void;
+    out(): void;
+    reset(): void;
+  };
 }
 
 declare global {

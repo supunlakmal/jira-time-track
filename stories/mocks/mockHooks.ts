@@ -125,10 +125,3 @@ export const createMockIpc = (overrides: any = {}) => {
   return defaultIpc;
 };
 
-// Setup global mocks for window.ipc
-export const setupMockWindow = (ipcOverrides: any = {}) => {
-  (global as any).window = {
-    ...global.window,
-    ipc: createMockIpc(ipcOverrides),
-  };
-};

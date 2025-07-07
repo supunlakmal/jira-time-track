@@ -5,6 +5,8 @@ import { store } from '../renderer/store/store'
 import { ThemeProvider } from '../renderer/components/ThemeProvider'
 import '../renderer/styles/globals.css'
 
+
+
 const preview: Preview = {
   parameters: {
     controls: {
@@ -39,6 +41,8 @@ const preview: Preview = {
           htmlElement.classList.remove('dark');
         }
       }, [context.globals.backgrounds?.value]);
+
+      
 
       return (
         <Provider store={store}>

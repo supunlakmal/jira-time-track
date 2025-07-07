@@ -3,10 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { TaskTimer } from "../types/dashboard";
-import TimerGrid from "../components/TimerGrid";
-import FloatingWindowHeader from "../components/FloatingWindowHeader";
-import Button from "../components/Button";
-import TimerDetail from "../components/TimerDetail";
+import TimerGrid from "../components/timers/TimerGrid";
+import FloatingWindowHeader from "../components/layout/FloatingWindowHeader";
+import Button from "../components/ui/Button";
+import TimerDetail from "../components/timers/TimerDetail";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
 
 
 
@@ -546,8 +547,9 @@ const FloatingWindow: React.FC = () => {
     : null;
 
   return (
-    <div className="h-screen bg-transparent select-none">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+    <ThemeProvider>
+      <div className="h-screen bg-transparent select-none">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
         <FloatingWindowHeader
           selectedTicketNumber={selectedTicketNumber}
           timersLength={timers.length}
@@ -589,8 +591,9 @@ const FloatingWindow: React.FC = () => {
               />
             )}
           </div>
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 };
 

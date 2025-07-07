@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ExportDialog } from '../../renderer/components/ExportDialog';
+import { ExportDialog } from '../../renderer/components/dialogs/ExportDialog';
 
 const meta: Meta<typeof ExportDialog> = {
   title: 'Components/ExportDialog',

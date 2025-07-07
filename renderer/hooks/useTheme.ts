@@ -90,8 +90,28 @@ export const useThemeState = (): ThemeContextType => {
     }
   }, [theme]);
 
+  // Listen for theme changes from other windows via IPC
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ipc?.on) {
+      const cleanup = window.ipc.on('theme-changed', (newTheme: Theme) => {
+        console.log('Received theme change from other window:', newTheme);
+        // Only update if it's different from current theme to avoid loops
+        if (newTheme !== theme) {
+          setTheme(newTheme);
+        }
+      });
+
+      return cleanup;
+    }
+  }, [theme]);
+
   const handleSetTheme = (newTheme: Theme) => {
     setTheme(newTheme);
+    
+    // Send theme change to main process to broadcast to all windows
+    if (typeof window !== 'undefined' && window.ipc?.send) {
+      window.ipc.send('theme-changed', newTheme);
+    }
   };
 
   return {

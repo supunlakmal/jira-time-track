@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import FloatingWindowHeader from '../../renderer/components/FloatingWindowHeader';
+import FloatingWindowHeader from '../../renderer/components/layout/FloatingWindowHeader';
 
 const meta: Meta<typeof FloatingWindowHeader> = {
   title: 'Components/FloatingWindowHeader',

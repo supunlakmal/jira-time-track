@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "./Button";
-import { TaskTimer } from "../types/dashboard";
+import Button from "../ui/Button";
+import { TaskTimer } from "../../types/dashboard";
 
 interface TimerDetailProps {
   timer: TaskTimer;
@@ -44,14 +44,14 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
     <div
       className={`p-3 rounded-lg border-l-4 ${
         timer.status === "running" && timer.isRunning
-          ? "bg-green-50 border-green-500"
+          ? "bg-green-50 dark:bg-green-900/20 border-green-500"
           : timer.status === "paused"
-          ? "bg-yellow-50 border-yellow-500"
+          ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500"
           : timer.status === "hold"
-          ? "bg-orange-50 border-orange-500"
+          ? "bg-orange-50 dark:bg-orange-900/20 border-orange-500"
           : timer.status === "completed"
-          ? "bg-blue-50 border-blue-500"
-          : "bg-gray-50 border-gray-500"
+          ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
+          : "bg-gray-50 dark:bg-gray-800 border-gray-500"
       }`}
     >
       <div className="flex justify-between items-center mb-2">
@@ -68,7 +68,7 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
           onClick={() => handleDeleteTimer(timer.ticketNumber)}
           variant="danger"
           size="icon"
-          className="w-8 h-8 hover:bg-red-50"
+          className="w-8 h-8 hover:bg-red-50 dark:hover:bg-red-900/20"
           title="Delete Timer"
         >
           🗑️
@@ -85,7 +85,7 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
             {timer.ticketNumber}
           </h3>
           <p
-            className="text-xs text-gray-500 line-clamp-2"
+            className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2"
             title={timer.ticketName}
           >
             {timer.ticketName}
@@ -95,11 +95,11 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
           <div className="text-lg font-mono font-medium text-gray-900 dark:text-gray-100">
             {formatTime(timer.totalElapsed)}
           </div>
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-400 dark:text-gray-500">
             Session: {formatTime(timer.elapsedTime)}
           </div>
           {timer.storyPoints && timer.storyPoints > 0 && (
-            <div className="text-xs text-gray-500 mt-0.5">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Est: {formatTime(estimatedTimeMs)}
             </div>
           )}
@@ -230,7 +230,7 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
               {timer.sessions.length > 1 ? "s" : ""} | Total:{" "}
               {formatTime(timer.totalElapsed)}
             </summary>
-            <ul className="mt-1 list-disc list-inside pl-2 text-gray-500 max-h-20 overflow-y-auto">
+            <ul className="mt-1 list-disc list-inside pl-2 text-gray-500 dark:text-gray-400 max-h-20 overflow-y-auto">
               {timer.sessions
                 .slice()
                 .reverse()

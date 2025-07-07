@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ManualTaskDialog } from '../../renderer/components/ManualTaskDialog';
+import { ManualTaskDialog } from '../../renderer/components/dialogs/ManualTaskDialog';
 
 const meta: Meta<typeof ManualTaskDialog> = {
   title: 'Components/ManualTaskDialog',

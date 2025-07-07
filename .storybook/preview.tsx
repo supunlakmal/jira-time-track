@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/nextjs-vite'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { store } from '../renderer/store/store'
-import { ThemeProvider } from '../renderer/components/ThemeProvider'
+import { ThemeProvider } from '../renderer/components/theme/ThemeProvider'
 import '../renderer/styles/globals.css'
 
 

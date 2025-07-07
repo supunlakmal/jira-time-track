@@ -21,19 +21,19 @@ const Overview: React.FC<OverviewProps> = ({
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Tickets */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Total Tickets
               </p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 {dashboardStats.totalTickets}
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-blue-600 dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -47,7 +47,7 @@ const Overview: React.FC<OverviewProps> = ({
               </svg>
             </div>
           </div>
-          <div className="mt-2 flex items-center text-sm text-gray-600">
+          <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-300">
             <span className="text-green-600 font-medium">
               {dashboardStats.completedTickets} completed
             </span>
@@ -59,19 +59,19 @@ const Overview: React.FC<OverviewProps> = ({
         </div>
 
         {/* Story Points */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Story Points
               </p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 {dashboardStats.totalStoryPoints.toFixed(1)}
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
+            <div className="p-3 bg-green-100 dark:bg-green-900 rounded-full">
               <svg
-                className="w-6 h-6 text-green-600"
+                className="w-6 h-6 text-green-600 dark:text-green-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -85,25 +85,25 @@ const Overview: React.FC<OverviewProps> = ({
               </svg>
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             Avg: {dashboardStats.averageStoryPoints.toFixed(1)} pts/ticket
           </div>
         </div>
 
         {/* Time Tracked */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Time Tracked
               </p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 {formatTime(dashboardStats.totalTimeTracked)}
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
+            <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
               <svg
-                className="w-6 h-6 text-purple-600"
+                className="w-6 h-6 text-purple-600 dark:text-purple-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -117,26 +117,26 @@ const Overview: React.FC<OverviewProps> = ({
               </svg>
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             Avg: {formatTime(dashboardStats.productivity.averageTimePerTicket)}
             /ticket
           </div>
         </div>
 
         {/* Projects */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 Active Projects
               </p>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 {dashboardStats.totalProjects}
               </p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
+            <div className="p-3 bg-orange-100 dark:bg-orange-900 rounded-full">
               <svg
-                className="w-6 h-6 text-orange-600"
+                className="w-6 h-6 text-orange-600 dark:text-orange-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -150,7 +150,7 @@ const Overview: React.FC<OverviewProps> = ({
               </svg>
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             {projectSummaryData.filter((p) => p.location).length} with local
             paths
           </div>
@@ -158,34 +158,34 @@ const Overview: React.FC<OverviewProps> = ({
       </div>
       {/* END OVERVIEW */}
       {/* Productivity Metrics */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Productivity Metrics (30 days)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {dashboardStats.productivity.ticketsPerDay.toFixed(1)}
             </p>
-            <p className="text-sm text-gray-600">Tickets/Day</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Tickets/Day</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {dashboardStats.productivity.pointsPerDay.toFixed(1)}
             </p>
-            <p className="text-sm text-gray-600">Points/Day</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Points/Day</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {formatTime(dashboardStats.productivity.averageTimePerTicket)}
             </p>
-            <p className="text-sm text-gray-600">Time/Ticket</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Time/Ticket</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
+          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {formatTime(dashboardStats.productivity.averageTimePerPoint)}
             </p>
-            <p className="text-sm text-gray-600">Time/Point</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Time/Point</p>
           </div>
         </div>
       </div>

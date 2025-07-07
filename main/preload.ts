@@ -51,6 +51,8 @@ const validChannels = [
   "zoom-out",
   "zoom-reset",
   "get-zoom-level",
+  // Theme synchronization
+  "theme-changed",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;

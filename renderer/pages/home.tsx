@@ -1,23 +1,20 @@
 // renderer/pages/home.tsx
 import Head from "next/head";
-import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
-import Button from "../components/Button";
+import CsvImportDialog from "../components/CsvImportDialog";
 import { ExportDialog } from "../components/ExportDialog";
+import Header from "../components/Header";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ManualTaskDialog } from "../components/ManualTaskDialog";
+import Overview from "../components/Overview";
+import ProjectsOverview from "../components/ProjectsOverview";
 import { ResetDialog } from "../components/ResetDialog";
-import { ThemeToggle } from "../components/ThemeToggle";
-import CsvImportDialog from "../components/CsvImportDialog";
+import TicketTable from "../components/TicketTable";
+import TicketTableActions from "../components/TicketTableActions";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";
-import Overview from "../components/Overview";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
-import ProjectsOverview from "../components/ProjectsOverview";
-import TicketTableActions from "../components/TicketTableActions";
-import TicketTable from "../components/TicketTable";
-import Header from "../components/Header";
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();

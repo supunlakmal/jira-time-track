@@ -41,7 +41,7 @@ const TimerGridItem: React.FC<TimerGridItemProps> = ({
             timer.isRunning
           )}`}
         ></span>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 dark:text-gray-400">
           {formatTime(timer.totalElapsed)}
         </span>
       </div>
@@ -49,7 +49,7 @@ const TimerGridItem: React.FC<TimerGridItemProps> = ({
         {timer.ticketNumber}
       </h4>
       <p
-        className="text-xs text-gray-500 truncate"
+        className="text-xs text-gray-500 dark:text-gray-400 truncate"
         title={
           timer.ticketName +
           (timer.storyPoints

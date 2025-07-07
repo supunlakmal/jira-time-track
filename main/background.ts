@@ -57,6 +57,12 @@ class DataManager {
     });
   }
 
+  // Public method for broadcasting theme changes
+  broadcastThemeChange(theme: string) {
+    this.broadcast("theme-changed", theme);
+    console.log(`DataManager: Theme change broadcast to all windows: ${theme}`);
+  }
+
   // Session methods
   saveSession(sessionData: any) {
     const sessions = this.store.get("sessions");
@@ -1162,6 +1168,19 @@ ipcMain.handle("get-zoom-level", (event) => {
     return { success: true, zoomLevel };
   }
   return { success: false, error: "No focused window" };
+});
+
+// ==================== THEME SYNCHRONIZATION IPC ====================
+ipcMain.on("theme-changed", (event, theme) => {
+  console.log(`Theme changed to: ${theme}`);
+  // Broadcast theme change to all windows
+  dataManager.broadcastThemeChange(theme);
+});
+
+ipcMain.handle("get-current-theme", () => {
+  // This will be used by newly opened windows to get the current theme
+  // For now, we'll rely on localStorage in each window
+  return { success: true };
 });
 
 // Legacy IPC channel (kept for compatibility)

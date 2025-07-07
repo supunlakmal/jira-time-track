@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ResetDialog } from '../../renderer/components/ResetDialog';
+import { ResetDialog } from '../../renderer/components/dialogs/ResetDialog';
 
 const meta: Meta<typeof ResetDialog> = {
   title: 'Components/ResetDialog',

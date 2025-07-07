@@ -1,16 +1,16 @@
 // renderer/pages/home.tsx
 import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
-import CsvImportDialog from "../components/CsvImportDialog";
-import { ExportDialog } from "../components/ExportDialog";
-import Header from "../components/Header";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { ManualTaskDialog } from "../components/ManualTaskDialog";
-import Overview from "../components/Overview";
-import ProjectsOverview from "../components/ProjectsOverview";
-import { ResetDialog } from "../components/ResetDialog";
-import TicketTable from "../components/TicketTable";
-import TicketTableActions from "../components/TicketTableActions";
+import CsvImportDialog from "../components/dialogs/CsvImportDialog";
+import { ExportDialog } from "../components/dialogs/ExportDialog";
+import Header from "../components/layout/Header";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { ManualTaskDialog } from "../components/dialogs/ManualTaskDialog";
+import Overview from "../components/dashboard/Overview";
+import ProjectsOverview from "../components/dashboard/ProjectsOverview";
+import { ResetDialog } from "../components/dialogs/ResetDialog";
+import TicketTable from "../components/tickets/TicketTable";
+import TicketTableActions from "../components/tickets/TicketTableActions";
 import { useMainWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";

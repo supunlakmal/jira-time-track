@@ -1,7 +1,7 @@
-// renderer/components/ProjectsOverview.tsx
+// renderer/components/dashboard/ProjectsOverview.tsx
 import React from "react";
-import Button from "./Button";
-import { ProjectSummary } from "../types/dashboard";
+import Button from "../ui/Button";
+import { ProjectSummary } from "../../types/dashboard";
 
 interface ProjectsOverviewProps {
   projectSummaryData: ProjectSummary[];

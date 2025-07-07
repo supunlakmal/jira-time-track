@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { CsvImportDialog } from '../../renderer/components/CsvImportDialog';
+import { CsvImportDialog } from '../../renderer/components/dialogs/CsvImportDialog';
 
 const meta: Meta<typeof CsvImportDialog> = {
   title: 'Components/CsvImportDialog',

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TicketTableActions from '../../renderer/components/TicketTableActions';
+import TicketTableActions from '../../renderer/components/tickets/TicketTableActions';
 
 const meta: Meta<typeof TicketTableActions> = {
   title: 'Components/TicketTableActions',

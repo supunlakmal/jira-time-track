@@ -1,5 +1,5 @@
 import type { Meta, StoryObj, StoryContext } from '@storybook/react';
-import { ThemeToggle } from '../../renderer/components/ThemeToggle';
+import { ThemeToggle } from '../../renderer/components/theme/ThemeToggle';
 import { useTheme } from '../../renderer/hooks/useTheme';
 
 interface ThemeToggleStoryArgs extends React.ComponentProps<typeof ThemeToggle> {

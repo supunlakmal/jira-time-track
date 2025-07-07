@@ -1,7 +1,7 @@
 
 import React from 'react';
-import Button from './Button';
-import { TimerSession } from '../store/sessionsSlice';
+import Button from '../ui/Button';
+import { TimerSession } from '../../store/sessionsSlice';
 
 interface Ticket {
   ticket_number: string;

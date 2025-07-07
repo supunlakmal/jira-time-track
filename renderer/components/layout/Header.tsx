@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import Button from "./Button";
-import { ThemeToggle } from "./ThemeToggle";
+import Button from "../ui/Button";
+import { ThemeToggle } from "../theme/ThemeToggle";
 
 interface HeaderProps {
   toggleFloatingWindow: () => void;

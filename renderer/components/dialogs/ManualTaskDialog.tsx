@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Button from "./Button";
-import { ProjectTicket } from "../types/electron";
+import Button from "../ui/Button";
+import { ProjectTicket } from "../../types/electron";
 
 interface ManualTaskDialogProps {
   isOpen: boolean;

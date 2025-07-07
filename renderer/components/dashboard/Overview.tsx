@@ -1,6 +1,6 @@
-// renderer/components/Overview.tsx
+// renderer/components/dashboard/Overview.tsx
 import React from "react";
-import { DashboardStats, ProjectSummary } from "../types/dashboard";
+import { DashboardStats, ProjectSummary } from "../../types/dashboard";
 
 interface OverviewProps {
   dashboardStats: DashboardStats;

@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSharedData } from "../hooks/useSharedData";
 import { useFloatingWindowShortcuts } from "../hooks/useKeyboardShortcuts";
 import { TaskTimer } from "../types/dashboard";
-import TimerGrid from "../components/TimerGrid";
-import FloatingWindowHeader from "../components/FloatingWindowHeader";
-import Button from "../components/Button";
-import TimerDetail from "../components/TimerDetail";
-import { ThemeProvider } from "../components/ThemeProvider";
+import TimerGrid from "../components/timers/TimerGrid";
+import FloatingWindowHeader from "../components/layout/FloatingWindowHeader";
+import Button from "../components/ui/Button";
+import TimerDetail from "../components/timers/TimerDetail";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
 
 
 

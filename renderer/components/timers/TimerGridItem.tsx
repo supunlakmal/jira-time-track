@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "./Button";
-import { TaskTimer } from "../types/dashboard";
+import Button from "../ui/Button";
+import { TaskTimer } from "../../types/dashboard";
 
 interface TimerGridItemProps {
   timer: TaskTimer;

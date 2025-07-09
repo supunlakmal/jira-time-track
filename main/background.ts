@@ -833,6 +833,181 @@ ipcMain.handle("get-current-branch", async (_, data) => {
   }
 });
 
+ipcMain.handle("create-git-branch", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Attempting to switch to or create git branch '${branchName}' in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      // First, try to switch to existing branch
+      console.log(`Trying to switch to existing branch '${branchName}'`);
+      const switchProcess = spawn("git", ["checkout", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let switchOutput = "";
+      let switchError = "";
+
+      switchProcess.stdout.on("data", (data) => {
+        switchOutput += data.toString();
+      });
+
+      switchProcess.stderr.on("data", (data) => {
+        switchError += data.toString();
+      });
+
+      switchProcess.on("close", (switchCode) => {
+        if (switchCode === 0) {
+          // Successfully switched to existing branch
+          console.log(`Successfully switched to existing branch '${branchName}'`);
+          resolve({ success: true, message: `Switched to existing branch '${branchName}'`, action: "switched" });
+        } else {
+          // Switch failed, try to create new branch
+          console.log(`Switch failed, attempting to create new branch '${branchName}'`);
+          
+          const createProcess = spawn("git", ["checkout", "-b", branchName], {
+            cwd: projectPath,
+            stdio: ["ignore", "pipe", "pipe"],
+          });
+
+          let createOutput = "";
+          let createError = "";
+
+          createProcess.stdout.on("data", (data) => {
+            createOutput += data.toString();
+          });
+
+          createProcess.stderr.on("data", (data) => {
+            createError += data.toString();
+          });
+
+          createProcess.on("close", (createCode) => {
+            if (createCode === 0) {
+              console.log(`Successfully created and switched to new branch '${branchName}'`);
+              resolve({ success: true, message: `Created and switched to new branch '${branchName}'`, action: "created" });
+            } else {
+              console.error(`Failed to create branch:`, createError.trim());
+              const errorMessage = createError.trim() || "Failed to create branch";
+              
+              // Handle common errors with user-friendly messages
+              if (errorMessage.includes("not a git repository")) {
+                resolve({ success: false, error: "Not a git repository" });
+              } else if (errorMessage.includes("already exists")) {
+                resolve({ success: false, error: `Branch '${branchName}' already exists but cannot switch to it` });
+              } else {
+                resolve({ success: false, error: errorMessage });
+              }
+            }
+          });
+
+          createProcess.on("error", (err) => {
+            console.error(`Error running git create command:`, err.message);
+            resolve({ success: false, error: `Failed to run git create: ${err.message}` });
+          });
+
+          // Timeout for create process
+          setTimeout(() => {
+            createProcess.kill();
+            console.warn(`Git create command timeout`);
+            resolve({ success: false, error: "Git create command timeout" });
+          }, 10000);
+        }
+      });
+
+      switchProcess.on("error", (err) => {
+        console.error(`Error running git switch command:`, err.message);
+        resolve({ success: false, error: `Failed to run git switch: ${err.message}` });
+      });
+
+      // Timeout for switch process
+      setTimeout(() => {
+        switchProcess.kill();
+        console.warn(`Git switch command timeout`);
+        resolve({ success: false, error: "Git switch command timeout" });
+      }, 10000);
+    });
+  } catch (error) {
+    console.error(`Exception in create-git-branch:`, error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("check-git-branch-exists", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Checking if git branch '${branchName}' exists in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      const gitProcess = spawn("git", ["branch", "--list", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let output = "";
+      let error = "";
+
+      gitProcess.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+
+      gitProcess.stderr.on("data", (data) => {
+        error += data.toString();
+      });
+
+      gitProcess.on("close", (code) => {
+        if (code === 0) {
+          // Check if output contains the branch name (means branch exists)
+          const branchExists = output.trim().includes(branchName);
+          console.log(`Branch '${branchName}' exists: ${branchExists}`);
+          resolve({ success: true, exists: branchExists });
+        } else {
+          console.error(`Git branch check failed:`, error.trim());
+          const errorMessage = error.trim() || "Git branch check failed";
+          
+          // Handle common errors
+          if (errorMessage.includes("not a git repository")) {
+            resolve({ success: false, error: "Not a git repository" });
+          } else {
+            resolve({ success: false, error: errorMessage });
+          }
+        }
+      });
+
+      gitProcess.on("error", (err) => {
+        console.error(`Error running git branch check:`, err.message);
+        resolve({ success: false, error: `Failed to run git: ${err.message}` });
+      });
+
+      // Timeout after 5 seconds (shorter for branch check)
+      setTimeout(() => {
+        gitProcess.kill();
+        console.warn(`Git branch check timeout`);
+        resolve({ success: false, error: "Git branch check timeout" });
+      }, 5000);
+    });
+  } catch (error) {
+    console.error(`Exception in check-git-branch-exists:`, error);
+    return { success: false, error: error.message };
+  }
+});
+
 ipcMain.handle("run-github-action", async (_, { projectPath, actionName }) => {
   if (!projectPath || !actionName) {
     return { error: "Missing project path or action name" };

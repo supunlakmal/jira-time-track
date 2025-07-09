@@ -160,6 +160,19 @@ export interface IpcHandler {
     out(): void;
     reset(): void;
   };
+  git: {
+    createBranch(branchName: string, projectPath: string): Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+      action?: string;
+    }>;
+    checkBranchExists(branchName: string, projectPath: string): Promise<{
+      success: boolean;
+      exists?: boolean;
+      error?: string;
+    }>;
+  };
 }
 
 declare global {

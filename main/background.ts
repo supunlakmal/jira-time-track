@@ -10,6 +10,7 @@ import { spawn } from "child_process";
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
+let splashWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 
 // Store for project paths
@@ -233,10 +234,13 @@ const createFloatingWindow = async () => {
 (async () => {
   await app.whenReady();
 
+  // Create splash screen first
+  createSplashWindow();
+
   // Create system tray
   createTray();
 
-  // Create main window
+  // Create main window (hidden initially)
   mainWindow = createMainWindow();
 
   // Application starts with empty task list until CSV import
@@ -436,11 +440,94 @@ function updateTrayTitle(activeTimers: number = 0) {
   }
 }
 
+function createSplashWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  
+  splashWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    x: Math.round((width - 400) / 2),
+    y: Math.round((height - 300) / 2),
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    show: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // Load splash screen HTML
+  let splashPath;
+  if (isProd) {
+    // In production, the app directory structure is different
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  } else {
+    // In development, we need to go up from main directory
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  }
+  
+  console.log("Main: Loading splash screen from:", splashPath);
+  console.log("Main: __dirname is:", __dirname);
+  console.log("Main: isProd is:", isProd);
+  
+  // Check if file exists
+  try {
+    if (fs.existsSync(splashPath)) {
+      console.log("Main: Splash file exists at:", splashPath);
+      splashWindow.loadFile(splashPath);
+    } else {
+      console.error("Main: Splash file does not exist at:", splashPath);
+      // Try alternative path
+      const altPath = path.join(__dirname, "..", "..", "renderer", "pages", "splash.html");
+      console.log("Main: Trying alternative path:", altPath);
+      if (fs.existsSync(altPath)) {
+        console.log("Main: Alternative path exists, loading from:", altPath);
+        splashWindow.loadFile(altPath);
+      } else {
+        console.error("Main: Alternative path also does not exist");
+      }
+    }
+  } catch (error) {
+    console.error("Main: Error checking splash file:", error);
+  }
+
+  splashWindow.once('ready-to-show', () => {
+    console.log("Main: Splash screen ready to show");
+    if (splashWindow) {
+      splashWindow.show();
+    }
+  });
+
+  splashWindow.on("closed", () => {
+    console.log("Main: Splash window closed");
+    splashWindow = null;
+  });
+
+  // Fallback timeout to ensure splash closes after 10 seconds
+  setTimeout(() => {
+    if (splashWindow) {
+      console.log("Main: Fallback timeout - closing splash screen");
+      splashWindow.close();
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  }, 10000);
+
+  return splashWindow;
+}
+
 function createMainWindow() {
   mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
+    show: false, // Don't show initially
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -461,6 +548,37 @@ function createMainWindow() {
 
   return mainWindow;
 }
+
+// ==================== SPLASH SCREEN IPC ====================
+ipcMain.on("app-ready", () => {
+  console.log("Main: Received app-ready signal");
+  
+  // Smooth transition: fade out splash, then show main window
+  if (splashWindow && mainWindow) {
+    console.log("Main: Both splash and main windows exist, starting transition");
+    
+    // Add fade-out effect to splash
+    splashWindow.webContents.executeJavaScript(`
+      console.log('Splash: Starting fade-out');
+      document.body.style.transition = 'opacity 0.3s ease-out';
+      document.body.style.opacity = '0';
+    `);
+    
+    // Close splash and show main window after fade-out
+    setTimeout(() => {
+      console.log("Main: Closing splash and showing main window");
+      if (splashWindow) {
+        splashWindow.close();
+      }
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, 300);
+  } else {
+    console.log("Main: Missing windows - splash:", !!splashWindow, "main:", !!mainWindow);
+  }
+});
 
 // ==================== WINDOW CONTROL IPC ====================
 ipcMain.on("toggle-float-window", () => {

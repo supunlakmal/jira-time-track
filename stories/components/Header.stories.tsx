@@ -54,6 +54,16 @@ export const Default: Story = {
           hide: () => {},
           show: () => {},
         },
+        git: {
+          createBranch: async (branchName: string, projectPath: string) => {
+            console.log('Mock Git Create Branch:', branchName, projectPath);
+            return Promise.resolve({ success: true });
+          },
+          checkBranchExists: async (branchName: string, projectPath: string) => {
+            console.log('Mock Git Check Branch Exists:', branchName, projectPath);
+            return Promise.resolve({ exists: false });
+          },
+        },
       };
     }
     return <Header {...args} />;

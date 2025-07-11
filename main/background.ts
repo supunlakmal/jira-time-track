@@ -6,6 +6,7 @@ import { createWindow } from "./helpers";
 import fs from "fs";
 import Store from "electron-store";
 import { spawn } from "child_process";
+import * as packageInfo from "../package.json";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
@@ -455,6 +456,7 @@ function createSplashWindow() {
     skipTaskbar: true,
     show: false,
     webPreferences: {
+      preload: path.join(__dirname, "splash-preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -499,6 +501,27 @@ function createSplashWindow() {
     console.log("Main: Splash screen ready to show");
     if (splashWindow) {
       splashWindow.show();
+      
+      // Send app information to splash screen
+      try {
+        const appVersion = app.getVersion();
+        const appName = packageInfo.name || 'Project Time Tracker';
+        
+        splashWindow.webContents.send('app-info', {
+          version: appVersion,
+          name: appName
+        });
+        
+        console.log(`Main: Sent app info - version: ${appVersion}, name: ${appName}`);
+      } catch (error) {
+        console.error('Main: Error sending app info to splash screen:', error);
+        
+        // Send fallback values
+        splashWindow.webContents.send('app-info', {
+          version: '1.0.0',
+          name: 'Project Time Tracker'
+        });
+      }
     }
   });
 

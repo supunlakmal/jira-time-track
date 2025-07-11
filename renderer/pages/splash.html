@@ -69,7 +69,14 @@
     .app-subtitle {
       font-size: 14px;
       opacity: 0.8;
-      margin-bottom: 40px;
+      margin-bottom: 8px;
+    }
+
+    .app-version {
+      font-size: 12px;
+      opacity: 0.6;
+      font-weight: 500;
+      margin-bottom: 32px;
     }
 
     .loading-dots {
@@ -162,6 +169,7 @@
 
     <h1 class="app-name">Project Time Tracker</h1>
     <p class="app-subtitle">Track your time efficiently</p>
+    <p class="app-version" id="app-version">v1.0.0</p>
 
     <div class="loading-dots">
       <div class="dot"></div>
@@ -171,6 +179,44 @@
 
     <p class="loading-text">Loading application...</p>
   </div>
+
+  <script>
+    // Check if electronAPI is available (from preload script)
+    if (typeof window.electronAPI !== 'undefined') {
+      // Listen for app info from main process
+      window.electronAPI.onAppInfo((data) => {
+        console.log('Splash: Received app info:', data);
+        
+        // Update version display
+        const versionElement = document.getElementById('app-version');
+        if (versionElement && data.version) {
+          versionElement.textContent = `v${data.version}`;
+        }
+        
+        // Update app name if provided
+        if (data.name) {
+          const nameElement = document.querySelector('.app-name');
+          if (nameElement) {
+            // Convert kebab-case to Title Case
+            const displayName = data.name
+              .split('-')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            nameElement.textContent = displayName;
+          }
+        }
+      });
+    } else {
+      console.warn('Splash: electronAPI not available, using default values');
+    }
+
+    // Clean up event listeners when the window is about to close
+    window.addEventListener('beforeunload', () => {
+      if (typeof window.electronAPI !== 'undefined' && window.electronAPI.removeAllListeners) {
+        window.electronAPI.removeAllListeners();
+      }
+    });
+  </script>
 </body>
 
 </html>

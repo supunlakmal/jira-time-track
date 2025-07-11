@@ -6,6 +6,17 @@ export interface ProjectTicket {
   story_points: number;
   isManual?: boolean;
   createdAt?: string;
+  // Jira-specific fields
+  isJiraImported?: boolean;
+  jiraId?: string;
+  status?: string;
+  issueType?: string;
+  priority?: string;
+  project?: string;
+  assignee?: string;
+  created?: string;
+  updated?: string;
+  importedAt?: string;
 }
 
 export interface TaskTimer {
@@ -115,6 +126,100 @@ export interface IpcHandler {
     taskId: string
   ): Promise<{
     success: boolean;
+    error?: string;
+  }>;
+
+  // Jira integration methods
+  invoke(channel: "jira-check-secure-storage"): Promise<{
+    success: boolean;
+    isAvailable: boolean;
+    hasCredentials: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-store-credentials",
+    credentials: {
+      domain: string;
+      email: string;
+      apiToken: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "jira-get-credentials-status"): Promise<{
+    success: boolean;
+    hasCredentials: boolean;
+    isAvailable: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-test-connection",
+    credentials?: {
+      domain: string;
+      email: string;
+      apiToken: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-fetch-issues",
+    options?: {
+      jql?: string;
+      maxResults?: number;
+      startAt?: number;
+      fetchAll?: boolean;
+    }
+  ): Promise<{
+    success: boolean;
+    data?: {
+      issues: Array<{
+        id: string;
+        key: string;
+        summary: string;
+        description?: string;
+        status: string;
+        assignee?: {
+          displayName: string;
+          emailAddress: string;
+        };
+        created: string;
+        updated: string;
+        storyPoints?: number;
+        issueType: string;
+        priority: string;
+        project: {
+          key: string;
+          name: string;
+        };
+      }>;
+      total: number;
+      maxResults: number;
+      startAt: number;
+    };
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-convert-to-tickets",
+    issues: any[]
+  ): Promise<{
+    success: boolean;
+    tickets?: ProjectTicket[];
+    error?: string;
+  }>;
+  invoke(channel: "jira-clear-credentials"): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "jira-get-projects"): Promise<{
+    success: boolean;
+    projects?: Array<{
+      key: string;
+      name: string;
+      id: string;
+    }>;
     error?: string;
   }>;
 

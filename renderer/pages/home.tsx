@@ -14,6 +14,8 @@ import TicketTableActions from "../components/tickets/TicketTableActions";
 import { useSharedData } from "../hooks/useSharedData";
 import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
+import { JiraSettingsDialog } from "../modules/jira";
+import type { JiraIssue } from "../modules/jira";
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();
@@ -27,6 +29,7 @@ export default function HomePage() {
   const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
   const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showJiraSettingsDialog, setShowJiraSettingsDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Signal app ready when all data is loaded
@@ -454,6 +457,44 @@ export default function HomePage() {
     }
   };
 
+  // Jira import handler
+  const handleJiraImport = async (jiraIssues: JiraIssue[]) => {
+    try {
+      console.log(`Importing ${jiraIssues.length} Jira issues...`);
+      
+      // Convert Jira issues to project tickets format
+      const result = await window.ipc.invoke("jira-convert-to-tickets", jiraIssues);
+      
+      if (result.success && result.tickets) {
+        // Import the converted tickets using the existing CSV import mechanism
+        const importResult = await window.ipc.invoke("import-csv-data", result.tickets);
+        
+        if (importResult.success) {
+          console.log(
+            `Successfully imported ${importResult.importedCount} tasks from Jira`
+          );
+          
+          // Show success message to user
+          alert(`Successfully imported ${importResult.importedCount} issues from Jira!`);
+          
+          // Close the Jira settings dialog
+          setShowJiraSettingsDialog(false);
+          
+          // Data will be automatically refreshed via the shared data hook
+        } else {
+          console.error("Error importing converted Jira tickets:", importResult.error);
+          alert(`Error importing Jira issues: ${importResult.error}`);
+        }
+      } else {
+        console.error("Error converting Jira issues:", result.error);
+        alert(`Error converting Jira issues: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error("Error importing Jira issues:", error);
+      alert("Failed to import Jira issues. Please try again.");
+    }
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -467,6 +508,7 @@ export default function HomePage() {
             setShowCsvImportDialog={setShowCsvImportDialog}
             setShowExportDialog={setShowExportDialog}
             setShowResetDialog={setShowResetDialog}
+            setShowJiraSettingsDialog={setShowJiraSettingsDialog}
           />
 
           {loading ? (
@@ -542,6 +584,15 @@ export default function HomePage() {
             onSave={editingTask ? handleEditManualTask : handleAddManualTask}
             editingTask={editingTask}
             existingTickets={data.map((ticket) => ticket.ticket_number)}
+          />
+        )}
+
+        {/* Jira Settings Dialog */}
+        {showJiraSettingsDialog && (
+          <JiraSettingsDialog
+            isOpen={showJiraSettingsDialog}
+            onClose={() => setShowJiraSettingsDialog(false)}
+            onImportIssues={handleJiraImport}
           />
         )}
       </div>

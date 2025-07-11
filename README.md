@@ -60,11 +60,7 @@ A cross-platform desktop application built with Nextron (Next.js + Electron) for
 
 ### 💪 Productivity & Wellness Features
 
-#### Idle Detection
 
-- **Automatic timer pausing** when system inactivity is detected
-- **Accurate time logging** preventing overestimation due to breaks
-- **Manual resume** requirement to ensure intentional time tracking
 
 
 ### 📈 Data Management & Reporting

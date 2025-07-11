@@ -1,0 +1,30 @@
+import { Link } from 'react-router-dom';
+
+// components
+import { PageBreadcrumb } from '../../components';
+
+// logos
+import logoDark from '../../assets/images/logo-dark.png'
+import logoLight from '../../assets/images/logo-light.png'
+
+const Error404Alt = () => {
+  return (
+    <>
+      <PageBreadcrumb title='Error 404 Alt' />
+      <div className="flex h-full justify-center items-center">
+        <div className="flex flex-col justify-center text-center gap-6">
+          <Link to="/" className="flex justify-center mx-auto">
+            <img className="h-6 block dark:hidden" src={logoDark} alt="" />
+            <img className="h-6 hidden dark:block" src={logoLight} alt="" />
+          </Link>
+          <p className="text-3xl font-semibold text-primary">404!</p>
+          <h1 className="text-4xl font-bold tracking-tight dark:text-gray-100">Page not found.</h1>
+          <p className="text-base text-gray-600 dark:text-gray-300">Sorry, we couldn’t find the page you’re looking for.</p>
+          <Link to="/" className="text-base font-medium text-primary"> Go back home </Link>
+        </div>
+      </div>
+    </>
+  )
+};
+
+export default Error404Alt

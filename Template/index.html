@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <link href="/favicon.ico" rel="shortcut icon"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="The Most Complete Responsive Web UI Kit & Dashboard Template" name="description"/>
+    <meta content="Coderthemes" name="Coderthemes"/>
+    <title>Konrix React - Tailwind CSS Admin & Dashboard Template</title>
+    <style>
+        .splash-screen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            background: white;
+            display: flex;
+            height: 100%;
+            width: 100%;
+            transform: translate(-50%, -50%);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: all 15s linear;
+            overflow: hidden;
+        }
+
+        div:has(div) + .splash-screen {
+            animation: fadeout 0.7s forwards;
+            z-index: 0;
+        }
+
+        @keyframes fadeout {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+    </style>
+
+    <script>const global = globalThis;</script>
+
+</head>
+
+<body>
+<div id="konrix">
+</div>
+<div class="splash-screen">
+    <img alt="Logo" class="light" src="/images/logo-dark.png" style="height: 10%;"/>
+</div>
+<script src="/src/index.tsx" type="module"></script>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+</body>
+
+</html>

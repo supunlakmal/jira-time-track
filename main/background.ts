@@ -7,6 +7,7 @@ import fs from "fs";
 import Store from "electron-store";
 import { spawn } from "child_process";
 import * as packageInfo from "../package.json";
+import { initializeJiraModule, shutdownJiraModule, getJiraModuleStatus } from "./modules/jira";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
@@ -234,6 +235,15 @@ const createFloatingWindow = async () => {
 
 (async () => {
   await app.whenReady();
+
+  // Initialize Jira module (if enabled)
+  try {
+    await initializeJiraModule();
+    const jiraStatus = getJiraModuleStatus();
+    console.log('Jira module status:', jiraStatus);
+  } catch (error) {
+    console.error('Failed to initialize Jira module:', error);
+  }
 
   // Create splash screen first
   createSplashWindow();
@@ -1505,8 +1515,15 @@ ipcMain.on("message", async (event, arg) => {
 });
 
 // Cleanup on app quit
-app.on("before-quit", () => {
+app.on("before-quit", async () => {
   if (tray) {
     tray.destroy();
+  }
+  
+  // Shutdown Jira module
+  try {
+    await shutdownJiraModule();
+  } catch (error) {
+    console.error('Failed to shutdown Jira module:', error);
   }
 });

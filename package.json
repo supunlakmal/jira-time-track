@@ -3,8 +3,18 @@
   "name": "project-time-tracker",
   "description": "A cross-platform desktop application for tracking time spent on Project tickets with floating timer, productivity features, and comprehensive reporting",
   "version": "1.6.0",
-  "author": "Developer",
+  "author": "supunlakmal",
+  "license": "ISC",
   "main": "app/background.js",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/supunlakmal"
+  },
+  "homepage": "https://github.com/supunlakmal/jira-time-track",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supunlakmal/jira-time-track.git"
+  },
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",

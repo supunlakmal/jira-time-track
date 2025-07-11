@@ -6,10 +6,12 @@ import { createWindow } from "./helpers";
 import fs from "fs";
 import Store from "electron-store";
 import { spawn } from "child_process";
+import * as packageInfo from "../package.json";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
+let splashWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 
 // Store for project paths
@@ -233,10 +235,13 @@ const createFloatingWindow = async () => {
 (async () => {
   await app.whenReady();
 
+  // Create splash screen first
+  createSplashWindow();
+
   // Create system tray
   createTray();
 
-  // Create main window
+  // Create main window (hidden initially)
   mainWindow = createMainWindow();
 
   // Application starts with empty task list until CSV import
@@ -436,11 +441,116 @@ function updateTrayTitle(activeTimers: number = 0) {
   }
 }
 
+function createSplashWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  
+  splashWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    x: Math.round((width - 400) / 2),
+    y: Math.round((height - 300) / 2),
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "splash-preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // Load splash screen HTML
+  let splashPath;
+  if (isProd) {
+    // In production, the app directory structure is different
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  } else {
+    // In development, we need to go up from main directory
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  }
+  
+  console.log("Main: Loading splash screen from:", splashPath);
+  console.log("Main: __dirname is:", __dirname);
+  console.log("Main: isProd is:", isProd);
+  
+  // Check if file exists
+  try {
+    if (fs.existsSync(splashPath)) {
+      console.log("Main: Splash file exists at:", splashPath);
+      splashWindow.loadFile(splashPath);
+    } else {
+      console.error("Main: Splash file does not exist at:", splashPath);
+      // Try alternative path
+      const altPath = path.join(__dirname, "..", "..", "renderer", "pages", "splash.html");
+      console.log("Main: Trying alternative path:", altPath);
+      if (fs.existsSync(altPath)) {
+        console.log("Main: Alternative path exists, loading from:", altPath);
+        splashWindow.loadFile(altPath);
+      } else {
+        console.error("Main: Alternative path also does not exist");
+      }
+    }
+  } catch (error) {
+    console.error("Main: Error checking splash file:", error);
+  }
+
+  splashWindow.once('ready-to-show', () => {
+    console.log("Main: Splash screen ready to show");
+    if (splashWindow) {
+      splashWindow.show();
+      
+      // Send app information to splash screen
+      try {
+        const appVersion = app.getVersion();
+        const appName = packageInfo.name || 'Project Time Tracker';
+        
+        splashWindow.webContents.send('app-info', {
+          version: appVersion,
+          name: appName
+        });
+        
+        console.log(`Main: Sent app info - version: ${appVersion}, name: ${appName}`);
+      } catch (error) {
+        console.error('Main: Error sending app info to splash screen:', error);
+        
+        // Send fallback values
+        splashWindow.webContents.send('app-info', {
+          version: '1.0.0',
+          name: 'Project Time Tracker'
+        });
+      }
+    }
+  });
+
+  splashWindow.on("closed", () => {
+    console.log("Main: Splash window closed");
+    splashWindow = null;
+  });
+
+  // Fallback timeout to ensure splash closes after 10 seconds
+  setTimeout(() => {
+    if (splashWindow) {
+      console.log("Main: Fallback timeout - closing splash screen");
+      splashWindow.close();
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  }, 10000);
+
+  return splashWindow;
+}
+
 function createMainWindow() {
   mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
+    show: false, // Don't show initially
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -461,6 +571,37 @@ function createMainWindow() {
 
   return mainWindow;
 }
+
+// ==================== SPLASH SCREEN IPC ====================
+ipcMain.on("app-ready", () => {
+  console.log("Main: Received app-ready signal");
+  
+  // Smooth transition: fade out splash, then show main window
+  if (splashWindow && mainWindow) {
+    console.log("Main: Both splash and main windows exist, starting transition");
+    
+    // Add fade-out effect to splash
+    splashWindow.webContents.executeJavaScript(`
+      console.log('Splash: Starting fade-out');
+      document.body.style.transition = 'opacity 0.3s ease-out';
+      document.body.style.opacity = '0';
+    `);
+    
+    // Close splash and show main window after fade-out
+    setTimeout(() => {
+      console.log("Main: Closing splash and showing main window");
+      if (splashWindow) {
+        splashWindow.close();
+      }
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, 300);
+  } else {
+    console.log("Main: Missing windows - splash:", !!splashWindow, "main:", !!mainWindow);
+  }
+});
 
 // ==================== WINDOW CONTROL IPC ====================
 ipcMain.on("toggle-float-window", () => {
@@ -712,6 +853,181 @@ ipcMain.handle("get-current-branch", async (_, data) => {
   } catch (error) {
     console.error(`Exception in get-current-branch for ${projectName}:`, error);
     return { error: error.message };
+  }
+});
+
+ipcMain.handle("create-git-branch", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Attempting to switch to or create git branch '${branchName}' in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      // First, try to switch to existing branch
+      console.log(`Trying to switch to existing branch '${branchName}'`);
+      const switchProcess = spawn("git", ["checkout", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let switchOutput = "";
+      let switchError = "";
+
+      switchProcess.stdout.on("data", (data) => {
+        switchOutput += data.toString();
+      });
+
+      switchProcess.stderr.on("data", (data) => {
+        switchError += data.toString();
+      });
+
+      switchProcess.on("close", (switchCode) => {
+        if (switchCode === 0) {
+          // Successfully switched to existing branch
+          console.log(`Successfully switched to existing branch '${branchName}'`);
+          resolve({ success: true, message: `Switched to existing branch '${branchName}'`, action: "switched" });
+        } else {
+          // Switch failed, try to create new branch
+          console.log(`Switch failed, attempting to create new branch '${branchName}'`);
+          
+          const createProcess = spawn("git", ["checkout", "-b", branchName], {
+            cwd: projectPath,
+            stdio: ["ignore", "pipe", "pipe"],
+          });
+
+          let createOutput = "";
+          let createError = "";
+
+          createProcess.stdout.on("data", (data) => {
+            createOutput += data.toString();
+          });
+
+          createProcess.stderr.on("data", (data) => {
+            createError += data.toString();
+          });
+
+          createProcess.on("close", (createCode) => {
+            if (createCode === 0) {
+              console.log(`Successfully created and switched to new branch '${branchName}'`);
+              resolve({ success: true, message: `Created and switched to new branch '${branchName}'`, action: "created" });
+            } else {
+              console.error(`Failed to create branch:`, createError.trim());
+              const errorMessage = createError.trim() || "Failed to create branch";
+              
+              // Handle common errors with user-friendly messages
+              if (errorMessage.includes("not a git repository")) {
+                resolve({ success: false, error: "Not a git repository" });
+              } else if (errorMessage.includes("already exists")) {
+                resolve({ success: false, error: `Branch '${branchName}' already exists but cannot switch to it` });
+              } else {
+                resolve({ success: false, error: errorMessage });
+              }
+            }
+          });
+
+          createProcess.on("error", (err) => {
+            console.error(`Error running git create command:`, err.message);
+            resolve({ success: false, error: `Failed to run git create: ${err.message}` });
+          });
+
+          // Timeout for create process
+          setTimeout(() => {
+            createProcess.kill();
+            console.warn(`Git create command timeout`);
+            resolve({ success: false, error: "Git create command timeout" });
+          }, 10000);
+        }
+      });
+
+      switchProcess.on("error", (err) => {
+        console.error(`Error running git switch command:`, err.message);
+        resolve({ success: false, error: `Failed to run git switch: ${err.message}` });
+      });
+
+      // Timeout for switch process
+      setTimeout(() => {
+        switchProcess.kill();
+        console.warn(`Git switch command timeout`);
+        resolve({ success: false, error: "Git switch command timeout" });
+      }, 10000);
+    });
+  } catch (error) {
+    console.error(`Exception in create-git-branch:`, error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("check-git-branch-exists", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Checking if git branch '${branchName}' exists in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      const gitProcess = spawn("git", ["branch", "--list", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let output = "";
+      let error = "";
+
+      gitProcess.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+
+      gitProcess.stderr.on("data", (data) => {
+        error += data.toString();
+      });
+
+      gitProcess.on("close", (code) => {
+        if (code === 0) {
+          // Check if output contains the branch name (means branch exists)
+          const branchExists = output.trim().includes(branchName);
+          console.log(`Branch '${branchName}' exists: ${branchExists}`);
+          resolve({ success: true, exists: branchExists });
+        } else {
+          console.error(`Git branch check failed:`, error.trim());
+          const errorMessage = error.trim() || "Git branch check failed";
+          
+          // Handle common errors
+          if (errorMessage.includes("not a git repository")) {
+            resolve({ success: false, error: "Not a git repository" });
+          } else {
+            resolve({ success: false, error: errorMessage });
+          }
+        }
+      });
+
+      gitProcess.on("error", (err) => {
+        console.error(`Error running git branch check:`, err.message);
+        resolve({ success: false, error: `Failed to run git: ${err.message}` });
+      });
+
+      // Timeout after 5 seconds (shorter for branch check)
+      setTimeout(() => {
+        gitProcess.kill();
+        console.warn(`Git branch check timeout`);
+        resolve({ success: false, error: "Git branch check timeout" });
+      }, 5000);
+    });
+  } catch (error) {
+    console.error(`Exception in check-git-branch-exists:`, error);
+    return { success: false, error: error.message };
   }
 });
 

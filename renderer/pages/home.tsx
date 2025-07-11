@@ -29,6 +29,34 @@ export default function HomePage() {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
+  // Signal app ready when all data is loaded
+  useEffect(() => {
+    console.log("HomePage: Checking app ready conditions - loading:", loading, "data:", !!data, "sessions:", !!sessions);
+    
+    if (!loading && typeof window !== 'undefined' && window.ipc) {
+      console.log("HomePage: Sending app-ready signal");
+      // Add a small delay to ensure smooth loading
+      const timer = setTimeout(() => {
+        window.ipc.send("app-ready");
+        console.log("HomePage: app-ready signal sent");
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loading, data, sessions]);
+
+  // Fallback: Send app-ready signal after component mounts (regardless of data state)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ipc) {
+      const fallbackTimer = setTimeout(() => {
+        console.log("HomePage: Sending fallback app-ready signal");
+        window.ipc.send("app-ready");
+      }, 3000); // 3 second fallback
+      
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, []); // Run once on mount
+
   // Load project paths from main process on component mount
   useEffect(() => {
     const loadPaths = async () => {

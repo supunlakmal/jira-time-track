@@ -15,6 +15,8 @@ const validChannels = [
   "save-project-paths",
   "select-project-directory",
   "get-current-branch",
+  "create-git-branch",
+  "check-git-branch-exists",
   "run-github-action",
   // Add any other channels your application might use between renderer and main
   "task-started", // For main-to-renderer
@@ -177,6 +179,16 @@ const handler = {
     getLevel: async () => {
       console.log("[IPC PRELOAD ZOOM] Get Zoom Level");
       return await ipcRenderer.invoke("get-zoom-level");
+    },
+  },
+  git: {
+    createBranch: async (branchName: string, projectPath: string) => {
+      console.log("[IPC PRELOAD GIT] Create Branch", branchName, projectPath);
+      return await ipcRenderer.invoke("create-git-branch", { branchName, projectPath });
+    },
+    checkBranchExists: async (branchName: string, projectPath: string) => {
+      console.log("[IPC PRELOAD GIT] Check Branch Exists", branchName, projectPath);
+      return await ipcRenderer.invoke("check-git-branch-exists", { branchName, projectPath });
     },
   },
 };

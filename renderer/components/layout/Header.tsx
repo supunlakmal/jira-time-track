@@ -29,12 +29,12 @@ const Header: React.FC<HeaderProps> = ({
           <Image
             src="/images/logo.png"
             alt="Logo"
-            width={80}
-            height={80}
+            width={40}
+            height={40}
             className="flex-shrink-0"
           />
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
+          <h1 className="text-sm font-bold text-gray-900 dark:text-white">
+            Project Time Tracker
           </h1>
         </div>
 

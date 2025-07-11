@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({
             </Button>
             <Button
               onClick={() => setShowManualTaskDialog(true)}
-              variant="secondary"
+              variant="primary"
               size="sm"
               title="Add a manual task"
               className="w-full sm:w-auto"
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
             </Button>
             <Button
               onClick={() => setShowCsvImportDialog(true)}
-              variant="warning"
+              variant="primary"
               size="sm"
               title="Import tasks from CSV file"
               className="w-full sm:w-auto"
@@ -102,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({
             </Button>
             <Button
               onClick={() => setShowExportDialog(true)}
-              variant="success"
+              variant="primary"
               size="sm"
               title="Export time tracking data"
               className="w-full sm:w-auto"
@@ -111,7 +111,7 @@ const Header: React.FC<HeaderProps> = ({
             </Button>
             <Button
               onClick={() => setShowResetDialog(true)}
-              variant="danger"
+              variant="primary"
               size="sm"
               title="Reset application data"
               className="w-full sm:w-auto"

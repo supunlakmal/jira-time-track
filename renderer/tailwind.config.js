@@ -33,10 +33,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@frostui/tailwindcss/plugin"),
-    require("@tailwindcss/forms"),
-    require("@tailwindcss/typography"),
-    require("@tailwindcss/aspect-ratio"),
-  ],
+  plugins: [],
 };

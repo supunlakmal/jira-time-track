@@ -1,0 +1,12 @@
+//
+// _glightbox.scss
+//
+
+.lg-outer {
+    .lg-thumb-item {
+        &:hover,
+        &.active {
+            border-color: #3073f1 !important;
+        }
+    }
+}

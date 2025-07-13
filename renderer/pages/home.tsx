@@ -16,6 +16,7 @@ import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
 import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
+import Dashboard from "../components/Template/src/pages/dashboard";
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();
@@ -34,28 +35,35 @@ export default function HomePage() {
 
   // Signal app ready when all data is loaded
   useEffect(() => {
-    console.log("HomePage: Checking app ready conditions - loading:", loading, "data:", !!data, "sessions:", !!sessions);
-    
-    if (!loading && typeof window !== 'undefined' && window.ipc) {
+    console.log(
+      "HomePage: Checking app ready conditions - loading:",
+      loading,
+      "data:",
+      !!data,
+      "sessions:",
+      !!sessions
+    );
+
+    if (!loading && typeof window !== "undefined" && window.ipc) {
       console.log("HomePage: Sending app-ready signal");
       // Add a small delay to ensure smooth loading
       const timer = setTimeout(() => {
         window.ipc.send("app-ready");
         console.log("HomePage: app-ready signal sent");
       }, 500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [loading, data, sessions]);
 
   // Fallback: Send app-ready signal after component mounts (regardless of data state)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ipc) {
+    if (typeof window !== "undefined" && window.ipc) {
       const fallbackTimer = setTimeout(() => {
         console.log("HomePage: Sending fallback app-ready signal");
         window.ipc.send("app-ready");
       }, 3000); // 3 second fallback
-      
+
       return () => clearTimeout(fallbackTimer);
     }
   }, []); // Run once on mount
@@ -461,33 +469,46 @@ export default function HomePage() {
   const handleJiraImport = async (jiraIssues: JiraIssue[]) => {
     try {
       console.log(`Importing ${jiraIssues.length} Jira issues...`);
-      
+
       // Convert Jira issues to project tickets format
-      const result = await window.ipc.invoke("jira-convert-to-tickets", jiraIssues);
-      
+      const result = await window.ipc.invoke(
+        "jira-convert-to-tickets",
+        jiraIssues
+      );
+
       if (result.success && result.tickets) {
         // Import the converted tickets using the existing CSV import mechanism
-        const importResult = await window.ipc.invoke("import-csv-data", result.tickets);
-        
+        const importResult = await window.ipc.invoke(
+          "import-csv-data",
+          result.tickets
+        );
+
         if (importResult.success) {
           console.log(
             `Successfully imported ${importResult.importedCount} tasks from Jira`
           );
-          
+
           // Show success message to user
-          alert(`Successfully imported ${importResult.importedCount} issues from Jira!`);
-          
+          alert(
+            `Successfully imported ${importResult.importedCount} issues from Jira!`
+          );
+
           // Close the Jira settings dialog
           setShowJiraSettingsDialog(false);
-          
+
           // Data will be automatically refreshed via the shared data hook
         } else {
-          console.error("Error importing converted Jira tickets:", importResult.error);
+          console.error(
+            "Error importing converted Jira tickets:",
+            importResult.error
+          );
           alert(`Error importing Jira issues: ${importResult.error}`);
         }
       } else {
         console.error("Error converting Jira issues:", result.error);
-        alert(`Error converting Jira issues: ${result.error || 'Unknown error'}`);
+        alert(
+          `Error converting Jira issues: ${result.error || "Unknown error"}`
+        );
       }
     } catch (error) {
       console.error("Error importing Jira issues:", error);
@@ -497,9 +518,10 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      <Head>
+      <Dashboard />
+      {/* <Head>
         <title>Project Time Tracker</title>
-      </Head>
+      </Head> */}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <Header
@@ -564,9 +586,7 @@ export default function HomePage() {
 
         {/* Reset Dialog */}
         {showResetDialog && (
-          <ResetDialog
-            onClose={() => setShowResetDialog(false)}
-          />
+          <ResetDialog onClose={() => setShowResetDialog(false)} />
         )}
 
         {/* CSV Import Dialog */}

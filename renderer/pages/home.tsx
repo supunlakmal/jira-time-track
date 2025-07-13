@@ -16,7 +16,6 @@ import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
 import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
-import Dashboard from "../components/Template/src/pages/dashboard";
 
 export default function HomePage() {
   const { projectData: data, sessions, loading } = useSharedData();
@@ -518,10 +517,9 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      <Dashboard />
-      {/* <Head>
+      <Head>
         <title>Project Time Tracker</title>
-      </Head> */}
+      </Head>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <Header

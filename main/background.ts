@@ -203,7 +203,22 @@ class DataManager {
 
   // Billing methods
   getBillingData() {
-    return this.store.get("billing");
+    try {
+      const billing = this.store.get("billing");
+      console.log("DataManager: getBillingData called, returning:", billing);
+      return billing;
+    } catch (error) {
+      console.error("DataManager: Error in getBillingData:", error);
+      // Return default billing data on error
+      return {
+        settings: {
+          projectRates: {},
+          currency: "USD",
+          invoicePrefix: "INV"
+        },
+        invoices: []
+      };
+    }
   }
 
   setBillingSettings(settings: any) {
@@ -870,7 +885,14 @@ ipcMain.handle("delete-manual-task", (_, taskId) => {
 
 // ==================== BILLING IPC HANDLERS ====================
 ipcMain.handle("get-billing-data", () => {
-  return dataManager.getBillingData();
+  try {
+    const billingData = dataManager.getBillingData();
+    console.log("Main: get-billing-data called, returning:", billingData);
+    return billingData;
+  } catch (error) {
+    console.error("Main: Error in get-billing-data:", error);
+    throw error;
+  }
 });
 
 ipcMain.handle("get-billing-settings", () => {

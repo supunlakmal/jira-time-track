@@ -19,7 +19,10 @@ export function useSharedData() {
         const [allTasks, sessionData, billing] = await Promise.all([
           window.ipc.invoke("get-all-tasks"),
           window.ipc.invoke("get-sessions"),
-          window.ipc.invoke("get-billing-data"),
+          window.ipc.invoke("get-billing-data").catch(error => {
+            console.error("Failed to load billing data:", error);
+            return null; // Return null as fallback
+          }),
         ]);
         
         setProjectData(allTasks || []);
@@ -45,7 +48,10 @@ export function useSharedData() {
       window.ipc.invoke("get-all-tasks").then(setProjectData);
     });
     const cleanupSessions = window.ipc.on("sessions-updated", setSessions);
-    const cleanupBilling = window.ipc.on("billing-updated", setBillingData);
+    const cleanupBilling = window.ipc.on("billing-updated", (data) => {
+      console.log("Billing data updated:", data);
+      setBillingData(data);
+    });
 
     loadData();
 

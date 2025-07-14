@@ -17,6 +17,7 @@ import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
 import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
+import Dashboard from "./dashbord";
 
 export default function HomePage() {
   const { projectData: data, sessions, billingData, loading } = useSharedData();
@@ -519,7 +520,8 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      <Head>
+      <Dashboard />
+      {/* <Head>
         <title>Project Time Tracker</title>
       </Head>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
@@ -538,7 +540,6 @@ export default function HomePage() {
             <LoadingSpinner />
           ) : (
             <>
-              {/* Dashboard Stats Cards */}
               <Overview
                 dashboardStats={dashboardStats}
                 projectSummaryData={projectSummaryData}
@@ -582,7 +583,6 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Export Dialog */}
         {showExportDialog && (
           <ExportDialog
             onClose={() => setShowExportDialog(false)}
@@ -590,12 +590,10 @@ export default function HomePage() {
           />
         )}
 
-        {/* Reset Dialog */}
         {showResetDialog && (
           <ResetDialog onClose={() => setShowResetDialog(false)} />
         )}
 
-        {/* CSV Import Dialog */}
         {showCsvImportDialog && (
           <CsvImportDialog
             onClose={() => setShowCsvImportDialog(false)}
@@ -603,7 +601,6 @@ export default function HomePage() {
           />
         )}
 
-        {/* Manual Task Dialog */}
         {showManualTaskDialog && (
           <ManualTaskDialog
             onClose={closeManualTaskDialog}
@@ -613,14 +610,10 @@ export default function HomePage() {
           />
         )}
 
-        {/* Billing Dialog */}
         {showBillingDialog && (
-          <BillingDialog
-            onClose={() => setShowBillingDialog(false)}
-          />
+          <BillingDialog onClose={() => setShowBillingDialog(false)} />
         )}
 
-        {/* Jira Settings Dialog */}
         {showJiraSettingsDialog && (
           <JiraSettingsDialog
             isOpen={showJiraSettingsDialog}
@@ -628,7 +621,7 @@ export default function HomePage() {
             onImportIssues={handleJiraImport}
           />
         )}
-      </div>
+      </div> */}
     </React.Fragment>
   );
 }

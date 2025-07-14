@@ -1,0 +1,2274 @@
+<!-- sm 640px, md 768px, lg 1024px, xl 1280px, 2xl 1536px, -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="./assets/css/output.css" rel="stylesheet" />
+    <link href="./assets/css/swiper-bundle.min.css" rel="stylesheet" />
+    <link href="./assets/css/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <title>Bankco</title>
+  </head>
+  <body
+    class="relative box-border w-full overflow-x-hidden font-urbanist 2xl:px-0"
+  >
+    <!-- Header start  -->
+    <!-- mobile menu start -->
+
+    <section
+      class="b-gray-300 relative z-50 flex w-full items-center justify-between gap-9 border-b bg-white transition-all xl:hidden"
+    >
+      <div
+        class="overlay fixed z-30 h-[90000px] w-0 bg-black opacity-20 transition-all duration-500"
+      ></div>
+      <div class="fixed top-0 z-40 flex w-full justify-between bg-white p-6">
+        <a href="/index.html" class="flex h-fit gap-1.5">
+          <img
+            src="./assets/images/logo/logoBlack.svg"
+            alt="logo"
+            class="w-5 sm:w-7 lg:w-10 xl:w-fit"
+          />
+          <span
+            class="flex h-full items-center justify-center pr-16 text-xl font-extrabold leading-extra-loose tracking-tight text-primary lg:text-4xl"
+            ><span class="text-gray-900">Bank</span> Co.</span
+          >
+        </a>
+        <div class="m-menu-btn flex w-6 lg:w-10">
+          <img
+            src="./assets/images/icon/bars-solid.svg"
+            alt=""
+            class="bars block transition-all"
+          />
+          <img
+            src="./assets/images/icon/xmark-solid.svg"
+            alt=""
+            class="xmark hidden transition-all"
+          />
+        </div>
+      </div>
+
+      <div
+        class="m-menu fixed -left-[100%] top-[93px] z-40 flex h-full w-full max-w-sm flex-col gap-4 rounded-br-md bg-white py-6 pl-[5%] pr-[5%] text-xl font-medium leading-9 text-gray-900 transition-all duration-500 lg:text-2xl"
+      >
+        <div class="flex cursor-pointer">
+          <span>Products</span>
+          <img src="./assets/images/icon//chevron-down.svg" alt="arrow down" />
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Features</span>
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Pricing</span>
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Resources</span>
+          <img src="./assets/images/icon//chevron-down.svg" alt="arrow down" />
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Blog</span>
+        </div>
+        <div class="flex w-full justify-between">
+          <a
+            href="#"
+            class="group relative z-50 inline-flex shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+          >
+            <div
+              class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary transition-all group-hover:h-full group-hover:w-full"
+            ></div>
+            <div
+              class="z-10 h-full w-full px-6 py-3 text-center text-xl font-semibold leading-8 text-primary group-hover:text-white"
+            >
+              Login
+            </div>
+          </a>
+          <a
+            href="#"
+            class="group relative z-40 inline-flex shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+          >
+            <div
+              class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+            ></div>
+            <span
+              class="z-10 h-full w-full px-6 py-3 text-center text-xl font-semibold leading-8 text-white group-hover:text-primary"
+              >Live Preview</span
+            >
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- mobile menu end  -->
+    <!-- menu start  -->
+    <section
+      class="b-gray-300 hidden items-center justify-center gap-9 border-b bg-white p-6 xl:flex"
+    >
+      <a href="/index.html" class="flex h-fit gap-1.5">
+        <img src="./assets/images/logo/logoBlack.svg" alt="logo" />
+        <span
+          class="flex h-full items-center justify-center pr-16 text-4xl font-extrabold leading-extra-loose tracking-tight text-primary"
+          ><span class="text-gray-900">Bank</span> Co.</span
+        >
+      </a>
+      <div class="flex gap-11 text-2xl font-medium leading-9 text-gray-900">
+        <div class="flex cursor-pointer">
+          <span>Products</span>
+          <img src="./assets/images/icon/chevron-down.svg" alt="arrow down" />
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Features</span>
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Pricing</span>
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Resources</span>
+          <img src="./assets/images/icon/chevron-down.svg" alt="arrow down" />
+        </div>
+        <div class="flex cursor-pointer">
+          <span>Blog</span>
+        </div>
+      </div>
+      <a
+        href="#"
+        class="group relative z-50 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+      >
+        <div
+          class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary transition-all group-hover:h-full group-hover:w-full"
+        ></div>
+        <span
+          class="z-10 h-full w-full px-9 py-2.5 text-center text-xl font-semibold leading-8 text-primary group-hover:text-white"
+          >Login</span
+        >
+      </a>
+      <a
+        href="#"
+        class="group relative z-40 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+      >
+        <div
+          class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+        ></div>
+        <div
+          class="z-10 h-full w-full px-9 py-2.5 text-center text-xl font-semibold leading-8 text-white group-hover:text-primary"
+        >
+          Live Preview
+        </div>
+      </a>
+    </section>
+    <!-- menu end  -->
+    <!-- Header end  -->
+    <!-- Hero start  -->
+    <section
+      class="flex w-full items-center justify-center xl:px-[5%] 2xl:px-0"
+      data-aos="fade-up"
+    >
+      <div
+        class="relative flex w-full max-w-[1320px] flex-col items-center justify-center p-10 pb-36 pt-28 transition-all duration-1000"
+      >
+        <div
+          class="overFlowHidden moving-element absolute h-full w-full xl:block"
+        >
+          <img
+            class="absolute right-[2%] top-[6%] z-10 2xl:right-[1%]"
+            src="./assets/images/shape/path.svg"
+            alt=""
+          />
+          <img
+            class="absolute left-[3%] top-[6%] z-10"
+            src="./assets/images/shape/path0.svg"
+            alt=""
+          />
+
+          <img
+            class="absolute left-[-1%] top-[16%] z-10 2xl:left-[-2%]"
+            src="./assets/images/shape/path1.svg"
+            alt=""
+          />
+          <img
+            class="absolute left-[7%] top-[16.5%] z-10"
+            src="./assets/images/shape/group5.svg"
+            alt=""
+          />
+          <img
+            class="absolute top-[17.5%] z-10 xl:right-[5%]"
+            src="./assets/images/shape/path38.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-5%] top-[18.5%] z-10 hidden xl:block"
+            src="./assets/images/shape/path2.svg"
+            alt=""
+          />
+          <img
+            class="absolute left-10 top-[26.5%] z-10 xl:left-[0%]"
+            src="./assets/images/shape/path3.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[16%] top-[31.5%] z-10"
+            src="./assets/images/shape/path4.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-5%] top-[43.5%] z-10"
+            src="./assets/images/shape/path5.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-1.2%] top-[49.7%] z-10"
+            src="./assets/images/shape/path7.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-0.8%] top-[50.5%] z-10"
+            src="./assets/images/shape/path40.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[7%] top-[55.2%] z-10 xl:right-[2%] xl:top-[54.2%]"
+            src="./assets/images/shape/path3.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[12%] top-[51.5%] z-10"
+            src="./assets/images/shape/path9.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-8%] top-[58%] z-10"
+            src="./assets/images/shape/group5.svg"
+            alt=""
+          />
+          <img
+            class="absolute right-[-5%] top-[64%] z-10"
+            src="./assets/images/shape/path8.svg"
+            alt=""
+          />
+          <img
+            class="absolute bottom-[13.5%] left-[5%] z-10 xl:left-[-6%]"
+            src="./assets/images/shape/path11.svg"
+            alt=""
+          />
+          <img
+            class="absolute bottom-[23.2%] left-[3%] z-10"
+            src="./assets/images/shape/path7.svg"
+            alt=""
+          />
+          <img
+            class="absolute bottom-[20.2%] left-[-9%] z-10"
+            src="./assets/images/shape/group5.svg"
+            alt=""
+          />
+          <img
+            class="absolute bottom-[23.6%] left-[-0.5%] z-10 -rotate-[80deg]"
+            src="./assets/images/shape/path40.svg"
+            alt=""
+          />
+          <img
+            class="absolute -left-[1.8%] bottom-[27%] z-10 xl:bottom-[27%]"
+            src="./assets/images/shape/path10.svg"
+            alt=""
+          />
+          <img
+            class="absolute bottom-[33.5%] left-[-5%] z-10"
+            src="./assets/images/shape/path10.svg"
+            alt=""
+          />
+        </div>
+        <!-- heading start  -->
+        <div class="w-full max-w-[1193px] text-center">
+          <span
+            class="text-center font-poppins text-3xl font-bold leading-big-loose decoration-[#090F32] sm:text-5xl xl:text-6xl 2xl:text-7xl"
+          >
+            <span class="relative"
+              ><img
+                class="absolute bottom-3 left-0 w-[150px] max-w-full xl:w-auto"
+                src="./assets/images/shape/fill3.svg"
+                alt=""
+              />Create</span
+            ><span class="leading-big-loose"> Awesome </span>
+            <span class="bg-primary-new px-2 leading-big-loose">
+              Dashboards
+            </span>
+            Designs in less than a minute
+          </span>
+        </div>
+        <div class="mt-5 w-full max-w-[784px] text-center">
+          <span
+            class="text-lg font-medium leading-160 text-[#48494E] decoration-[#48494E] xl:text-xl"
+            >Create & Design awesome dashboards directly in Html & Figma in just
+            a few moments with the First Dashboard Builder for HTML!</span
+          >
+        </div>
+        <!-- Heading end  -->
+        <!-- Buttons  -->
+        <div class="relative mt-10 flex items-center justify-center gap-9">
+          <a
+            href="#"
+            class="group relative z-40 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+          >
+            <div
+              class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+            ></div>
+            <div
+              class="z-10 h-full w-full px-9 py-2.5 text-center text-xl font-semibold leading-8 text-white group-hover:text-primary"
+              href="#"
+            >
+              Live Preview
+            </div>
+          </a>
+          <a
+            href="#"
+            class="group relative z-50 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary transition-all"
+          >
+            <div
+              class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary transition-all group-hover:h-full group-hover:w-full"
+            ></div>
+            <span
+              class="z-10 h-full w-full px-9 py-2.5 text-center text-xl font-semibold leading-8 text-primary group-hover:text-white"
+              >Login</span
+            >
+          </a>
+        </div>
+        <!-- image start  -->
+        <div class="relative z-0 flex items-center justify-center">
+          <div
+            class="absolute -left-6 top-[50px] w-[50px] sm:w-[80px] xl:left-[-110px] xl:top-[-20px] xl:w-[175px]"
+          >
+            <img src="./assets/images/shape/Shape 2.svg" alt="shape" />
+          </div>
+          <div
+            class="mt-[70px] box-border flex w-full max-w-[1320px] items-center justify-center rounded-20 border-[15px] border-[#F3F7F8] bg-[#F3F7F8] sm:p-7 xl:p-14"
+          >
+            <img
+              class="z-50 h-full w-full rounded-20"
+              src="./assets/images/dashboard/dashboard.jpg"
+              alt="dashboard"
+            />
+          </div>
+          <div
+            class="absolute bottom-[-10%] right-[-2%] z-[-1] h-[80px] w-[80px] -rotate-90 rounded-bl-[205px] rounded-tl-[205px] rounded-tr-[205px] bg-[#22c55e] sm:bottom-[-13%] sm:right-[-4%] sm:h-52 sm:w-52 xl:bottom-[-90px] xl:right-[-90px] xl:h-[300px] xl:w-[300px] 2xl:bottom-[-140px] 2xl:right-[-140px] 2xl:h-[400px] 2xl:w-[400px]"
+          />
+        </div>
+        <!-- image end  -->
+      </div>
+    </section>
+
+    <!-- Hero end  -->
+    <!-- Features start  -->
+    <section
+      class="flex w-full flex-col items-center justify-center px-[5%] 2xl:pt-28"
+      data-aos="fade-up"
+      data-aos-anchor-placement="top-bottom"
+    >
+      <!-- heading  -->
+      <div class="w-full max-w-[614px] text-center">
+        <span
+          class="text-center font-poppins text-3xl font-bold leading-big-loose text-gray-800 sm:text-4xl xl:text-4xl 2xl:text-5xl"
+          >All features included in a single Design Tool
+        </span>
+      </div>
+      <div class="w-full max-w-[527px] pt-3 text-center">
+        <span
+          class="font-urbanist text-lg font-normal leading-160 text-gray-800 2xl:text-xl"
+          >Venus main features. Most important and useful features of Template
+          in a single design system tool.
+        </span>
+      </div>
+      <!-- cards start  -->
+      <div
+        class="flex w-full max-w-[1320px] flex-wrap items-center justify-center gap-x-7 gap-y-3 pt-20"
+      >
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-left"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="active group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div class="max-w-[120px]">
+              <img
+                class="active hidden group-hover:block current:block"
+                src="./assets/images/features/friendlyW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="active block group-hover:hidden current:hidden"
+                src="./assets/images/features/friendly.svg"
+                alt="friendly"
+              />
+            </div>
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="active text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Fully Responsive </span
+              ><br />
+              <span
+                class="active z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >Components / assets are fully responsive
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-right"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div class="max-w-[120px]">
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/reactW.svg"
+                alt="reactW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/react.svg"
+                alt="react"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Atomic Design </span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >Themeforest is based on Atomic Design Methodology
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-left"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div class="max-w-[120px]">
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/appsRectangleW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/appsRectangle.svg"
+                alt="friendly"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="line-clamp-1 text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Variants & Auto Layout
+              </span>
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >All compontents states are made as variants
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-right"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div class="max-w-[120px]">
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/customerServiceW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/customerService.svg"
+                alt="friendly"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Free Support</span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >You receive Free Support for Pro, Team & Company License
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-left"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div
+              class="relative flex max-w-[120px] flex-col items-center justify-center"
+            >
+              <div
+                class="absolute inline-flex gap-4 rounded-[100px] bg-portage px-4 py-[2px]"
+              >
+                <span
+                  class="text-center text-sm font-normal leading-180 text-white"
+                >
+                  Upcoming</span
+                >
+              </div>
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/scienceW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/science.svg"
+                alt="friendly"
+              />
+            </div>
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >React Library</span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >Bankco come with a specific library based on React
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-right"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div
+              class="relative flex max-w-[120px] flex-col items-center justify-center"
+            >
+              <div
+                class="absolute inline-flex gap-4 rounded-[100px] bg-portage px-4 py-[2px]"
+              >
+                <span
+                  class="text-center text-sm font-normal leading-180 text-white"
+                >
+                  Upcoming</span
+                >
+              </div>
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/friendly2W.svg"
+                alt="reactW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/friendly2.svg"
+                alt="react"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Native Ready </span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >All elements are Android & IOS Native Ready
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-left"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div
+              class="relative flex max-w-[120px] flex-col items-center justify-start"
+            >
+              <div
+                class="absolute -top-10 inline-flex gap-4 rounded-[100px] bg-portage px-4 py-[2px]"
+              >
+                <span
+                  class="text-center text-sm font-normal leading-180 text-white"
+                >
+                  Upcoming</span
+                >
+              </div>
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/darkModeW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/darkMode.svg"
+                alt="friendly"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Light & Dark Mode </span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >BankCo is available in two modes: Light & Dark Mode
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+        <!-- single card start  -->
+        <div
+          class="overflow-hidden pt-4"
+          data-aos="flip-right"
+          data-aos-easing="ease-out-cubic"
+        >
+          <div
+            class="group relative flex w-[306px] flex-col items-center justify-center overflow-hidden rounded-20 border border-solid border-gray-200 p-6 drop-shadow-[10px_10px_40px_0px_rgba(39,218,104,0.10)] duration-500 ease-in-out hover:bg-primary current:bg-primary"
+          >
+            <img
+              src="./assets/images/cards/cardBg.png"
+              alt=""
+              class="absolute -bottom-[55px] -right-[58px]"
+            />
+            <div class="max-w-[120px]">
+              <img
+                class="hidden group-hover:block current:block"
+                src="./assets/images/features/fontW.svg"
+                alt="friendlyW"
+              />
+              <img
+                class="block group-hover:hidden current:hidden"
+                src="./assets/images/features/font.svg"
+                alt="friendly"
+              />
+            </div>
+
+            <div class="z-10 text-center font-urbanist">
+              <span
+                class="text-3xl font-bold leading-150 text-gray-900 group-hover:text-white current:text-white"
+                >Global Styles</span
+              ><br />
+              <span
+                class="z-10 px-2 text-base font-medium text-gray-600 group-hover:text-gray-300 current:text-gray-300"
+                >More than 250+ Global Styles for typography & colors.
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- single card end  -->
+      </div>
+      <!-- cards end  -->
+    </section>
+    <!-- Features end  -->
+    <!-- View start  -->
+
+    <section
+      class="relative mt-[60px] flex w-full flex-wrap items-center justify-center p-3 xl:p-[5%] 2xl:mt-[120px] 2xl:p-0"
+      data-aos="fade-up"
+      data-aos-easing="fade-down"
+    >
+      <div
+        class="relative flex w-full max-w-[1320px] flex-col justify-between overflow-hidden rounded-20 bg-gray-900 pl-8 pt-10 lg:flex-row xl:pb-0 xl:pl-16 xl:pt-[73px]"
+      >
+        <!-- bg -->
+        <div
+          class="absolute bottom-32 left-[-160px] h-[651px] w-12 rounded-full bg-white bg-gradient-to-l xl:w-[651px] xl:p-24"
+          style="
+            background: linear-gradient(
+              to left,
+              rgba(255, 255, 255, 0.2),
+              rgba(255, 255, 255, 0)
+            );
+            z-index: -0;
+          "
+        >
+          <div class="h-full w-full rounded-full bg-basicInterface"></div>
+        </div>
+        <div class="absolute bottom-0 right-0 z-0 xl:top-4">
+          <img
+            src="./assets/images/shape/rectangle.svg"
+            alt=""
+            class="max-w-full"
+          />
+        </div>
+        <!-- bg -->
+        <!-- Left side start -->
+        <div class="z-10 pr-5">
+          <div class="flex w-full max-w-[513px] flex-col">
+            <span
+              class="font-poppins text-xl font-bold leading-big-loose text-white sm:text-3xl xl:text-4xl 2xl:text-5xl"
+              >Make the coolest Dashboard Designs directly in Template!</span
+            >
+            <span
+              class="pb-12 pt-7 text-lg font-medium leading-160 text-white 2xl:text-xl"
+              >Customize and stylize your dashboard and all widgets easily with
+              the Global Styles for typography & colors!</span
+            >
+            <div class="flex gap-3 xl:gap-8">
+              <a
+                href="#"
+                class="group relative z-40 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border border-primary px-5 py-1 transition-all xl:border-[2.333px] xl:px-9 xl:py-2.5"
+              >
+                <div
+                  class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+                ></div>
+                <span
+                  class="z-10 text-center text-lg font-semibold leading-8 text-white group-hover:text-primary xl:text-xl"
+                >
+                  Live Preview
+                </span>
+              </a>
+
+              <a
+                href="#"
+                class="group relative z-50 flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-white px-9 py-2.5 transition-all hover:border-primary"
+              >
+                <div
+                  class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary transition-all group-hover:h-full group-hover:w-full"
+                ></div>
+                <div
+                  class="z-10 flex gap-2 text-center text-xl font-semibold leading-8 text-white group-hover:text-white"
+                >
+                  <img src="./assets/images/icon/figmaW.svg" alt="figma" /> Get
+                  Figma
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- Left side end  -->
+        <!-- Right side start  -->
+        <div class="flex w-full justify-end lg:w-1/2">
+          <div class="z-10 mt-10 w-fit pb-12 xl:mt-0">
+            <div class="rounded-l-20 bg-lightGray py-4 pl-4 xl:pl-12">
+              <img
+                src="./assets/images/dashboard/dashboard2.jpg"
+                alt="dashboard"
+              />
+            </div>
+          </div>
+        </div>
+        <!-- Right side end  -->
+      </div>
+    </section>
+    <!-- View end  -->
+    <!-- cards details start  -->
+    <section
+      class="mt-[50px] flex w-full items-center justify-center xl:px-[5%] 2xl:mt-[138px] 2xl:p-0"
+    >
+      <div
+        class="relative flex w-[90%] max-w-[1320px] flex-wrap gap-40 bg-cover px-[5%] pb-[137px] pt-[125px] xl:w-full xl:flex-nowrap xl:px-0 2xl:flex-wrap"
+        style="background: url('./assets/images/cards/bg.png')"
+      >
+        <div
+          class="relative z-0 flex h-full w-11/12 items-center justify-center rounded-20 xl:w-6/12 2xl:w-[505px]"
+        >
+          <div
+            class="relative z-0 flex h-full w-full items-center justify-center rounded-20 bg-alertsWarningLight xl:w-[505px]"
+          >
+            <!-- Bg start  -->
+            <img
+              src="./assets/images/cards/vector.png"
+              alt=""
+              class="absolute"
+              style="z-index: -1"
+            />
+
+            <img
+              src="./assets/images/cards/revenue.png"
+              class="absolute left-[3%] top-[5%]"
+              alt=""
+              style="z-index: 1"
+            />
+            <img
+              src="./assets/images/cards/earning.png"
+              class="absolute -left-[4%] bottom-[2%] z-20 max-w-[100px] sm:max-w-[130px] xl:max-w-[163px]"
+              alt=""
+            />
+            <img
+              src="./assets/images/cards/efficiency.png"
+              class="absolute -right-[12%] top-[8%] z-20 w-32 sm:w-fit"
+              alt=""
+            />
+            <img
+              src="./assets/images/cards/offer.png"
+              class="absolute -bottom-[10%] -right-[12%] z-20 w-32 sm:w-fit"
+              alt=""
+            />
+
+            <!-- Bg end  -->
+            <img
+              src="./assets/images/cards/dashboard.jpg "
+              class="z-10 w-full px-6 pt-14 xl:px-11 xl:pt-28"
+              alt="dashboard"
+              data-aos="fade-right"
+              data-aos-easing="fade-left"
+            />
+          </div>
+        </div>
+        <div
+          class="relative w-10/12 xl:ml-16 xl:w-5/12 2xl:max-w-[514px]"
+          data-aos="fade-left"
+          data-aos-easing="fade-right"
+        >
+          <span
+            class="z-10 font-poppins text-3xl font-bold leading-big-loose text-black xl:text-4xl 2xl:text-5xl"
+            >120+ Widgets &<br />
+            UI Cards in BankCo</span
+          ><br />
+          <span
+            class="z-10 mt-[14px] text-lg font-medium leading-160 text-gray-500 xl:text-xl"
+            >Design dashboards quickly with 400+ Widgets &<br />
+            Cards world-class standards out-of-the-box
+          </span>
+          <div
+            class="z-10 flex flex-col text-base font-normal leading-220 text-gray-600 xl:text-xl"
+          >
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>Up to 5 staff members</span>
+            </div>
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>Fraud analysis</span>
+            </div>
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>Professional reports</span>
+            </div>
+            <a
+              href="#"
+              class="group relative z-40 mt-5 inline-flex h-[60px] max-w-[190px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary px-9 py-2.5 transition-all"
+            >
+              <div
+                class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+              ></div>
+              <span
+                class="z-10 text-center text-xl font-semibold leading-8 text-white group-hover:text-primary"
+                >Live Preview</span
+              >
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- cards details end  -->
+    <!-- features start  -->
+    <section
+      class="flex w-full items-center justify-center bg-gray-50 px-[5%] pb-[60px] pt-[60px] xl:pb-[145px] xl:pt-[120px]"
+    >
+      <div
+        class="flex flex-wrap gap-10 xl:flex-nowrap xl:items-center xl:justify-center xl:gap-40"
+        data-aos="fade-right"
+        data-aos-easing="fade-left"
+      >
+        <!-- Right side start  -->
+        <div class="max-w-[500px]">
+          <span
+            class="font-poppins text-3xl font-bold leading-big-loose text-[#090D26] xl:text-4xl 2xl:text-5xl"
+            >Why you choose BankCo.
+          </span>
+          <div
+            class="z-10 flex flex-col text-sm font-normal text-[#4f4f4f] xl:text-xl xl:leading-[42px]"
+          >
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>Responsive layout (desktops, tablets, mobile devices)</span>
+            </div>
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>2 Different Dashbaord layout</span>
+            </div>
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>5 Different App</span>
+            </div>
+            <div class="mt-3 flex gap-[10px]">
+              <img src="./assets/images/icon/check.svg" alt="" />
+              <span>Clean and Flat design & more ...</span>
+            </div>
+            <a
+              href="#"
+              class="group relative z-40 mt-12 inline-flex h-[60px] max-w-[200px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-xl border-[2.333px] border-primary px-9 py-2.5 transition-all"
+            >
+              <div
+                class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+              ></div>
+              <span
+                class="z-10 text-center text-xl font-semibold leading-8 text-white group-hover:text-primary"
+                >See Details</span
+              >
+            </a>
+          </div>
+        </div>
+        <!-- Right side end  -->
+        <!-- Left side start  -->
+        <div class="flex max-w-[649px] flex-wrap gap-6">
+          <span
+            class="rounded-xl bg-primaryNew px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Great Interface</span
+          ><span
+            class="rounded-xl bg-othersTeal px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Experienced</span
+          ><span
+            class="rounded-xl bg-othersOrange px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Low Price</span
+          ><span
+            class="rounded-xl bg-alertsWarningLight px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Customizable</span
+          ><span
+            class="rounded-xl bg-primaryNew px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Marketing</span
+          ><span
+            class="rounded-xl bg-alertsWarningLight px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Great Support</span
+          ><span
+            class="rounded-xl bg-primaryNew px-[20px] py-[12px] text-lg font-medium text-gray-700 xl:px-[46px] xl:py-[22px] xl:text-xl xl:leading-160"
+            >Safe</span
+          >
+          <span
+            class="px-[10px] py-[12px] font-poppins text-xl font-normal text-gray-900 xl:px-[18px] xl:py-[22px] xl:text-2xl"
+            >& more…</span
+          >
+        </div>
+
+        <!-- Left side end  -->
+      </div>
+    </section>
+    <!-- features end  -->
+    <!-- layout start  -->
+    <section
+      class="relative flex w-full justify-center overflow-hidden bg-basicInterface py-[60px] xl:py-[120px]"
+      style="background: url('./assets/images/responsive/bg1.png')"
+    >
+      <div
+        class="flex w-full max-w-[1320px] flex-col items-center justify-center px-[5%] xl:flex-row 2xl:px-0"
+      >
+        <!-- Right side start  -->
+        <div
+          class="flex w-full flex-col justify-center xl:max-w-[578px]"
+          data-aos="fade-right"
+          data-aos-easing="fade-left"
+        >
+          <span
+            class="text-center font-poppins text-3xl font-bold leading-big-loose text-white xl:text-left xl:text-5xl"
+            >Responsive Layout for any Device</span
+          ><br />
+          <span
+            class="mt-3 text-center text-lg font-medium leading-130 tracking-[-0.356] text-secondary-200 xl:max-w-[473px] xl:text-left xl:text-xl"
+            >The layout is responsive and looks gorgeous and professional on any
+            major devices and this Theme comes with custom page Themes.
+          </span>
+          <div
+            class="mt-10 flex w-full items-center justify-center gap-6 text-lg font-normal leading-7 tracking-[-0.4] text-white xl:w-fit xl:gap-10"
+          >
+            <a
+              href="#"
+              class="group relative z-40 inline-flex h-[60px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-[28px] border-solid border-white border-opacity-60 px-9 py-2.5 transition-all hover:border"
+            >
+              <div
+                class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+              ></div>
+              <span
+                class="z-10 text-center text-lg leading-8 text-white"
+                href="#"
+                >Check Demos</span
+              >
+            </a>
+
+            <a
+              href="#"
+              class="group relative z-50 flex h-14 w-[188px] items-center justify-center overflow-hidden rounded-[28px] border border-solid border-white border-opacity-60 transition-all hover:border-primary"
+            >
+              <div
+                class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary transition-all group-hover:h-full group-hover:w-full"
+              ></div>
+              <span class="z-10" href="#">Purchase now!</span>
+            </a>
+          </div>
+        </div>
+        <!-- Right side end  -->
+        <!-- Left side start  -->
+        <div
+          class="mt-8 flex items-center justify-center xl:mt-0 xl:justify-start"
+          data-aos="fade-left"
+          data-aos-easing="fade-right"
+        >
+          <img
+            src="./assets/images/responsive/bg.png"
+            alt=""
+            class="absolute w-full sm:h-[60%] sm:w-auto xl:-top-[37px] xl:right-[130px] xl:h-full"
+          />
+          <img
+            src="./assets/images/responsive/responsive.png"
+            alt=""
+            class="relative -ml-20 mt-16 w-full max-w-[948px] xl:ml-20 xl:mt-0"
+          />
+        </div>
+
+        <!-- Left side end  -->
+      </div>
+    </section>
+    <!-- layout end  -->
+    <!-- slider start  -->
+    <section
+      class="flex w-full flex-col justify-center bg-[#F8FAFE] px-[5%] pb-28 2xl:px-[0]"
+    >
+      <!-- header start  -->
+      <div class="pb-14">
+        <div
+          class="mt-[60px] text-center font-poppins text-3xl font-semibold text-black xl:mt-[120px] xl:text-5xl xl:leading-big-loose"
+        >
+          <span>
+            <span class="relative z-0 max-w-fit"
+              ><div
+                class="absolute bottom-3 left-0 -z-10 h-3 w-full bg-primaryNew"
+              ></div>
+              Trusted and</span
+            >
+            used by the top
+            <br class="hidden xl:block" />
+            Developers & Designers</span
+          >
+        </div>
+      </div>
+      <!-- header end  -->
+      <div class="w-full px-[5%] md:px-0">
+        <div class="swiper trustSlider max-w-[1320px]">
+          <div class="swiper-wrapper mb-[88px]">
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] transition-all md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >Latin derived from Cicero's 1st-century BC text De Finibus
+                    Bonor et Malorum print.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >Martin Jonas.
+                      <span class="text-stockColor"> USA</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >The passage experienced a surgu popularity during the ios
+                    when Letraset used it on their lor bonord dry-transfer
+                    sheets & again during the sample.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >RI Shovo. <span class="text-stockColor"> BD</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >From its medieval origins digital print everything there is
+                    know about ubiquitous lorem ip surgue cicer elit.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >Jubayer Hasan.
+                      <span class="text-stockColor"> KSA</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >Latin derived from Cicero's 1st-century BC text De Finibus
+                    Bonor et Malorum print.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >Martin Jonas.
+                      <span class="text-stockColor"> USA</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >The passage experienced a surgu popularity during the ios
+                    when Letraset used it on their lor bonord dry-transfer
+                    sheets & again during the sample.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >RI Shovo. <span class="text-stockColor"> BD</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+
+            <!-- single slide -->
+            <div class="swiper-slide">
+              <div
+                class="flex h-[430px] w-full max-w-full flex-col justify-between rounded-xl border border-b-[7px] border-solid border-white border-b-alertsErrorBase bg-white px-11 py-[30px] md:w-[530px]"
+              >
+                <div>
+                  <img
+                    src="./assets/images/icon/quotation.svg"
+                    alt="quotation"
+                    class="pb-10"
+                  />
+                  <span
+                    class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                    >From its medieval origins digital print everything there is
+                    know about ubiquitous lorem ip surgue cicer elit.</span
+                  >
+                </div>
+                <div>
+                  <div class="flex w-full items-center justify-between">
+                    <span
+                      class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                      >Jubayer Hasan.
+                      <span class="text-stockColor"> KSA</span></span
+                    >
+                    <img src="./assets/images/icon/star.svg" alt="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- single slide -->
+          </div>
+          <div class="trust-pagination swiper-pagination"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- slider end  -->
+    <!-- accordion start  -->
+    <section
+      class="flex w-full items-center justify-center px-[5%] py-[60px] 2xl:px-0 2xl:py-[120px]"
+    >
+      <div class="w-full max-w-[1320px]">
+        <!-- heading  -->
+        <div
+          class="pb-14 text-center font-poppins text-3xl font-bold leading-big-loose text-gray-900 xl:text-5xl"
+        >
+          <span>Frequently asked question</span>
+        </div>
+
+        <!-- heading  -->
+
+        <div class="flex flex-col gap-16 px-[5%] xl:flex-row xl:px-0">
+          <div class="flex w-full flex-col gap-[30px] xl:max-w-[630px]">
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >Enhance workflow consistency</span
+                >
+
+                <span class="accordion-icon rotate-0 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >Build professional & performance projects</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >Work together with your team</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >Easy-to-use for both designers & developers</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >Access to modern UI components</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+          </div>
+          <div class="flex w-full flex-col gap-[30px] xl:max-w-[630px]">
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+            <!-- single accordion start  -->
+            <div
+              class="flex flex-col gap-8 bg-[#F6F9FB] px-6 py-6 transition-all"
+            >
+              <div class="accordion-header flex cursor-pointer justify-between">
+                <span
+                  class="text-lg font-normal leading-150 text-gray-900 xl:text-2xl"
+                  >leveraged methods of empowerment</span
+                >
+
+                <span class="accordion-icon rotate-180 transition-all">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.46839 17.0306C2.53806 17.1005 2.62082 17.1559 2.71194 17.1937C2.80305 17.2315 2.90074 17.251 2.99939 17.251C3.09804 17.251 3.19572 17.2315 3.28684 17.1937C3.37796 17.1559 3.46072 17.1005 3.53039 17.0306L11.9994 8.56014L20.4684 17.0306C20.5381 17.1004 20.6209 17.1557 20.712 17.1934C20.8031 17.2312 20.9008 17.2506 20.9994 17.2506C21.098 17.2506 21.1957 17.2312 21.2868 17.1934C21.3779 17.1557 21.4607 17.1004 21.5304 17.0306C21.6001 16.9609 21.6554 16.8781 21.6932 16.787C21.7309 16.6959 21.7503 16.5983 21.7503 16.4996C21.7503 16.401 21.7309 16.3034 21.6932 16.2123C21.6554 16.1212 21.6001 16.0384 21.5304 15.9686L12.5304 6.96864C12.4607 6.89879 12.378 6.84338 12.2868 6.80557C12.1957 6.76776 12.098 6.7483 11.9994 6.7483C11.9007 6.7483 11.8031 6.76776 11.7119 6.80557C11.6208 6.84338 11.5381 6.89879 11.4684 6.96864L2.46839 15.9686C2.39854 16.0383 2.34313 16.1211 2.30532 16.2122C2.26751 16.3033 2.24805 16.401 2.24805 16.4996C2.24805 16.5983 2.26751 16.696 2.30532 16.7871C2.34313 16.8782 2.39854 16.961 2.46839 17.0306Z"
+                      fill="#2A313C"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="accordion-body hidden">
+                <span class="text-sm leading-175 text-gray-600 xl:text-base"
+                  >Bankco can help you to enhance workflow consistency. If you
+                  have a large spread of stylistic preferences or if you want to
+                  increase your UI work speed, Venus is the best solution.</span
+                >
+              </div>
+            </div>
+            <!-- single accordion end  -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- accordion end  -->
+    <!-- Pricing start  -->
+    <section
+      class="relative flex w-full items-center justify-center bg-[#F8FAFE] py-[60px] pb-[100px] 2xl:py-[120px]"
+    >
+      <!-- bg start  -->
+      <img
+        src="./assets/images/pricing/ellipse.png"
+        alt=""
+        class="absolute left-0 top-6 scale-50 xl:scale-100"
+      />
+      <img
+        src="./assets/images/pricing/shape.png"
+        alt=""
+        class="absolute left-[7%] top-28 z-0 scale-50 xl:left-[4%] xl:scale-90 2xl:scale-100"
+      />
+      <!-- bg end  -->
+      <div class="z-10 w-full max-w-[1320px] px-[5%]">
+        <div class="relative flex w-full justify-center pb-20 text-center">
+          <div
+            class="absolute left-[40.5%] top-5 z-0 h-[10px] w-[120px] bg-alertsWarningBase xl:top-10 xl:h-[14px] xl:w-[190px]"
+          ></div>
+          <span
+            class="w-black z-10 text-center font-poppins text-3xl font-bold leading-big-loose xl:text-5xl"
+            >No hidden charge, Choose <br />
+            your plan.</span
+          >
+        </div>
+        <div
+          class="relative flex flex-col-reverse justify-center gap-[50px] xl:flex-row xl:gap-[102px]"
+        >
+          <!-- bg start-->
+          <img
+            src="./assets/images/pricing/shape2.svg"
+            alt=""
+            class="absolute -left-[7%] top-0 z-0"
+          />
+          <!-- bg end  -->
+          <div class="z-10 flex flex-col items-center pt-[50px]">
+            <div class="flex flex-col gap-[34px]">
+              <span
+                class="text-center font-poppins text-3xl font-bold leading-big-loose text-gray-900 sm:text-4xl xl:text-5xl"
+                >Save your <br />
+                Money now!</span
+              >
+              <span
+                class="text-lg font-medium leading-160 text-gray-600 xl:max-w-[478px] xl:text-xl"
+                >If you're a developer looking for an admin dashboard that is
+                developer-friendly, rich with features, and highly customizable
+                look no further than BankCo. We offer very simple pricing
+                depending on your needs.
+              </span>
+            </div>
+            <img
+              src="./assets/images/pricing/frame.svg"
+              alt=""
+              class="mt-[72px] max-w-[200px]"
+            />
+          </div>
+
+          <div
+            class="z-10 flex flex-col items-center justify-center gap-10 lg:flex-row"
+          >
+            <!-- card start  -->
+            <div
+              class="boder-[#E7E5EA1A] w-full rounded-[32px] border border-solid bg-basicSecondary px-5 text-center sm:w-7/12 lg:w-[350px] xl:px-10"
+              data-aos="flip-left"
+              data-aos-easing="ease-out-cubic"
+            >
+              <div class="flex flex-col pb-6 pt-7">
+                <span
+                  class="text-3xl font-bold tracking-40 text-white xl:text-5xl"
+                  >Regular</span
+                >
+                <span
+                  class="text-base font-medium leading-150 tracking-40 text-secondary-200 xl:text-lg"
+                  >License</span
+                >
+              </div>
+              <hr class="bg-[#E7E5EA] opacity-10" />
+              <div class="flex flex-col pb-6 pt-3">
+                <span
+                  class="text-center text-3xl font-bold leading-[116,667%] tracking-[-2px] text-white xl:text-5xl"
+                  >$12.00</span
+                ><span
+                  class="text-base font-medium leading-150 tracking-40 text-secondary-200 xl:text-lg"
+                  >License</span
+                >
+              </div>
+              <hr class="bg-[#E7E5EA] opacity-10" />
+              <div
+                class="flex flex-col gap-[16px] py-[32px] text-sm font-semibold leading-150 text-white xl:text-base"
+              >
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Quality checked by Envato. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Lifetime support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">For Personal Projects only. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Permitted for personal use only. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Skype support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Anydesk/Teamviewer support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Free installation. </span>
+                </div>
+              </div>
+              <div class="flex items-center justify-center">
+                <a
+                  href="#"
+                  class="group relative z-40 mb-10 w-[170px] overflow-hidden rounded-[28px] border border-solid border-secondary-100 border-opacity-50 p-4 text-center transition-all hover:border-primary"
+                >
+                  <div
+                    class="absolute bottom-0 right-0 z-0 h-0 w-0 bg-primary opacity-10 transition-all group-hover:h-full group-hover:w-full"
+                  ></div>
+                  <span
+                    class="z-40 text-center text-base font-semibold leading-160 tracking-[-0.36px] text-white"
+                    >Buy now</span
+                  >
+                </a>
+              </div>
+            </div>
+            <!-- card end  -->
+            <!-- card start  -->
+            <div
+              class="boder-[#E7E5EA1A] w-full rounded-[32px] border border-solid bg-white px-5 text-center sm:w-7/12 lg:w-[350px] xl:px-10"
+              data-aos="flip-right"
+              data-aos-easing="ease-out-cubic"
+            >
+              <div class="flex flex-col pb-6 pt-7">
+                <span
+                  class="text-3xl font-bold tracking-40 text-basicSecondary xl:text-5xl"
+                  >Regular</span
+                >
+                <span
+                  class="text-base font-medium leading-150 tracking-40 text-basicSecondary xl:text-lg"
+                  >License</span
+                >
+              </div>
+              <hr class="bg-secondary-300" />
+              <div class="flex flex-col pb-6 pt-3">
+                <span
+                  class="text-center text-3xl font-bold leading-[116,667%] tracking-[-2px] text-basicSecondary xl:text-5xl"
+                  >$12.00</span
+                ><span
+                  class="text-base font-medium leading-150 tracking-40 text-basicSecondary xl:text-lg"
+                  >License</span
+                >
+              </div>
+              <hr class="bg-secondary-300" />
+              <div
+                class="flex flex-col gap-[16px] py-[32px] text-sm font-semibold leading-150 text-secondary-400 xl:text-base"
+              >
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Quality checked by Envato. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Lifetime support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">For Personal Projects only. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/greenCheck.png"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Permitted for personal use only. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Skype support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Anydesk/Teamviewer support. </span>
+                </div>
+                <div class="flex gap-1">
+                  <img
+                    src="./assets/images/icon/remove-circle.svg"
+                    alt=""
+                    class=""
+                  />
+                  <span class="">Free installation. </span>
+                </div>
+              </div>
+              <div class="flex items-center justify-center">
+                <a
+                  href="#"
+                  class="group relative z-40 mb-10 inline-flex h-[60px] w-[170px] shrink-0 items-center justify-center gap-3 overflow-hidden rounded-[28px] border-solid border-primary border-opacity-60 px-9 py-2.5 transition-all hover:border-2"
+                >
+                  <div
+                    class="absolute bottom-0 right-0 z-0 h-full w-full bg-primary transition-all group-hover:h-0 group-hover:w-0"
+                  ></div>
+                  <span
+                    class="z-10 text-center text-lg leading-8 text-white group-hover:text-primary"
+                    >Buy now</span
+                  >
+                </a>
+              </div>
+            </div>
+            <!-- card end  -->
+          </div>
+          <!-- bg start-->
+          <img
+            src="./assets/images/pricing/shape3.png"
+            alt=""
+            class="absolute -bottom-[88px] -right-[7%] z-0 w-[220px] scale-75 xl:-right-[5%] xl:scale-100"
+          />
+          <!-- bg end  -->
+        </div>
+      </div>
+    </section>
+    <!-- Pricing end  -->
+    <!-- Footer start  -->
+    <section
+      class="relative flex w-full flex-col items-center justify-center bg-basicInterface px-[5%] xl:mt-0 2xl:px-0"
+    >
+      <img
+        src="./assets/images/footer/bg.png"
+        alt=""
+        class="absolute right-0 top-0 z-0"
+      />
+      <div
+        class="z-10 flex w-full max-w-[1320px] flex-col gap-5 py-[60px] xl:flex-row xl:justify-center 2xl:gap-[123px] 2xl:py-[120px]"
+      >
+        <!-- fast col  -->
+        <div class="w-full max-w-[270px]">
+          <a href="/index.html" class="flex items-center gap-[6.88px] pb-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="45"
+              viewBox="0 0 32 45"
+              fill="none"
+            >
+              <path
+                d="M0 10.861C0 4.86259 4.92485 0 11 0C17.0752 0 22 4.86259 22 10.861V13.7998C20.1579 13.0719 18.1471 12.6711 16.0417 12.6711C7.18205 12.6711 0 19.7624 0 28.51V10.861Z"
+                fill="#22C55E"
+              />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M16 44.5088C24.8366 44.5088 32 37.3453 32 28.5088C32 19.6722 24.8366 12.5088 16 12.5088C7.16344 12.5088 0 19.6722 0 28.5088C0 37.3453 7.16344 44.5088 16 44.5088ZM16 36.7374C20.5445 36.7374 24.2286 33.0533 24.2286 28.5088C24.2286 23.9643 20.5445 20.2802 16 20.2802C11.4555 20.2802 7.77143 23.9643 7.77143 28.5088C7.77143 33.0533 11.4555 36.7374 16 36.7374Z"
+                fill="white"
+              />
+            </svg>
+            <span
+              class="text-3xl font-extrabold leading-big-loose text-white xl:text-4xl"
+              >Bank<span class="text-primary">Co</span></span
+            >
+          </a>
+          <span class="text-base font-normal leading-180 text-white xl:text-lg">
+            We work with a passion of taking challenges and creating new ones in
+            advertising sector.
+          </span>
+          <div class="flex gap-[10px] pt-5">
+            <div
+              class="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all"
+            >
+              <div
+                class="absolute z-0 h-full w-full rounded-full bg-white opacity-10 transition-all group-hover:bg-primary group-hover:opacity-100"
+              ></div>
+              <div class="z-10">
+                <!-- facebook svg  -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="10"
+                  height="20"
+                  viewBox="0 0 10 20"
+                  fill="none"
+                >
+                  <g clip-path="url(#clip0_570_11628)">
+                    <path
+                      d="M2.55277 20V10.6154H0V7.23652H2.55277V4.3505C2.55277 2.08264 4.0607 0 7.53529 0C8.9421 0 9.98237 0.1311 9.98237 0.1311L9.9004 3.28642C9.9004 3.28642 8.83949 3.27638 7.68178 3.27638C6.42879 3.27638 6.22804 3.83768 6.22804 4.7693V7.23652H10L9.83588 10.6154H6.22804V20H2.55277Z"
+                      class="fill-[#747681] transition-all group-hover:fill-white"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_570_11628">
+                      <rect width="10" height="20" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+            <div
+              class="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all"
+            >
+              <div
+                class="absolute z-0 h-full w-full rounded-full bg-white opacity-10 transition-all group-hover:bg-primary group-hover:opacity-100"
+              ></div>
+              <div class="z-10">
+                <!--twitter svg  -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M19.7029 4.11366C19.0071 4.42199 18.2596 4.63033 17.4738 4.72449C18.2846 4.23932 18.8912 3.47572 19.1804 2.57616C18.4186 3.02865 17.5849 3.34716 16.7154 3.51783C16.1307 2.89355 15.3563 2.47977 14.5124 2.34072C13.6684 2.20168 12.8022 2.34515 12.0481 2.74887C11.2941 3.15259 10.6944 3.79396 10.3422 4.57341C9.99003 5.35287 9.90503 6.22679 10.1004 7.05949C8.55682 6.98199 7.04677 6.58079 5.66827 5.88192C4.28977 5.18304 3.07362 4.20213 2.09875 3.00283C1.76542 3.57783 1.57375 4.24449 1.57375 4.95449C1.57338 5.59366 1.73078 6.22303 2.03198 6.78677C2.33319 7.35051 2.76888 7.83119 3.30042 8.18616C2.68398 8.16655 2.08114 7.99998 1.54208 7.70033V7.75033C1.54202 8.64678 1.85211 9.51564 2.41974 10.2095C2.98736 10.9033 3.77756 11.3794 4.65625 11.557C4.0844 11.7118 3.48486 11.7346 2.90292 11.6237C3.15083 12.395 3.63375 13.0695 4.28406 13.5528C4.93437 14.036 5.71951 14.3038 6.52958 14.3187C5.15444 15.3982 3.45616 15.9837 1.70792 15.9812C1.39823 15.9812 1.08881 15.9632 0.78125 15.927C2.55581 17.068 4.62153 17.6735 6.73125 17.6712C13.8729 17.6712 17.7771 11.7562 17.7771 6.62616C17.7771 6.45949 17.7729 6.29116 17.7654 6.12449C18.5248 5.57531 19.1803 4.89524 19.7013 4.11616L19.7029 4.11366Z"
+                    class="fill-[#747681] transition-all group-hover:fill-white"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div
+              class="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all"
+            >
+              <div
+                class="absolute z-0 h-full w-full rounded-full bg-white opacity-10 transition-all group-hover:bg-primary group-hover:opacity-100"
+              ></div>
+              <div class="z-10">
+                <!-- instagram svg  -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M10.0006 7.39511C8.56699 7.39511 7.39706 8.56503 7.39706 9.99863C7.39706 11.4322 8.56699 12.6021 10.0006 12.6021C11.4342 12.6021 12.6041 11.4322 12.6041 9.99863C12.6041 8.56503 11.4342 7.39511 10.0006 7.39511ZM17.8092 9.99863C17.8092 8.9205 17.8189 7.85214 17.7584 6.77597C17.6978 5.52597 17.4127 4.4166 16.4986 3.50253C15.5826 2.58652 14.4752 2.30332 13.2252 2.24277C12.1471 2.18222 11.0787 2.19199 10.0025 2.19199C8.92441 2.19199 7.85605 2.18222 6.77988 2.24277C5.52988 2.30332 4.4205 2.58847 3.50644 3.50253C2.59042 4.41855 2.30722 5.52597 2.24667 6.77597C2.18613 7.8541 2.19589 8.92246 2.19589 9.99863C2.19589 11.0748 2.18613 12.1451 2.24667 13.2213C2.30722 14.4713 2.59238 15.5807 3.50644 16.4947C4.42246 17.4107 5.52988 17.6939 6.77988 17.7545C7.858 17.815 8.92636 17.8053 10.0025 17.8053C11.0807 17.8053 12.149 17.815 13.2252 17.7545C14.4752 17.6939 15.5846 17.4088 16.4986 16.4947C17.4146 15.5787 17.6978 14.4713 17.7584 13.2213C17.8209 12.1451 17.8092 11.0768 17.8092 9.99863ZM10.0006 14.0045C7.78378 14.0045 5.99472 12.2154 5.99472 9.99863C5.99472 7.78183 7.78378 5.99277 10.0006 5.99277C12.2174 5.99277 14.0064 7.78183 14.0064 9.99863C14.0064 12.2154 12.2174 14.0045 10.0006 14.0045ZM14.1705 6.76425C13.6529 6.76425 13.235 6.34628 13.235 5.82871C13.235 5.31113 13.6529 4.89316 14.1705 4.89316C14.6881 4.89316 15.106 5.31113 15.106 5.82871C15.1062 5.95161 15.0821 6.07333 15.0351 6.18691C14.9882 6.30048 14.9193 6.40368 14.8324 6.49058C14.7455 6.57749 14.6423 6.64639 14.5287 6.69335C14.4151 6.74031 14.2934 6.76441 14.1705 6.76425Z"
+                    class="fill-[#747681] transition-all group-hover:fill-white"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div
+              class="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all"
+            >
+              <div
+                class="absolute z-0 h-full w-full rounded-full bg-white opacity-10 transition-all group-hover:bg-primary group-hover:opacity-100"
+              ></div>
+              <div class="z-10">
+                <!-- youtube svg  -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M10.0048 15.8446H9.98817C9.93651 15.8446 4.76734 15.8346 3.46317 15.4805C3.11079 15.3855 2.78952 15.1997 2.53154 14.9416C2.27356 14.6834 2.08791 14.3621 1.99317 14.0096C1.75866 12.6866 1.64541 11.3449 1.65484 10.0013C1.64879 8.65548 1.7651 7.3119 2.00234 5.98714C2.09975 5.63411 2.28626 5.31205 2.54397 5.05186C2.80168 4.79167 3.12193 4.60209 3.47401 4.5013C4.74234 4.16797 9.76901 4.16797 9.98234 4.16797H9.99984C10.0523 4.16797 15.2348 4.17797 16.5257 4.53214C17.2415 4.7263 17.8007 5.28547 17.994 6.0013C18.2357 7.32964 18.3498 8.67714 18.3332 10.0271C18.339 11.3713 18.2224 12.7133 17.9848 14.0363C17.8889 14.3884 17.7025 14.7092 17.4442 14.9669C17.1859 15.2246 16.8646 15.4103 16.5123 15.5055C15.2457 15.8413 10.2182 15.8446 10.0048 15.8446ZM8.33817 7.50547L8.33401 12.5055L12.6773 10.0055L8.33817 7.50547Z"
+                    class="fill-[#747681] transition-all group-hover:fill-white"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6 xl:flex-row xl:gap-[74px]">
+          <!-- links  -->
+          <div class="mt-7 flex xl:mt-0 xl:justify-center">
+            <div
+              class="hidden h-[198px] w-[1px] bg-basicWhite opacity-20 xl:block"
+            ></div>
+
+            <div class="flex flex-col gap-4 pr-[71px] xl:gap-7 xl:pl-[22px]">
+              <span
+                class="text-xl font-semibold leading-150 text-white xl:text-2xl"
+                >Links</span
+              >
+              <div class="flex flex-col gap-[14px]">
+                <a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Home</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Service</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Blog</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Contact Us</a
+                >
+              </div>
+            </div>
+            <div
+              class="hidden h-[198px] w-[1px] bg-basicWhite opacity-20 xl:block"
+            ></div>
+          </div>
+          <!-- links end  -->
+          <!-- service start  -->
+          <div class="flex xl:justify-center">
+            <div class="flex flex-col gap-4 pr-12 xl:gap-7">
+              <span
+                class="text-xl font-semibold leading-150 text-white xl:text-2xl"
+                >Services</span
+              >
+              <div class="flex flex-col gap-[14px]">
+                <a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Contact & Faq</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Track Your Order</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Shipping</a
+                ><a
+                  href="#"
+                  class="text-base font-medium leading-180 text-basicInterface2 xl:text-lg"
+                  >Trade Program</a
+                >
+              </div>
+            </div>
+            <div
+              class="hidden h-[198px] w-[1px] bg-basicWhite opacity-20 xl:block"
+            ></div>
+          </div>
+          <!-- service end  -->
+        </div>
+        <!-- contact info start  -->
+        <div class="flex flex-col gap-4">
+          <span
+            class="pb-3 text-xl font-semibold leading-150 text-white xl:text-2xl"
+            >Official info:</span
+          >
+          <div class="flex items-start gap-2">
+            <img src="./assets/images/icon/location.svg" alt="" class="" />
+            <span class="text-base font-medium text-basicInterface2 xl:text-lg"
+              >30 Commercial Road <br />
+              Fratton, Australia</span
+            >
+          </div>
+          <div class="flex items-start gap-2">
+            <img src="./assets/images/icon/call.svg" alt="" class="" />
+            <span class="text-base font-medium text-basicInterface2 xl:text-lg"
+              >1-888-452-1505</span
+            >
+          </div>
+          <div class="flex">
+            <span
+              class="font-sans text-lg font-medium leading-160 text-white xl:text-xl"
+              >Subscribe Newsletter</span
+            >
+          </div>
+          <div>
+            <form class="box-border">
+              <input
+                class="mt-1 w-2/3 max-w-[223px] rounded-l-xl bg-white bg-opacity-20 p-[14px] text-lg font-normal leading-8 text-basicInterface3 xl:w-full xl:p-[10px] 2xl:p-[14px]"
+                placeholder="Email address"
+              />
+              <button
+                type="submit"
+                class="-ml-1 inline-flex max-w-[128px] shrink-0 cursor-pointer overflow-hidden rounded-r-xl bg-primary p-[14px] text-lg font-normal leading-8 text-white transition-all xl:p-[10px] 2xl:p-[14px]"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+          <!-- Subscribe end  -->
+        </div>
+        <!-- contact info end  -->
+        <!-- Subscribe start  -->
+      </div>
+
+      <hr class="w-full bg-[#7476813B] opacity-25" />
+
+      <span
+        class="p-[22px] text-center text-sm font-medium leading-160 text-white xl:text-xl"
+        >Copyright © 2023 – All Rights Reserved. Made by BankCo</span
+      >
+    </section>
+    <!-- Footer End  -->
+
+    <script src="./assets/js/swiper-bundle.min.js"></script>
+    <script src="./assets/js/aos.js"></script>
+
+    <script src="./assets/js/app.js"></script>
+    <script>
+      AOS.init();
+    </script>
+  </body>
+</html>

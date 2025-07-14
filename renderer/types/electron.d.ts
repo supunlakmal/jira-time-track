@@ -129,6 +129,107 @@ export interface IpcHandler {
     error?: string;
   }>;
 
+  // Billing integration methods
+  invoke(channel: "get-billing-data"): Promise<{
+    settings: {
+      globalHourlyRate?: number;
+      projectRates: Record<string, number>;
+      currency: string;
+      taxRate?: number;
+      companyName?: string;
+      companyAddress?: string;
+      invoicePrefix: string;
+    };
+    invoices: any[];
+  }>;
+  invoke(channel: "get-billing-settings"): Promise<{
+    globalHourlyRate?: number;
+    projectRates: Record<string, number>;
+    currency: string;
+    taxRate?: number;
+    companyName?: string;
+    companyAddress?: string;
+    invoicePrefix: string;
+  }>;
+  invoke(
+    channel: "save-billing-settings",
+    settings: {
+      globalHourlyRate?: number;
+      projectRates: Record<string, number>;
+      currency: string;
+      taxRate?: number;
+      companyName?: string;
+      companyAddress?: string;
+      invoicePrefix: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "calculate-ticket-cost",
+    ticketNumber: string
+  ): Promise<{
+    success: boolean;
+    cost?: {
+      ticketNumber: string;
+      ticketName: string;
+      projectName: string;
+      timeSpent: number;
+      timeSpentHours: number;
+      hourlyRate: number;
+      totalCost: number;
+      currency: string;
+    };
+    error?: string;
+  }>;
+  invoke(channel: "calculate-project-costs"): Promise<{
+    success: boolean;
+    costs?: Array<{
+      projectName: string;
+      totalTimeSpent: number;
+      totalCost: number;
+      ticketCount: number;
+      averageHourlyRate: number;
+      currency: string;
+    }>;
+    error?: string;
+  }>;
+  invoke(
+    channel: "add-invoice",
+    invoiceData: {
+      id: string;
+      invoiceNumber: string;
+      projectName?: string;
+      clientName?: string;
+      dateRange: { start: Date; end: Date };
+      items: any[];
+      subtotal: number;
+      taxAmount: number;
+      totalCost: number;
+      totalHours: number;
+      currency: string;
+      generatedAt: Date;
+    }
+  ): Promise<{
+    success: boolean;
+    invoice?: any;
+    error?: string;
+  }>;
+  invoke(channel: "get-invoices"): Promise<{
+    success: boolean;
+    invoices?: any[];
+    error?: string;
+  }>;
+  invoke(
+    channel: "delete-invoice",
+    invoiceId: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "get-sessions"): Promise<Record<string, any>>;
+
   // Jira integration methods
   invoke(channel: "jira-check-secure-storage"): Promise<{
     success: boolean;
@@ -250,6 +351,29 @@ export interface IpcHandler {
   on(
     channel: "theme-changed",
     listener: (theme: string) => void
+  ): () => void;
+  on(
+    channel: "billing-updated",
+    listener: (billingData: {
+      settings: {
+        globalHourlyRate?: number;
+        projectRates: Record<string, number>;
+        currency: string;
+        taxRate?: number;
+        companyName?: string;
+        companyAddress?: string;
+        invoicePrefix: string;
+      };
+      invoices: any[];
+    }) => void
+  ): () => void;
+  on(
+    channel: "sessions-updated",
+    listener: (sessions: Record<string, any>) => void
+  ): () => void;
+  on(
+    channel: "project-data-updated", 
+    listener: (data: any[]) => void
   ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 

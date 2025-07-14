@@ -520,108 +520,109 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      <Dashboard />
-      {/* <Head>
-        <title>Project Time Tracker</title>
-      </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <Header
-            toggleFloatingWindow={toggleFloatingWindow}
-            setShowManualTaskDialog={setShowManualTaskDialog}
-            setShowCsvImportDialog={setShowCsvImportDialog}
-            setShowExportDialog={setShowExportDialog}
-            setShowResetDialog={setShowResetDialog}
-            setShowJiraSettingsDialog={setShowJiraSettingsDialog}
-            setShowBillingDialog={setShowBillingDialog}
-          />
+      <Dashboard>
+        <Head>
+          <title>Project Time Tracker</title>
+        </Head>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <Header
+              toggleFloatingWindow={toggleFloatingWindow}
+              setShowManualTaskDialog={setShowManualTaskDialog}
+              setShowCsvImportDialog={setShowCsvImportDialog}
+              setShowExportDialog={setShowExportDialog}
+              setShowResetDialog={setShowResetDialog}
+              setShowJiraSettingsDialog={setShowJiraSettingsDialog}
+              setShowBillingDialog={setShowBillingDialog}
+            />
 
-          {loading ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <Overview
-                dashboardStats={dashboardStats}
-                projectSummaryData={projectSummaryData}
-                formatTime={formatTime}
-                billingData={billingData}
-                sessions={sessions}
-              />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <Overview
+                  dashboardStats={dashboardStats}
+                  projectSummaryData={projectSummaryData}
+                  formatTime={formatTime}
+                  billingData={billingData}
+                  sessions={sessions}
+                />
 
-              <ProjectsOverview
-                projectSummaryData={projectSummaryData}
-                selectedProject={selectedProject}
-                handleProjectSelect={handleProjectSelect}
-                handleChooseProjectPath={handleChooseProjectPath}
-                refreshBranch={refreshBranch}
-                formatTime={formatTime}
-                billingData={billingData}
-                sessions={sessions}
-              />
+                <ProjectsOverview
+                  projectSummaryData={projectSummaryData}
+                  selectedProject={selectedProject}
+                  handleProjectSelect={handleProjectSelect}
+                  handleChooseProjectPath={handleChooseProjectPath}
+                  refreshBranch={refreshBranch}
+                  formatTime={formatTime}
+                  billingData={billingData}
+                  sessions={sessions}
+                />
 
-              <TicketTableActions
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                selectedProject={selectedProject}
-                loading={loading}
-                refreshData={() => window.location.reload()}
-              />
+                <TicketTableActions
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedProject={selectedProject}
+                  loading={loading}
+                  refreshData={() => window.location.reload()}
+                />
 
-              <TicketTable
-                ticketsToDisplay={ticketsToDisplay}
-                sessions={sessions}
-                selectedProject={selectedProject}
-                searchTerm={searchTerm}
-                formatTime={formatTime}
-                getProjectName={getProjectName}
-                openEditDialog={openEditDialog}
-                handleDeleteManualTask={handleDeleteManualTask}
-                data={data}
-                billingData={billingData}
-              />
-            </>
+                <TicketTable
+                  ticketsToDisplay={ticketsToDisplay}
+                  sessions={sessions}
+                  selectedProject={selectedProject}
+                  searchTerm={searchTerm}
+                  formatTime={formatTime}
+                  getProjectName={getProjectName}
+                  openEditDialog={openEditDialog}
+                  handleDeleteManualTask={handleDeleteManualTask}
+                  data={data}
+                  billingData={billingData}
+                />
+              </>
+            )}
+          </div>
+
+          {showExportDialog && (
+            <ExportDialog
+              onClose={() => setShowExportDialog(false)}
+              projects={projectSummaryData.map((p) => p.name)}
+            />
+          )}
+
+          {showResetDialog && (
+            <ResetDialog onClose={() => setShowResetDialog(false)} />
+          )}
+
+          {showCsvImportDialog && (
+            <CsvImportDialog
+              onClose={() => setShowCsvImportDialog(false)}
+              onImport={handleCsvImport}
+            />
+          )}
+
+          {showManualTaskDialog && (
+            <ManualTaskDialog
+              onClose={closeManualTaskDialog}
+              onSave={editingTask ? handleEditManualTask : handleAddManualTask}
+              editingTask={editingTask}
+              existingTickets={data.map((ticket) => ticket.ticket_number)}
+            />
+          )}
+
+          {showBillingDialog && (
+            <BillingDialog onClose={() => setShowBillingDialog(false)} />
+          )}
+
+          {showJiraSettingsDialog && (
+            <JiraSettingsDialog
+              isOpen={showJiraSettingsDialog}
+              onClose={() => setShowJiraSettingsDialog(false)}
+              onImportIssues={handleJiraImport}
+            />
           )}
         </div>
-
-        {showExportDialog && (
-          <ExportDialog
-            onClose={() => setShowExportDialog(false)}
-            projects={projectSummaryData.map((p) => p.name)}
-          />
-        )}
-
-        {showResetDialog && (
-          <ResetDialog onClose={() => setShowResetDialog(false)} />
-        )}
-
-        {showCsvImportDialog && (
-          <CsvImportDialog
-            onClose={() => setShowCsvImportDialog(false)}
-            onImport={handleCsvImport}
-          />
-        )}
-
-        {showManualTaskDialog && (
-          <ManualTaskDialog
-            onClose={closeManualTaskDialog}
-            onSave={editingTask ? handleEditManualTask : handleAddManualTask}
-            editingTask={editingTask}
-            existingTickets={data.map((ticket) => ticket.ticket_number)}
-          />
-        )}
-
-        {showBillingDialog && (
-          <BillingDialog onClose={() => setShowBillingDialog(false)} />
-        )}
-
-        {showJiraSettingsDialog && (
-          <JiraSettingsDialog
-            isOpen={showJiraSettingsDialog}
-            onClose={() => setShowJiraSettingsDialog(false)}
-            onImportIssues={handleJiraImport}
-          />
-        )}
-      </div> */}
+      </Dashboard>
     </React.Fragment>
   );
 }

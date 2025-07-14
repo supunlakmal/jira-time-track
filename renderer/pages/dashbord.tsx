@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
+import HeaderNew from "../components/layout/HeaderNew";
 
 // --- Data for the Sidebar ---
 // To modify the sidebar, edit this data structure.
@@ -151,9 +152,9 @@ const NavSection = ({ title, items }) => (
 const Sidebar = ({ sections }) => {
   return (
     <aside
-      className="sidebar-wrapper 
+      className="
    
-    block h-full w-[308px] bg-white dark:bg-darkblack-600 sm:hidden xl:block"
+    block h-full w-[308px] bg-white dark:bg-darkblack-600 "
     >
       {/* Sidebar Header */}
       <div className="sidebar-header relative z-30 flex h-[108px] w-full items-center border-b border-r border-b-[#F7F7F7] border-r-[#F7F7F7] pl-[50px] dark:border-darkblack-400">
@@ -177,7 +178,7 @@ const Sidebar = ({ sections }) => {
       </div>
 
       {/* Sidebar Body */}
-      <div className="sidebar-body overflow-style-none relative z-30 h-screen w-full overflow-y-scroll pb-[200px] pl-[48px] pt-[14px]">
+      <div className="sidebar-body overflow-style-none relative z-30 h-screen w-full  pb-[200px] pl-[48px] pt-[14px]">
         <div className="nav-wrapper mb-[36px] pr-[50px]">
           {sections.map((section) => (
             <NavSection
@@ -187,25 +188,6 @@ const Sidebar = ({ sections }) => {
             />
           ))}
         </div>
-
-        {/* <UpgradeBanner /> */}
-
-        {/* Sidebar Footer */}
-        {/* <div className="copy-write-text">
-          <p className="text-sm text-[#969BA0]">© 2023 All Rights Reserved</p>
-          <p className="text-sm font-medium text-bgray-700">
-            Made with ❤️ by
-            <a
-              href="https://quomodotheme.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border-b font-semibold hover:text-blue-600"
-            >
-              {" "}
-              QuomodoTheme
-            </a>
-          </p>
-        </div> */}
       </div>
     </aside>
   );
@@ -213,19 +195,20 @@ const Sidebar = ({ sections }) => {
 
 // --- The Main Page Component ---
 // This is the exported page component that uses the reusable Sidebar.
-const Dashboard = () => {
+const Dashboard = ({ children }) => {
   return (
-    <div className="layout-wrapper active w-full">
-      <div className="relative flex w-full">
+    <div className="">
+      <div className=" flex ">
         <Sidebar sections={sidebarSections} />
-        {/* You can add the main content of your dashboard page here */}
-        <main className="w-full xl:ml-[308px]">
-          {/* Example Content */}
-          <div className="p-8">
-            <h1 className="text-2xl font-bold">Dashboard Content Area</h1>
-            <p>Your main page content goes here.</p>
-          </div>
-        </main>
+
+        <div className=" w-full dark:bg-darkblack-500">
+          <HeaderNew />
+
+          {/* You can add the main content of your dashboard page here */}
+          <main className="w-full dark:bg-darkblack-500">
+            <div className="p-8">{children}</div>
+          </main>
+        </div>
       </div>
     </div>
   );

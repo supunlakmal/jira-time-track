@@ -28,16 +28,42 @@ const zoomStore = new Store<Record<string, number>>({
 });
 
 // ==================== CENTRALIZED DATA MANAGER ====================
+interface BillingData {
+  settings: {
+    globalHourlyRate?: number;
+    projectRates: Record<string, number>;
+    currency: string;
+    taxRate?: number;
+    companyName?: string;
+    companyAddress?: string;
+    invoicePrefix: string;
+  };
+  invoices: any[];
+}
+
 interface AppData {
   sessions: { [ticketNumber: string]: any };
   projectData: any[];
   manualTasks: any[];
+  billing: BillingData;
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, projectData: [], manualTasks: [] },
+    defaults: { 
+      sessions: {}, 
+      projectData: [], 
+      manualTasks: [],
+      billing: {
+        settings: {
+          projectRates: {},
+          currency: "USD",
+          invoicePrefix: "INV"
+        },
+        invoices: []
+      }
+    },
   });
 
   private windows: Set<BrowserWindow> = new Set();
@@ -173,6 +199,106 @@ class DataManager {
     if (options.projectPaths) {
       projectPathsStore.clear();
     }
+  }
+
+  // Billing methods
+  getBillingData() {
+    return this.store.get("billing");
+  }
+
+  setBillingSettings(settings: any) {
+    const billing = this.getBillingData();
+    billing.settings = { ...billing.settings, ...settings };
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log("DataManager: Billing settings updated");
+  }
+
+  getBillingSettings() {
+    return this.getBillingData().settings;
+  }
+
+  addInvoice(invoice: any) {
+    const billing = this.getBillingData();
+    billing.invoices.push(invoice);
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log(`DataManager: Invoice ${invoice.invoiceNumber} added`);
+    return invoice;
+  }
+
+  getInvoices() {
+    return this.getBillingData().invoices;
+  }
+
+  deleteInvoice(invoiceId: string) {
+    const billing = this.getBillingData();
+    billing.invoices = billing.invoices.filter(inv => inv.id !== invoiceId);
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log(`DataManager: Invoice ${invoiceId} deleted`);
+  }
+
+  calculateTicketCost(ticketNumber: string) {
+    const sessions = this.getSessions();
+    const billing = this.getBillingSettings();
+    const sessionData = sessions[ticketNumber];
+
+    if (!sessionData) return null;
+
+    const projectData = this.getAllTasks();
+    const ticket = projectData.find(t => t.ticket_number === ticketNumber);
+    
+    if (!ticket) return null;
+
+    const projectName = ticket.project_name;
+    const hourlyRate = billing.projectRates[projectName] || billing.globalHourlyRate || 0;
+    const timeSpentMs = sessionData.totalElapsed || 0;
+    const timeSpentHours = timeSpentMs / (1000 * 60 * 60);
+    const totalCost = timeSpentHours * hourlyRate;
+
+    return {
+      ticketNumber,
+      ticketName: ticket.ticket_name,
+      projectName,
+      timeSpent: timeSpentMs,
+      timeSpentHours,
+      hourlyRate,
+      totalCost,
+      currency: billing.currency || "USD"
+    };
+  }
+
+  calculateProjectCosts() {
+    const sessions = this.getSessions();
+    const billing = this.getBillingSettings();
+    const projectData = this.getAllTasks();
+    const projectCosts = new Map();
+
+    Object.keys(sessions).forEach(ticketNumber => {
+      const cost = this.calculateTicketCost(ticketNumber);
+      if (cost && cost.projectName) {
+        const existing = projectCosts.get(cost.projectName) || {
+          projectName: cost.projectName,
+          totalTimeSpent: 0,
+          totalCost: 0,
+          ticketCount: 0,
+          currency: cost.currency
+        };
+
+        existing.totalTimeSpent += cost.timeSpent;
+        existing.totalCost += cost.totalCost;
+        existing.ticketCount += 1;
+        projectCosts.set(cost.projectName, existing);
+      }
+    });
+
+    return Array.from(projectCosts.values()).map(project => ({
+      ...project,
+      averageHourlyRate: project.totalTimeSpent > 0 
+        ? project.totalCost / (project.totalTimeSpent / (1000 * 60 * 60))
+        : 0
+    }));
   }
 }
 
@@ -738,6 +864,75 @@ ipcMain.handle("delete-manual-task", (_, taskId) => {
     return { success: true };
   } catch (error) {
     console.error("Error deleting manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// ==================== BILLING IPC HANDLERS ====================
+ipcMain.handle("get-billing-data", () => {
+  return dataManager.getBillingData();
+});
+
+ipcMain.handle("get-billing-settings", () => {
+  return dataManager.getBillingSettings();
+});
+
+ipcMain.handle("save-billing-settings", (_, settings) => {
+  try {
+    dataManager.setBillingSettings(settings);
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving billing settings:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("calculate-ticket-cost", (_, ticketNumber) => {
+  try {
+    const cost = dataManager.calculateTicketCost(ticketNumber);
+    return { success: true, cost };
+  } catch (error) {
+    console.error("Error calculating ticket cost:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("calculate-project-costs", () => {
+  try {
+    const costs = dataManager.calculateProjectCosts();
+    return { success: true, costs };
+  } catch (error) {
+    console.error("Error calculating project costs:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("add-invoice", (_, invoiceData) => {
+  try {
+    const invoice = dataManager.addInvoice(invoiceData);
+    return { success: true, invoice };
+  } catch (error) {
+    console.error("Error adding invoice:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-invoices", () => {
+  try {
+    const invoices = dataManager.getInvoices();
+    return { success: true, invoices };
+  } catch (error) {
+    console.error("Error getting invoices:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-invoice", (_, invoiceId) => {
+  try {
+    dataManager.deleteInvoice(invoiceId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
     return { success: false, error: error.message };
   }
 });

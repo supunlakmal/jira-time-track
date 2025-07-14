@@ -1,6 +1,7 @@
 // renderer/pages/home.tsx
 import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
+import { BillingDialog } from "../components/dialogs/BillingDialog";
 import CsvImportDialog from "../components/dialogs/CsvImportDialog";
 import { ExportDialog } from "../components/dialogs/ExportDialog";
 import Header from "../components/layout/Header";
@@ -18,7 +19,7 @@ import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
 
 export default function HomePage() {
-  const { projectData: data, sessions, loading } = useSharedData();
+  const { projectData: data, sessions, billingData, loading } = useSharedData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
@@ -30,6 +31,7 @@ export default function HomePage() {
   const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showJiraSettingsDialog, setShowJiraSettingsDialog] = useState(false);
+  const [showBillingDialog, setShowBillingDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Signal app ready when all data is loaded
@@ -529,6 +531,7 @@ export default function HomePage() {
             setShowExportDialog={setShowExportDialog}
             setShowResetDialog={setShowResetDialog}
             setShowJiraSettingsDialog={setShowJiraSettingsDialog}
+            setShowBillingDialog={setShowBillingDialog}
           />
 
           {loading ? (
@@ -540,6 +543,8 @@ export default function HomePage() {
                 dashboardStats={dashboardStats}
                 projectSummaryData={projectSummaryData}
                 formatTime={formatTime}
+                billingData={billingData}
+                sessions={sessions}
               />
 
               <ProjectsOverview
@@ -549,6 +554,8 @@ export default function HomePage() {
                 handleChooseProjectPath={handleChooseProjectPath}
                 refreshBranch={refreshBranch}
                 formatTime={formatTime}
+                billingData={billingData}
+                sessions={sessions}
               />
 
               <TicketTableActions
@@ -569,6 +576,7 @@ export default function HomePage() {
                 openEditDialog={openEditDialog}
                 handleDeleteManualTask={handleDeleteManualTask}
                 data={data}
+                billingData={billingData}
               />
             </>
           )}
@@ -602,6 +610,13 @@ export default function HomePage() {
             onSave={editingTask ? handleEditManualTask : handleAddManualTask}
             editingTask={editingTask}
             existingTickets={data.map((ticket) => ticket.ticket_number)}
+          />
+        )}
+
+        {/* Billing Dialog */}
+        {showBillingDialog && (
+          <BillingDialog
+            onClose={() => setShowBillingDialog(false)}
           />
         )}
 

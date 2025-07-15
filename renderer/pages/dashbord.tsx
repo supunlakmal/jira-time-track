@@ -2,90 +2,57 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import HeaderNew from "../components/layout/HeaderNew";
+import { Timer, AddTask, Receipt, Settings, Upload, Download, RestartAlt } from '@mui/icons-material';
 
 // --- Data for the Sidebar ---
 // To modify the sidebar, edit this data structure.
 // Icons are included as JSX elements for reusability.
 
-// A simple icon component for repeated icons
-const UserIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <ellipse
-      cx="11.7778"
-      cy="17.5555"
-      rx="7.77778"
-      ry="4.44444"
-      fill="#1A202C"
-      className="path-1"
-    />
-    <circle
-      cx="11.7778"
-      cy="6.44444"
-      r="4.44444"
-      fill="#22C55E"
-      className="path-2"
-    />
-  </svg>
-);
 
 // --- MODIFIED DATA FOR THE SIDEBAR ---
-// This data structure now contains only 6 links as requested.
+// This data structure now contains sidebar items with MUI icons
 const sidebarSections = [
   {
     title: "Menu",
     items: [
       {
-        label: "A-1",
+        label: "Toggle Floating Timer",
         href: "/a-1",
-        icon: <UserIcon />,
+        icon: <Timer className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
-        label: "A-2",
+        label: "Add Manual Task",
         href: "/a-2",
-        icon: <UserIcon />,
+        icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
-        label: "A-3",
+        label: "Billing",
         href: "/a-3",
-        icon: <UserIcon />,
+        icon: <Receipt className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
-        label: "A-4",
+        label: "Jira Setting",
         href: "/a-4",
-        icon: <UserIcon />,
+        icon: <Settings className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
-        label: "A-5",
+        label: "Import CSV",
         href: "/a-5",
-        icon: <UserIcon />,
+        icon: <Upload className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
-        label: "A-6",
+        label: "Export Data",
         href: "/a-6",
-        icon: <UserIcon />,
+        icon: <Download className="text-bgray-600 dark:text-bgray-300" />,
+      },
+      {
+        label: "Reset Data",
+        href: "/a-7",
+        icon: <RestartAlt className="text-bgray-600 dark:text-bgray-300" />,
       },
     ],
   },
 ];
-
-// --- Reusable Components ---
-
-// Component for a single Sub-menu Item
-const SubMenuItem = ({ href, label }) => (
-  <li>
-    <Link href={href}>
-      <span className="text-md inline-block py-1.5 font-medium text-bgray-600 transition-all hover:text-bgray-800 dark:text-bgray-50 hover:dark:text-success-300">
-        {label}
-      </span>
-    </Link>
-  </li>
-);
 
 // Component for a single Navigation Item
 const NavItem = ({ href, icon, label, subMenu, extras }) => (
@@ -98,38 +65,9 @@ const NavItem = ({ href, icon, label, subMenu, extras }) => (
             {label}
           </span>
         </div>
-        {/* Render right arrow if there's a submenu */}
-        {subMenu && (
-          <span>
-            <svg
-              width="6"
-              height="12"
-              viewBox="0 0 6 12"
-              fill="none"
-              className="fill-current"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                fill="currentColor"
-                d="M0.531506 0.414376C0.20806 0.673133 0.155619 1.1451 0.414376 1.46855L4.03956 6.00003L0.414376 10.5315C0.155618 10.855 0.208059 11.3269 0.531506 11.5857C0.854952 11.8444 1.32692 11.792 1.58568 11.4685L5.58568 6.46855C5.80481 6.19464 5.80481 5.80542 5.58568 5.53151L1.58568 0.531506C1.32692 0.20806 0.854953 0.155619 0.531506 0.414376Z"
-              />
-            </svg>
-          </span>
-        )}
-        {/* Render extra elements like avatar and notifications */}
         {extras && <>{extras}</>}
       </div>
     </Link>
-    {/* Render sub-menu if it exists */}
-    {subMenu && (
-      <ul className="sub-menu ml-2.5 mt-[22px] border-l border-success-100 pl-5">
-        {subMenu.map((item) => (
-          <SubMenuItem key={item.label} href={item.href} label={item.label} />
-        ))}
-      </ul>
-    )}
   </li>
 );
 

@@ -6,12 +6,17 @@ import {
   DarkMode,
   KeyboardArrowDown,
   LightMode,
+  PictureInPicture,
   Search,
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { useRef } from "react";
 
-const HeaderNew = () => {
+interface HeaderNewProps {
+  toggleFloatingWindow?: () => void;
+}
+
+const HeaderNew: React.FC<HeaderNewProps> = ({ toggleFloatingWindow }) => {
   // Ref to the main wrapper for handling "click outside"
   const quickAccessRef = useRef(null);
 
@@ -60,11 +65,24 @@ const HeaderNew = () => {
         <div className="quick-access-wrapper relative" ref={quickAccessRef}>
           <div className="flex items-center space-x-[43px]">
             <div className="hidden items-center space-x-5 xl:flex">
+              {/* Floating Timer Toggle */}
+              {toggleFloatingWindow && (
+                <button
+                  onClick={toggleFloatingWindow}
+                  type="button"
+                  className="relative flex h-[52px] w-[52px] items-center justify-center rounded-[12px] border border-success-300 dark:border-darkblack-400 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Toggle Floating Timer"
+                >
+                  <PictureInPicture className="text-bgray-900 dark:text-bgray-50" />
+                </button>
+              )}
+              
               {/* Theme Toggle */}
               <button
                 onClick={handleThemeToggle}
                 type="button"
-                className="relative flex h-[52px] w-[52px] items-center justify-center rounded-[12px] border border-success-300 dark:border-darkblack-400"
+                className="relative flex h-[52px] w-[52px] items-center justify-center rounded-[12px] border border-success-300 dark:border-darkblack-400 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                title="Toggle Theme"
               >
                 <span className="block dark:hidden">
                   <DarkMode className="text-bgray-900" />

@@ -521,7 +521,7 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      <Dashboard>
+      <Dashboard toggleFloatingWindow={toggleFloatingWindow}>
         <Head>
           <title>Project Time Tracker</title>
         </Head>

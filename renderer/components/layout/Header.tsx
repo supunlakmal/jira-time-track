@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
           {/* Primary Actions */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Button
+            {/* <Button
               onClick={toggleFloatingWindow}
               variant="primary"
               size="sm"
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Add Manual Task
-            </Button>
+            </Button> */}
           </div>
 
           {/* Data Actions */}

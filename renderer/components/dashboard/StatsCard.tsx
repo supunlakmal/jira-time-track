@@ -15,6 +15,35 @@ interface StatsCardProps {
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
+  const formatValue = (value: string | number, category?: string): string => {
+    if (typeof value === 'string') return value;
+    
+    switch (category) {
+      case "currency":
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(value);
+      case "time":
+        return formatTime(value);
+      case "percentage":
+        return `${value.toFixed(1)}%`;
+      case "number":
+      default:
+        return value.toLocaleString();
+    }
+  };
+
+  const formatTime = (ms: number): string => {
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
   const getIcon = (iconType: string) => {
     const iconProps = {
       className: "text-bgray-900 dark:text-white",
@@ -30,6 +59,30 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
         return <Work {...iconProps} />;
       case "monthly":
         return <TrendingUp {...iconProps} />;
+      case "tickets":
+        return (
+          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        );
+      case "points":
+        return (
+          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        );
+      case "time":
+        return (
+          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case "projects":
+        return (
+          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
       default:
         return <TrendingUp {...iconProps} />;
     }
@@ -81,7 +134,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
       <div className="flex items-end justify-between">
         <div className="flex-1">
           <p className="text-3xl font-bold leading-[48px] text-bgray-900 dark:text-white">
-            {data.value}
+            {formatValue(data.value, data.category)}
           </p>
           <div className="flex items-center space-x-1">
             <span>{getTrendIcon()}</span>

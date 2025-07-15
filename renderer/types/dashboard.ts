@@ -50,11 +50,14 @@ export interface TaskTimer {
 export interface StatsCardData {
   id: string;
   title: string;
-  value: string;
+  value: string | number;
   change: string;
   changeType: "positive" | "negative";
   icon: string;
   chartId: string;
+  category?: "currency" | "time" | "number" | "percentage";
+  rawValue?: number; // For calculations when value is formatted
+  unit?: string; // For additional context (e.g., "tickets", "points", "hours")
 }
 
 export interface EfficiencyData {

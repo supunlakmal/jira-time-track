@@ -2,23 +2,17 @@
 import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
 
-import CsvImportDialog from "../components/dialogs/CsvImportDialog";
-import { ExportDialog } from "../components/dialogs/ExportDialog";
-import Header from "../components/layout/Header";
-import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { ManualTaskDialog } from "../components/dialogs/ManualTaskDialog";
 import Overview from "../components/dashboard/Overview";
 import ProjectsOverview from "../components/dashboard/ProjectsOverview";
-import { ResetDialog } from "../components/dialogs/ResetDialog";
+import Header from "../components/layout/Header";
 import TicketTable from "../components/tickets/TicketTable";
 import TicketTableActions from "../components/tickets/TicketTableActions";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { useSharedData } from "../hooks/useSharedData";
+import type { JiraIssue } from "../modules/jira";
 import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
-import { JiraSettingsDialog } from "../modules/jira";
-import type { JiraIssue } from "../modules/jira";
 import Dashboard from "./dashboard";
-import StatsCard from "../components/dashboard/StatsCard";
 
 export default function HomePage() {
   const { projectData: data, sessions, billingData, loading } = useSharedData();
@@ -586,41 +580,6 @@ export default function HomePage() {
               </>
             )}
           </div>
-
-          {showExportDialog && (
-            <ExportDialog
-              onClose={() => setShowExportDialog(false)}
-              projects={projectSummaryData.map((p) => p.name)}
-            />
-          )}
-
-          {showResetDialog && (
-            <ResetDialog onClose={() => setShowResetDialog(false)} />
-          )}
-
-          {showCsvImportDialog && (
-            <CsvImportDialog
-              onClose={() => setShowCsvImportDialog(false)}
-              onImport={handleCsvImport}
-            />
-          )}
-
-          {showManualTaskDialog && (
-            <ManualTaskDialog
-              onClose={closeManualTaskDialog}
-              onSave={editingTask ? handleEditManualTask : handleAddManualTask}
-              editingTask={editingTask}
-              existingTickets={data.map((ticket) => ticket.ticket_number)}
-            />
-          )}
-
-          {showJiraSettingsDialog && (
-            <JiraSettingsDialog
-              isOpen={showJiraSettingsDialog}
-              onClose={() => setShowJiraSettingsDialog(false)}
-              onImportIssues={handleJiraImport}
-            />
-          )}
         </div>
       </Dashboard>
     </React.Fragment>

@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Toggle Floating Timer
-            </Button>
+            </Button>*/}
             <Button
               onClick={() => setShowManualTaskDialog(true)}
               variant="primary"
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Add Manual Task
-            </Button> */}
+            </Button>
           </div>
 
           {/* Data Actions */}

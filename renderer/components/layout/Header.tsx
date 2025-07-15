@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({
             >
               Toggle Floating Timer
             </Button>*/}
-            <Button
+            {/* <Button
               onClick={() => setShowManualTaskDialog(true)}
               variant="primary"
               size="sm"
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Add Manual Task
-            </Button>
+            </Button> */}
           </div>
 
           {/* Data Actions */}
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({
               </svg>
               Billing
             </Button>
-            <Button
+            {/* <Button
               onClick={() => setShowJiraSettingsDialog(true)}
               variant="primary"
               size="sm"
@@ -114,8 +114,8 @@ const Header: React.FC<HeaderProps> = ({
                 />
               </svg>
               Jira Settings
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               onClick={() => setShowCsvImportDialog(true)}
               variant="primary"
               size="sm"
@@ -123,8 +123,8 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Import CSV
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               onClick={() => setShowExportDialog(true)}
               variant="primary"
               size="sm"
@@ -132,8 +132,8 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Export Data
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               onClick={() => setShowResetDialog(true)}
               variant="primary"
               size="sm"
@@ -141,12 +141,12 @@ const Header: React.FC<HeaderProps> = ({
               className="w-full sm:w-auto"
             >
               Reset Data
-            </Button>
+            </Button> */}
           </div>
 
           {/* Settings Controls */}
           <div className="flex items-center justify-center sm:justify-start gap-3">
-            <ThemeToggle size="md" />
+            {/* <ThemeToggle size="md" /> */}
 
             {/* Zoom Controls */}
             <div className="flex items-center gap-2 border border-gray-300 rounded-lg p-1 bg-white dark:bg-gray-800 dark:border-gray-600">

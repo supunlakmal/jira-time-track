@@ -1,7 +1,7 @@
 // renderer/pages/home.tsx
 import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
-import { BillingDialog } from "../components/dialogs/BillingDialog";
+
 import CsvImportDialog from "../components/dialogs/CsvImportDialog";
 import { ExportDialog } from "../components/dialogs/ExportDialog";
 import Header from "../components/layout/Header";
@@ -612,10 +612,6 @@ export default function HomePage() {
               editingTask={editingTask}
               existingTickets={data.map((ticket) => ticket.ticket_number)}
             />
-          )}
-
-          {showBillingDialog && (
-            <BillingDialog onClose={() => setShowBillingDialog(false)} />
           )}
 
           {showJiraSettingsDialog && (

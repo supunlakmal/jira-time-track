@@ -1,6 +1,7 @@
 // renderer/components/dashboard/Overview.tsx
 import React from "react";
 import { DashboardStats, ProjectSummary } from "../../types/dashboard";
+import StatsCard from "./StatsCard";
 
 interface OverviewProps {
   dashboardStats: DashboardStats;
@@ -17,22 +18,23 @@ const Overview: React.FC<OverviewProps> = ({
   billingData,
   sessions,
 }) => {
-  
   const calculateBillingStats = () => {
     if (!billingData?.settings || !sessions) return null;
-    
+
     let totalRevenue = 0;
     let totalBillableTime = 0;
     let billedTickets = 0;
-    
-    Object.keys(sessions).forEach(ticketNumber => {
+
+    Object.keys(sessions).forEach((ticketNumber) => {
       const session = sessions[ticketNumber];
       if (!session?.totalElapsed) return;
-      
+
       // Find project for this ticket
       const projectName = getProjectFromTicket(ticketNumber);
-      const hourlyRate = billingData.settings.projectRates?.[projectName] || billingData.settings.globalHourlyRate;
-      
+      const hourlyRate =
+        billingData.settings.projectRates?.[projectName] ||
+        billingData.settings.globalHourlyRate;
+
       if (hourlyRate) {
         const timeSpentHours = session.totalElapsed / (1000 * 60 * 60);
         totalRevenue += timeSpentHours * hourlyRate;
@@ -40,89 +42,185 @@ const Overview: React.FC<OverviewProps> = ({
         billedTickets++;
       }
     });
-    
-    const averageRate = totalBillableTime > 0 ? totalRevenue / (totalBillableTime / (1000 * 60 * 60)) : 0;
-    
+
+    const averageRate =
+      totalBillableTime > 0
+        ? totalRevenue / (totalBillableTime / (1000 * 60 * 60))
+        : 0;
+
     return {
       totalRevenue,
       totalBillableTime,
       billedTickets,
       averageRate,
-      currency: billingData.settings.currency || 'USD'
+      currency: billingData.settings.currency || "USD",
     };
   };
-  
+
   const getProjectFromTicket = (ticketNumber: string) => {
-    return ticketNumber.split('-')[0] || 'Unknown';
+    return ticketNumber.split("-")[0] || "Unknown";
   };
-  
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+
+  const formatCurrency = (amount: number, currency: string = "USD") => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
     }).format(amount);
   };
-  
+
   const billingStats = calculateBillingStats();
   return (
-    <div className="mb-8">
-      {/* START OVERVIEW */}
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Overview
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Total Tickets */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Total Tickets
-              </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {dashboardStats.totalTickets}
-              </p>
+    <>
+      <div className="mb-8">
+        {/* START OVERVIEW */}
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Overview
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Tickets */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Total Tickets
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {dashboardStats.totalTickets}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                <svg
+                  className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+              </div>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-              <svg
-                className="w-6 h-6 text-blue-600 dark:text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
+            <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-green-600 font-medium">
+                {dashboardStats.completedTickets} completed
+              </span>
+              <span className="mx-2">•</span>
+              <span className="text-blue-600 font-medium">
+                {dashboardStats.inProgressTickets} in progress
+              </span>
             </div>
           </div>
-          <div className="mt-2 flex items-center text-sm text-gray-600 dark:text-gray-300">
-            <span className="text-green-600 font-medium">
-              {dashboardStats.completedTickets} completed
-            </span>
-            <span className="mx-2">•</span>
-            <span className="text-blue-600 font-medium">
-              {dashboardStats.inProgressTickets} in progress
-            </span>
+
+          {/* Story Points */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Story Points
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {dashboardStats.totalStoryPoints.toFixed(1)}
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+                <svg
+                  className="w-6 h-6 text-green-600 dark:text-green-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Avg: {dashboardStats.averageStoryPoints.toFixed(1)} pts/ticket
+            </div>
+          </div>
+
+          {/* Time Tracked */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Time Tracked
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {formatTime(dashboardStats.totalTimeTracked)}
+                </p>
+              </div>
+              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+                <svg
+                  className="w-6 h-6 text-purple-600 dark:text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Avg:{" "}
+              {formatTime(dashboardStats.productivity.averageTimePerTicket)}
+              /ticket
+            </div>
+          </div>
+
+          {/* Projects */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Active Projects
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {dashboardStats.totalProjects}
+                </p>
+              </div>
+              <div className="p-3 bg-orange-100 dark:bg-orange-900 rounded-full">
+                <svg
+                  className="w-6 h-6 text-orange-600 dark:text-orange-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              {projectSummaryData.filter((p) => p.location).length} with local
+              paths
+            </div>
           </div>
         </div>
 
-        {/* Story Points */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Story Points
-              </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {dashboardStats.totalStoryPoints.toFixed(1)}
-              </p>
-            </div>
-            <div className="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+        {/* Billing Overview */}
+        {billingStats && (
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-lg shadow-sm border border-green-200 dark:border-green-600/30 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
               <svg
-                className="w-6 h-6 text-green-600 dark:text-green-400"
+                className="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -131,164 +229,149 @@ const Overview: React.FC<OverviewProps> = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
+              Billing Overview
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {formatCurrency(
+                    billingStats.totalRevenue,
+                    billingStats.currency
+                  )}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Total Revenue
+                </p>
+              </div>
+              <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {formatTime(billingStats.totalBillableTime)}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Billable Time
+                </p>
+              </div>
+              <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {formatCurrency(
+                    billingStats.averageRate,
+                    billingStats.currency
+                  )}
+                  /h
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Avg Rate
+                </p>
+              </div>
+              <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {billingStats.billedTickets}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Billed Tickets
+                </p>
+              </div>
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            Avg: {dashboardStats.averageStoryPoints.toFixed(1)} pts/ticket
-          </div>
-        </div>
+        )}
 
-        {/* Time Tracked */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Time Tracked
-              </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {formatTime(dashboardStats.totalTimeTracked)}
-              </p>
-            </div>
-            <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
-              <svg
-                className="w-6 h-6 text-purple-600 dark:text-purple-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-          </div>
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            Avg: {formatTime(dashboardStats.productivity.averageTimePerTicket)}
-            /ticket
-          </div>
-        </div>
+        {/* END OVERVIEW */}
 
-        {/* Projects */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                Active Projects
-              </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {dashboardStats.totalProjects}
-              </p>
-            </div>
-            <div className="p-3 bg-orange-100 dark:bg-orange-900 rounded-full">
-              <svg
-                className="w-6 h-6 text-orange-600 dark:text-orange-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-            </div>
-          </div>
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            {projectSummaryData.filter((p) => p.location).length} with local
-            paths
-          </div>
-        </div>
-      </div>
-      
-      {/* Billing Overview */}
-      {billingStats && (
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-lg shadow-sm border border-green-200 dark:border-green-600/30 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <svg
-              className="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            Billing Overview
+        {/* New OVERVIEW */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatsCard
+            data={{
+              change: "+ 3.5%",
+              changeType: "positive",
+              chartId: "totalEarnBar",
+              icon: "earnings",
+              id: "1",
+              title: "Total earnings",
+              value: "$7,245.00",
+            }}
+          />{" "}
+          <StatsCard
+            data={{
+              change: "+ 3.5%",
+              changeType: "positive",
+              chartId: "totalEarnBar",
+              icon: "earnings",
+              id: "1",
+              title: "Total earnings",
+              value: "$7,245.00",
+            }}
+          />{" "}
+          <StatsCard
+            data={{
+              change: "+ 3.5%",
+              changeType: "positive",
+              chartId: "totalEarnBar",
+              icon: "earnings",
+              id: "1",
+              title: "Total earnings",
+              value: "$7,245.00",
+            }}
+          />{" "}
+          <StatsCard
+            data={{
+              change: "+ 3.5%",
+              changeType: "positive",
+              chartId: "totalEarnBar",
+              icon: "earnings",
+              id: "1",
+              title: "Total earnings",
+              value: "$7,245.00",
+            }}
+          />
+        </section>
+
+        {/* END New OVERVIEW */}
+
+        {/* Productivity Metrics */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Productivity Metrics (30 days)
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {formatCurrency(billingStats.totalRevenue, billingStats.currency)}
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-2xl font-bold text-blue-600">
+                {dashboardStats.productivity.ticketsPerDay.toFixed(1)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Total Revenue</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Tickets/Day
+              </p>
             </div>
-            <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatTime(billingStats.totalBillableTime)}
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-2xl font-bold text-blue-600">
+                {dashboardStats.productivity.pointsPerDay.toFixed(1)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Billable Time</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Points/Day
+              </p>
             </div>
-            <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {formatCurrency(billingStats.averageRate, billingStats.currency)}/h
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-2xl font-bold text-blue-600">
+                {formatTime(dashboardStats.productivity.averageTimePerTicket)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Avg Rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Time/Ticket
+              </p>
             </div>
-            <div className="text-center p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg">
-              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                {billingStats.billedTickets}
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-2xl font-bold text-blue-600">
+                {formatTime(dashboardStats.productivity.averageTimePerPoint)}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Billed Tickets</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Time/Point
+              </p>
             </div>
           </div>
         </div>
-      )}
-      {/* END OVERVIEW */}
-      {/* Productivity Metrics */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Productivity Metrics (30 days)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">
-              {dashboardStats.productivity.ticketsPerDay.toFixed(1)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Tickets/Day</p>
-          </div>
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">
-              {dashboardStats.productivity.pointsPerDay.toFixed(1)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Points/Day</p>
-          </div>
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">
-              {formatTime(dashboardStats.productivity.averageTimePerTicket)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Time/Ticket</p>
-          </div>
-          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">
-              {formatTime(dashboardStats.productivity.averageTimePerPoint)}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Time/Point</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      </div>{" "}
+    </>
   );
 };
 

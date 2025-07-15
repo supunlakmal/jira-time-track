@@ -2,12 +2,20 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import HeaderNew from "../components/layout/HeaderNew";
-import { Timer, AddTask, Receipt, Settings, Upload, Download, RestartAlt } from '@mui/icons-material';
+import {
+  Timer,
+  AddTask,
+  Receipt,
+  Settings,
+  Upload,
+  Download,
+  RestartAlt,
+} from "@mui/icons-material";
+import StatsCard from "../components/dashboard/StatsCard";
 
 // --- Data for the Sidebar ---
 // To modify the sidebar, edit this data structure.
 // Icons are included as JSX elements for reusability.
-
 
 // --- MODIFIED DATA FOR THE SIDEBAR ---
 // This data structure now contains sidebar items with MUI icons

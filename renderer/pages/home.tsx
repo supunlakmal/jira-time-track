@@ -18,6 +18,7 @@ import { DashboardStats, ProjectSummary } from "../types/dashboard";
 import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
 import Dashboard from "./dashbord";
+import StatsCard from "../components/dashboard/StatsCard";
 
 export default function HomePage() {
   const { projectData: data, sessions, billingData, loading } = useSharedData();
@@ -524,8 +525,11 @@ export default function HomePage() {
         <Head>
           <title>Project Time Tracker</title>
         </Head>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+        <div className="">
+          <div
+            className="
+          "
+          >
             <Header
               toggleFloatingWindow={toggleFloatingWindow}
               setShowManualTaskDialog={setShowManualTaskDialog}

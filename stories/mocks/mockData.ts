@@ -157,3 +157,158 @@ export const mockTimers = [
     sessions: [],
   },
 ];
+
+// Dashboard Component Mock Data
+import { 
+  StatsCardData, 
+  EfficiencyData, 
+  LocationData, 
+  CustomerData, 
+  FilterOption,
+  DashboardFilters,
+  PaginationState 
+} from '../../renderer/types/dashboard';
+
+export const mockStatsCards: StatsCardData[] = [
+  {
+    id: '1',
+    title: 'Total earnings',
+    value: '$7,245.00',
+    change: '+ 3.5%',
+    changeType: 'positive',
+    icon: 'earnings',
+    chartId: 'totalEarnBar'
+  },
+  {
+    id: '2',
+    title: 'Total Spending',
+    value: '$5,892.00',
+    change: '- 1.2%',
+    changeType: 'negative',
+    icon: 'spending',
+    chartId: 'totalSpendingBar'
+  },
+  {
+    id: '3',
+    title: 'Total Goals',
+    value: '$12,450.00',
+    change: '+ 8.7%',
+    changeType: 'positive',
+    icon: 'goals',
+    chartId: 'totalGoalBar'
+  },
+  {
+    id: '4',
+    title: 'Monthly Spending',
+    value: '$3,156.00',
+    change: '+ 2.1%',
+    changeType: 'positive',
+    icon: 'monthly',
+    chartId: 'monthSpendingBar'
+  }
+];
+
+export const mockEfficiencyData: EfficiencyData = {
+  arrival: 5230,
+  spending: 6230,
+  goal: 13,
+  goalPercentage: 13,
+  spendingPercentage: 28,
+  othersPercentage: 59
+};
+
+export const mockLocationData: LocationData[] = [
+  {
+    id: '1',
+    country: 'Brazil',
+    flagImage: '/assets/images/flag/bra.png',
+    percentage: 65,
+    progressColor: 'success'
+  },
+  {
+    id: '2',
+    country: 'United States',
+    flagImage: '/assets/images/flag/usa.png',
+    percentage: 85,
+    progressColor: 'warning'
+  },
+  {
+    id: '3',
+    country: 'Italy',
+    flagImage: '/assets/images/flag/italy.png',
+    percentage: 95,
+    progressColor: 'orange'
+  },
+  {
+    id: '4',
+    country: 'Germany',
+    flagImage: '/assets/images/flag/germany.png',
+    percentage: 45,
+    progressColor: 'success'
+  }
+];
+
+export const mockCustomerData: CustomerData[] = [
+  {
+    id: '1',
+    name: 'Devon Lane',
+    email: 'devon@mail.com',
+    location: 'Philadelphia, USA',
+    spent: '$101.00',
+    avatar: '/assets/images/avatar/user-40x40.png'
+  },
+  {
+    id: '2',
+    name: 'Bessie Cooper',
+    email: 'bessie@mail.com',
+    location: 'New York, USA',
+    spent: '$245.00',
+    avatar: '/assets/images/avatar/user-40x40-1.png'
+  },
+  {
+    id: '3',
+    name: 'Dianne Russell',
+    email: 'dianne@mail.com',
+    location: 'Los Angeles, USA',
+    spent: '$89.50',
+    avatar: '/assets/images/avatar/user-40x40-2.png'
+  },
+  {
+    id: '4',
+    name: 'Robert Fox',
+    email: 'robert@mail.com',
+    location: 'Chicago, USA',
+    spent: '$156.75'
+  },
+  {
+    id: '5',
+    name: 'Jenny Wilson',
+    email: 'jenny@mail.com',
+    location: 'Miami, USA',
+    spent: '$78.25'
+  }
+];
+
+export const mockFilterOptions: FilterOption[] = [
+  { value: 'january', label: 'January' },
+  { value: 'february', label: 'February' },
+  { value: 'march', label: 'March' },
+  { value: 'april', label: 'April' },
+  { value: 'may', label: 'May' },
+  { value: 'june', label: 'June' }
+];
+
+export const mockDashboardFilters: DashboardFilters = {
+  dateRange: 'Jan 10 - Jan 16',
+  location: '',
+  amountSpent: '',
+  transactionDate: '',
+  transactionType: '',
+  searchQuery: ''
+};
+
+export const mockPaginationState: PaginationState = {
+  currentPage: 1,
+  itemsPerPage: 3,
+  totalItems: 5
+};

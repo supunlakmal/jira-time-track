@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
 import {
-  TrendingUp,
   AccountBalance,
   Timeline,
+  TrendingUp,
   Work,
 } from "@mui/icons-material";
-import { Avatar } from "@mui/material";
+import React from "react";
 import { StatsCardData } from "../../types/dashboard";
 
 interface StatsCardProps {
@@ -16,8 +15,8 @@ interface StatsCardProps {
 
 const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
   const formatValue = (value: string | number, category?: string): string => {
-    if (typeof value === 'string') return value;
-    
+    if (typeof value === "string") return value;
+
     switch (category) {
       case "currency":
         return new Intl.NumberFormat("en-US", {
@@ -37,7 +36,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
   const formatTime = (ms: number): string => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
@@ -61,26 +60,66 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
         return <TrendingUp {...iconProps} />;
       case "tickets":
         return (
-          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <svg
+            className="w-6 h-6 text-bgray-900 dark:text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
           </svg>
         );
       case "points":
         return (
-          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          <svg
+            className="w-6 h-6 text-bgray-900 dark:text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+            />
           </svg>
         );
       case "time":
         return (
-          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-6 h-6 text-bgray-900 dark:text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         );
       case "projects":
         return (
-          <svg className="w-6 h-6 text-bgray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          <svg
+            className="w-6 h-6 text-bgray-900 dark:text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
           </svg>
         );
       default:
@@ -119,17 +158,6 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
             {data.title}
           </span>
         </div>
-        <div>
-          <Avatar
-            sx={{
-              width: 24,
-              height: 24,
-              backgroundColor: "transparent",
-            }}
-            src="/assets/images/avatar/members-2.png"
-            alt="members"
-          />
-        </div>
       </div>
       <div className="flex items-end justify-between">
         <div className="flex-1">
@@ -137,7 +165,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
             {formatValue(data.value, data.category)}
           </p>
           <div className="flex items-center space-x-1">
-            <span>{getTrendIcon()}</span>
+            {/* <span>{getTrendIcon()}</span> */}
             <span className="text-sm font-medium text-success-300">
               {data.change}
             </span>

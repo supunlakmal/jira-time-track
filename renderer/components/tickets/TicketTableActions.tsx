@@ -1,7 +1,7 @@
-
-import React from 'react';
-import Button from '../ui/Button';
-import { Refresh } from '@mui/icons-material';
+import { Refresh } from "@mui/icons-material";
+import React from "react";
+import Button from "../ui/Button";
+import SearchInput from "../ui/SearchInput";
 
 interface TicketTableActionsProps {
   searchTerm: string;
@@ -20,17 +20,19 @@ const TicketTableActions: React.FC<TicketTableActionsProps> = ({
 }) => {
   return (
     <div className="mb-6 flex gap-4 items-center">
-      <input
-        type="text"
-        placeholder={`Search tickets in ${selectedProject || 'all projects'}...`}
+      <SearchInput
+        placeholder={`Search tickets in ${
+          selectedProject || "all projects"
+        }...`}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+        className="flex-1"
+        fullWidth
       />
-      <Button 
-        onClick={refreshData} 
-        disabled={loading} 
-        variant="gray" 
+      <Button
+        onClick={refreshData}
+        disabled={loading}
+        variant="gray"
         size="md"
         startIcon={<Refresh fontSize="small" />}
       >

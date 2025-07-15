@@ -1,19 +1,24 @@
 "use client";
 
-import React from 'react';
-import { 
-  Search, 
-  FilterList, 
-  CalendarToday, 
-  MoreHoriz,
-  SwapVert,
+import {
+  CalendarToday,
   ChevronLeft,
   ChevronRight,
-  KeyboardArrowDown
-} from '@mui/icons-material';
-import { Avatar, Checkbox } from '@mui/material';
-import { CustomerData, DashboardFilters, PaginationState, FilterOption } from '../../types/dashboard';
-import FilterDropdown from './FilterDropdown';
+  FilterList,
+  KeyboardArrowDown,
+  MoreHoriz,
+  SwapVert,
+} from "@mui/icons-material";
+import { Avatar, Checkbox } from "@mui/material";
+import React from "react";
+import {
+  CustomerData,
+  DashboardFilters,
+  FilterOption,
+  PaginationState,
+} from "../../types/dashboard";
+import SearchInput from "../ui/SearchInput";
+import FilterDropdown from "./FilterDropdown";
 
 interface DataTableProps {
   data: CustomerData[];
@@ -32,46 +37,46 @@ const DataTable: React.FC<DataTableProps> = ({
   activeDropdown,
   onFilterChange,
   onDropdownToggle,
-  onPaginationChange
+  onPaginationChange,
 }) => {
   const locationOptions: FilterOption[] = [
-    { value: 'all', label: 'All Locations' },
-    { value: 'usa', label: 'USA' },
-    { value: 'brazil', label: 'Brazil' }
+    { value: "all", label: "All Locations" },
+    { value: "usa", label: "USA" },
+    { value: "brazil", label: "Brazil" },
   ];
 
   const amountOptions: FilterOption[] = [
-    { value: 'all', label: 'All Amounts' },
-    { value: '>1000', label: '> $1,000' },
-    { value: '<1000', label: '< $1,000' }
+    { value: "all", label: "All Amounts" },
+    { value: ">1000", label: "> $1,000" },
+    { value: "<1000", label: "< $1,000" },
   ];
 
   const dateOptions: FilterOption[] = [
-    { value: 'all', label: 'All Dates' },
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'This Week' }
+    { value: "all", label: "All Dates" },
+    { value: "today", label: "Today" },
+    { value: "week", label: "This Week" },
   ];
 
   const transactionOptions: FilterOption[] = [
-    { value: 'all', label: 'All transaction' },
-    { value: 'income', label: 'Income' },
-    { value: 'expense', label: 'Expense' }
+    { value: "all", label: "All transaction" },
+    { value: "income", label: "Income" },
+    { value: "expense", label: "Expense" },
   ];
 
   const resultOptions: FilterOption[] = [
-    { value: '3', label: '3' },
-    { value: '5', label: '5' },
-    { value: '10', label: '10' }
+    { value: "3", label: "3" },
+    { value: "5", label: "5" },
+    { value: "10", label: "10" },
   ];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFilterChange('searchQuery', e.target.value);
+    onFilterChange("searchQuery", e.target.value);
   };
 
   const handlePageChange = (newPage: number) => {
     onPaginationChange({
       ...pagination,
-      currentPage: newPage
+      currentPage: newPage,
     });
   };
 
@@ -79,7 +84,7 @@ const DataTable: React.FC<DataTableProps> = ({
     onPaginationChange({
       ...pagination,
       itemsPerPage: parseInt(value),
-      currentPage: 1
+      currentPage: 1,
     });
   };
 
@@ -90,27 +95,20 @@ const DataTable: React.FC<DataTableProps> = ({
       <div className="flex flex-col space-y-5">
         {/* Search and Filter Bar */}
         <div className="flex h-[56px] w-full space-x-4">
-          <div className="hidden h-full rounded-lg border border-transparent bg-bgray-100 px-[18px] focus-within:border-success-300 dark:bg-darkblack-500 sm:block sm:w-70 lg:w-88">
-            <div className="flex h-full w-full items-center space-x-[15px]">
-              <span>
-                <Search className="text-bgray-900 dark:text-white" />
-              </span>
-              <label htmlFor="listSearch" className="w-full">
-                <input
-                  type="text"
-                  id="listSearch"
-                  placeholder="Search by name, email, or others..."
-                  value={filters.searchQuery}
-                  onChange={handleSearchChange}
-                  className="search-input w-full border-none bg-bgray-100 px-0 text-sm tracking-wide text-bgray-600 placeholder:text-sm placeholder:font-medium placeholder:text-bgray-500 focus:outline-none focus:ring-0 dark:bg-darkblack-500"
-                />
-              </label>
-            </div>
+          <div className="hidden sm:block sm:w-70 lg:w-88">
+            <SearchInput
+              placeholder="Search by name, email, or others..."
+              value={filters.searchQuery}
+              onChange={handleSearchChange}
+              variant="filled"
+              fullWidth
+              className="h-[56px] rounded-lg bg-bgray-100 dark:bg-darkblack-500 border-transparent focus-within:border-success-300"
+            />
           </div>
-          
+
           <div className="relative h-full flex-1">
             <button
-              onClick={() => onDropdownToggle('table-filter')}
+              onClick={() => onDropdownToggle("table-filter")}
               type="button"
               className="flex h-full w-full items-center justify-center rounded-lg border border-bgray-300 bg-bgray-100 dark:border-darkblack-500 dark:bg-darkblack-500"
             >
@@ -123,14 +121,14 @@ const DataTable: React.FC<DataTableProps> = ({
                 </span>
               </div>
             </button>
-            
-            {activeDropdown === 'table-filter' && (
+
+            {activeDropdown === "table-filter" && (
               <div className="absolute right-0 top-[60px] z-10 w-full overflow-hidden rounded-lg bg-white shadow-lg dark:bg-darkblack-500">
                 <ul>
-                  {['January', 'February', 'March'].map((month) => (
+                  {["January", "February", "March"].map((month) => (
                     <li
                       key={month}
-                      onClick={() => onDropdownToggle('table-filter')}
+                      onClick={() => onDropdownToggle("table-filter")}
                       className="cursor-pointer px-5 py-2 text-sm font-semibold text-bgray-900 hover:bg-bgray-100 dark:text-white hover:dark:bg-darkblack-600"
                     >
                       {month}
@@ -151,7 +149,7 @@ const DataTable: React.FC<DataTableProps> = ({
               </p>
               <div className="relative h-[56px] w-full">
                 <button
-                  onClick={() => onDropdownToggle('province-filter')}
+                  onClick={() => onDropdownToggle("province-filter")}
                   type="button"
                   className="relative flex h-full w-full items-center justify-between rounded-lg bg-bgray-100 px-4 dark:bg-darkblack-500"
                 >
@@ -160,15 +158,15 @@ const DataTable: React.FC<DataTableProps> = ({
                   </span>
                   <KeyboardArrowDown className="text-bgray-500" />
                 </button>
-                
-                {activeDropdown === 'province-filter' && (
+
+                {activeDropdown === "province-filter" && (
                   <FilterDropdown
                     id="province-filter"
-                    label={filters.location || 'Select Location'}
+                    label={filters.location || "Select Location"}
                     options={locationOptions}
                     isOpen={true}
-                    onToggle={() => onDropdownToggle('province-filter')}
-                    onSelect={(value) => onFilterChange('location', value)}
+                    onToggle={() => onDropdownToggle("province-filter")}
+                    onSelect={(value) => onFilterChange("location", value)}
                     className="absolute right-0 top-14 z-10 w-full"
                   />
                 )}
@@ -181,24 +179,22 @@ const DataTable: React.FC<DataTableProps> = ({
               </p>
               <div className="relative h-[56px] w-full">
                 <button
-                  onClick={() => onDropdownToggle('amount-filter')}
+                  onClick={() => onDropdownToggle("amount-filter")}
                   type="button"
                   className="relative flex h-full w-full items-center justify-between rounded-lg bg-bgray-100 px-4 dark:bg-darkblack-500"
                 >
-                  <span className="text-base text-bgray-500">
-                    {'>'} $1,000
-                  </span>
+                  <span className="text-base text-bgray-500">{">"} $1,000</span>
                   <KeyboardArrowDown className="text-bgray-500" />
                 </button>
-                
-                {activeDropdown === 'amount-filter' && (
+
+                {activeDropdown === "amount-filter" && (
                   <FilterDropdown
                     id="amount-filter"
-                    label={filters.amountSpent || 'Select Amount'}
+                    label={filters.amountSpent || "Select Amount"}
                     options={amountOptions}
                     isOpen={true}
-                    onToggle={() => onDropdownToggle('amount-filter')}
-                    onSelect={(value) => onFilterChange('amountSpent', value)}
+                    onToggle={() => onDropdownToggle("amount-filter")}
+                    onSelect={(value) => onFilterChange("amountSpent", value)}
                     className="absolute right-0 top-14 z-10 w-full"
                   />
                 )}
@@ -211,24 +207,24 @@ const DataTable: React.FC<DataTableProps> = ({
               </p>
               <div className="relative h-[56px] w-full">
                 <button
-                  onClick={() => onDropdownToggle('date-filter-table')}
+                  onClick={() => onDropdownToggle("date-filter-table")}
                   type="button"
                   className="relative flex h-full w-full items-center justify-between rounded-lg bg-bgray-100 px-4 dark:bg-darkblack-500"
                 >
-                  <span className="text-base text-bgray-500">
-                    Select date
-                  </span>
+                  <span className="text-base text-bgray-500">Select date</span>
                   <CalendarToday className="text-bgray-500 dark:text-white" />
                 </button>
-                
-                {activeDropdown === 'date-filter-table' && (
+
+                {activeDropdown === "date-filter-table" && (
                   <FilterDropdown
                     id="date-filter-table"
-                    label={filters.transactionDate || 'Select Date'}
+                    label={filters.transactionDate || "Select Date"}
                     options={dateOptions}
                     isOpen={true}
-                    onToggle={() => onDropdownToggle('date-filter-table')}
-                    onSelect={(value) => onFilterChange('transactionDate', value)}
+                    onToggle={() => onDropdownToggle("date-filter-table")}
+                    onSelect={(value) =>
+                      onFilterChange("transactionDate", value)
+                    }
                     className="absolute right-0 top-14 z-10 w-full"
                   />
                 )}
@@ -241,7 +237,7 @@ const DataTable: React.FC<DataTableProps> = ({
               </p>
               <div className="relative h-[56px] w-full">
                 <button
-                  onClick={() => onDropdownToggle('trans-filter-tb')}
+                  onClick={() => onDropdownToggle("trans-filter-tb")}
                   type="button"
                   className="relative flex h-full w-full items-center justify-between rounded-lg bg-bgray-100 px-4 dark:bg-darkblack-500"
                 >
@@ -250,15 +246,17 @@ const DataTable: React.FC<DataTableProps> = ({
                   </span>
                   <KeyboardArrowDown className="text-bgray-500" />
                 </button>
-                
-                {activeDropdown === 'trans-filter-tb' && (
+
+                {activeDropdown === "trans-filter-tb" && (
                   <FilterDropdown
                     id="trans-filter-tb"
-                    label={filters.transactionType || 'Select Type'}
+                    label={filters.transactionType || "Select Type"}
                     options={transactionOptions}
                     isOpen={true}
-                    onToggle={() => onDropdownToggle('trans-filter-tb')}
-                    onSelect={(value) => onFilterChange('transactionType', value)}
+                    onToggle={() => onDropdownToggle("trans-filter-tb")}
+                    onSelect={(value) =>
+                      onFilterChange("transactionType", value)
+                    }
                     className="absolute right-0 top-14 z-10 w-full"
                   />
                 )}
@@ -276,9 +274,9 @@ const DataTable: React.FC<DataTableProps> = ({
                   <label className="text-center">
                     <Checkbox
                       sx={{
-                        color: '#A0AEC0',
-                        '&.Mui-checked': {
-                          color: '#22C55E',
+                        color: "#A0AEC0",
+                        "&.Mui-checked": {
+                          color: "#22C55E",
                         },
                       }}
                     />
@@ -329,9 +327,9 @@ const DataTable: React.FC<DataTableProps> = ({
                     <label className="text-center">
                       <Checkbox
                         sx={{
-                          color: '#A0AEC0',
-                          '&.Mui-checked': {
-                            color: '#22C55E',
+                          color: "#A0AEC0",
+                          "&.Mui-checked": {
+                            color: "#22C55E",
                           },
                         }}
                       />
@@ -343,7 +341,7 @@ const DataTable: React.FC<DataTableProps> = ({
                         sx={{
                           width: 40,
                           height: 40,
-                          backgroundColor: '#F3F4F6'
+                          backgroundColor: "#F3F4F6",
                         }}
                         src={customer.avatar}
                         alt="avatar"
@@ -395,28 +393,30 @@ const DataTable: React.FC<DataTableProps> = ({
                   id="result-filter"
                   label={pagination.itemsPerPage.toString()}
                   options={resultOptions}
-                  isOpen={activeDropdown === 'result-filter'}
-                  onToggle={() => onDropdownToggle('result-filter')}
+                  isOpen={activeDropdown === "result-filter"}
+                  onToggle={() => onDropdownToggle("result-filter")}
                   onSelect={handleItemsPerPageChange}
                   className="border border-bgray-300 dark:border-darkblack-400"
                 />
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-5 sm:space-x-[35px]">
-              <button 
+              <button
                 type="button"
-                onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                onClick={() =>
+                  handlePageChange(Math.max(1, pagination.currentPage - 1))
+                }
                 disabled={pagination.currentPage === 1}
               >
                 <ChevronLeft className="text-bgray-400" />
               </button>
-              
+
               <div className="flex items-center">
                 {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => {
                   const pageNum = i + 1;
                   const isActive = pageNum === pagination.currentPage;
-                  
+
                   return (
                     <button
                       key={pageNum}
@@ -424,15 +424,15 @@ const DataTable: React.FC<DataTableProps> = ({
                       onClick={() => handlePageChange(pageNum)}
                       className={`rounded-lg px-4 py-1.5 text-xs font-bold transition duration-300 ease-in-out lg:px-6 lg:py-2.5 lg:text-sm ${
                         isActive
-                          ? 'bg-success-50 text-success-300 dark:bg-darkblack-500 dark:text-bgray-50'
-                          : 'text-bgray-500 hover:bg-success-50 hover:text-success-300 dark:hover:bg-darkblack-500'
+                          ? "bg-success-50 text-success-300 dark:bg-darkblack-500 dark:text-bgray-50"
+                          : "text-bgray-500 hover:bg-success-50 hover:text-success-300 dark:hover:bg-darkblack-500"
                       }`}
                     >
                       {pageNum}
                     </button>
                   );
                 })}
-                
+
                 {totalPages > 3 && (
                   <>
                     <span className="text-sm text-bgray-500">. . . .</span>
@@ -446,10 +446,14 @@ const DataTable: React.FC<DataTableProps> = ({
                   </>
                 )}
               </div>
-              
-              <button 
+
+              <button
                 type="button"
-                onClick={() => handlePageChange(Math.min(totalPages, pagination.currentPage + 1))}
+                onClick={() =>
+                  handlePageChange(
+                    Math.min(totalPages, pagination.currentPage + 1)
+                  )
+                }
                 disabled={pagination.currentPage === totalPages}
               >
                 <ChevronRight className="text-bgray-400" />

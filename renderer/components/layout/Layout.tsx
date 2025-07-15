@@ -1,13 +1,13 @@
 import React from "react";
-import { Sidebar, sidebarSections } from "../components/navigation";
-import HeaderNew from "../components/layout/HeaderNew";
+import { Sidebar, sidebarSections } from "../navigation";
+import HeaderNew from "./HeaderNew";
 
-interface DashboardProps {
+interface LayoutProps {
   children: React.ReactNode;
   toggleFloatingWindow?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({
+const Layout: React.FC<LayoutProps> = ({
   children,
   toggleFloatingWindow,
 }) => {
@@ -28,4 +28,4 @@ const Dashboard: React.FC<DashboardProps> = ({
   );
 };
 
-export default Dashboard;
+export default Layout;

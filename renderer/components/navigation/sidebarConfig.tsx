@@ -13,33 +13,38 @@ export const sidebarSections: NavSectionProps[] = [
     title: "Menu",
     items: [
       {
+        label: "Dashboard",
+        href: "/home",
+        icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
+      },
+      {
         label: "Add Manual Task",
-        href: "/a-2",
+        href: "/manual-task",
         icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Billing",
-        href: "/a-3",
+        href: "/billing",
         icon: <Receipt className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Jira Setting",
-        href: "/a-4",
+        href: "/jira-settings",
         icon: <Settings className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Import CSV",
-        href: "/a-5",
+        href: "/import-csv",
         icon: <Upload className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Export Data",
-        href: "/a-6",
+        href: "/export-data",
         icon: <Download className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Reset Data",
-        href: "/a-7",
+        href: "/reset-data",
         icon: <RestartAlt className="text-bgray-600 dark:text-bgray-300" />,
       },
     ],

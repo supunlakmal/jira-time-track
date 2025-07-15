@@ -17,7 +17,7 @@ import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
 import { JiraSettingsDialog } from "../modules/jira";
 import type { JiraIssue } from "../modules/jira";
-import Dashboard from "./dashbord";
+import Dashboard from "./dashboard";
 import StatsCard from "../components/dashboard/StatsCard";
 
 export default function HomePage() {

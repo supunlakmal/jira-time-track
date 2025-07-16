@@ -171,9 +171,6 @@ const StatsCard: React.FC<StatsCardProps> = ({ data }) => {
             </span>
           </div>
         </div>
-        <div className="w-[136px]">
-          <canvas id={data.chartId} height="68"></canvas>
-        </div>
       </div>
     </div>
   );

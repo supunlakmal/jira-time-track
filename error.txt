@@ -1,4 +1,22 @@
- renderer/components/Template/src/pages/extra/Gallery/data.ts:30:3
-    30   src: string,
-         ~~~
-    The expected type comes from property 'src' which is declared here on type 'FilterImageType'
+renderer/components/projects/ProjectCard.tsx:11:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
+
+11 import { Project } from "../../store/projectsSlice";
+            ~~~~~~~
+
+renderer/components/projects/ProjectListItem.tsx:5:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
+
+5 import { Project } from "../../store/projectsSlice";
+           ~~~~~~~
+
+renderer/components/projects/ProjectView.tsx:3:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
+
+3 import { Project } from "../../store/projectsSlice";
+           ~~~~~~~
+
+
+Found 3 errors in 3 files.
+
+Errors  Files
+     1  renderer/components/projects/ProjectCard.tsx:11
+     1  renderer/components/projects/ProjectListItem.tsx:5
+     1  renderer/components/projects/ProjectView.tsx:3

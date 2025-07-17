@@ -1,14 +1,13 @@
-
-import React, { FC } from "react";
-import Image from "next/image";
 import {
-  Star,
-  CalendarToday,
-  MoreHoriz,
-  Description,
   BarChart,
+  CalendarToday,
+  Description,
+  MoreHoriz,
 } from "@mui/icons-material";
-import { Project } from "../../types/dashboard";
+import { FC } from "react";
+import { projectStatusColors } from "../../constants/projectStatus";
+import { ProjectHelper } from "../../helpers/ProjectHelper";
+import { Project } from "../../store/projectsSlice";
 
 interface ProjectCardProps {
   project: Project;
@@ -20,13 +19,14 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
       <div className="flex flex-col space-y-1.5 p-3 sm:p-6 pb-2">
         <div className="flex flex-wrap gap-2 justify-between items-start">
           <div className="flex items-start space-x-3">
-            <div className={`w-1 h-12 rounded-full ${project.barColor}`}></div>
+            <div
+              className={`w-1 h-12 rounded-full ${ProjectHelper.getProgressBarColor(
+                project
+              )}`}
+            ></div>
             <div>
               <div className="font-semibold tracking-tight text-lg flex items-center text-gray-900 dark:text-white">
                 {project.name}
-                {project.isStarred && (
-                  <Star className="h-4 w-4 ml-2 text-yellow-500 fill-yellow-500" />
-                )}
               </div>
               <div className="text-sm text-muted-foreground dark:text-gray-400">
                 {project.description}
@@ -34,7 +34,9 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
             </div>
           </div>
           <div
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent font-medium text-nowrap ${project.statusColor}`}
+            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent font-medium text-nowrap ${
+              projectStatusColors[project.status]
+            }`}
           >
             {project.status}
           </div>
@@ -60,13 +62,15 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
           </div>
           <div className="relative w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 h-2">
             <div
-              className={`h-full w-full flex-1 ${project.barColor} transition-all`}
+              className={`h-full w-full flex-1 ${ProjectHelper.getProgressBarColor(
+                project
+              )} transition-all`}
               style={{ width: `${project.progress}%` }}
             ></div>
           </div>
         </div>
         <div className="mt-4 flex justify-between items-center">
-          <div className="flex -space-x-2">
+          {/* <div className="flex -space-x-2">
             {project.team.map((member) => (
               <span
                 key={member.name}
@@ -81,7 +85,7 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
                 />
               </span>
             ))}
-          </div>
+          </div> */}
           <div className="flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center">
               <Description className="h-3.5 w-3.5 mr-1" />
@@ -104,7 +108,10 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
             <div>
               <p className="text-gray-500 dark:text-gray-400 mb-1">Budget</p>
               <p className="font-medium text-gray-900 dark:text-white">
-                {project.budget}
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(project.budget)}
               </p>
             </div>
             <div>
@@ -115,14 +122,14 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
                 {project.startDate}
               </p>
             </div>
-            <div>
+            {/* <div>
               <p className="text-gray-500 dark:text-gray-400 mb-1">Priority</p>
               <div
                 className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent font-medium ${project.priorityColor}`}
               >
                 {project.priority}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

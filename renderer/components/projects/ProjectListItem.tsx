@@ -1,11 +1,8 @@
-
-import React, { FC } from "react";
-import Image from "next/image";
-import {
-  Star,
-  MoreHoriz,
-} from "@mui/icons-material";
-import { Project } from "../../types/dashboard";
+import { MoreHoriz } from "@mui/icons-material";
+import { FC } from "react";
+import { projectStatusColors } from "../../constants/projectStatus";
+import { ProjectHelper } from "../../helpers/ProjectHelper";
+import { Project } from "../../store/projectsSlice";
 
 interface ProjectListItemProps {
   project: Project;
@@ -15,15 +12,16 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
   return (
     <div className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
       <div className="flex items-center flex-1 space-x-4">
-        <div className={`w-1.5 h-10 rounded-full ${project.barColor}`}></div>
+        <div
+          className={`w-1.5 h-10 rounded-full ${ProjectHelper.getProgressBarColor(
+            project
+          )}`}
+        ></div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center">
             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
               {project.name}
             </p>
-            {project.isStarred && (
-              <Star className="h-4 w-4 ml-2 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-            )}
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
             {project.description}
@@ -33,7 +31,9 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
 
       <div className="hidden md:flex items-center space-x-4 w-1/2 justify-end">
         <div
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium text-nowrap ${project.statusColor}`}
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium text-nowrap ${
+            projectStatusColors[project.status]
+          }`}
         >
           {project.status}
         </div>
@@ -47,13 +47,13 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
           </div>
           <div className="relative w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 h-1.5">
             <div
-              className={`h-full ${project.barColor}`}
+              className={`h-full ${ProjectHelper.getProgressBarColor(project)}`}
               style={{ width: `${project.progress}%` }}
             ></div>
           </div>
         </div>
 
-        <div className="flex -space-x-2">
+        {/* <div className="flex -space-x-2">
           {project.team.slice(0, 3).map((member) => (
             <span
               key={member.name}
@@ -68,7 +68,7 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
               />
             </span>
           ))}
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center pl-4">

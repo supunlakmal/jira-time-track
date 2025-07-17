@@ -1,6 +1,6 @@
 
 import React, { FC } from "react";
-import { Project } from "../../types/dashboard";
+import { Project } from "../../store/projectsSlice";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectListItem } from "./ProjectListItem";
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import DataTable from '../../renderer/components/dashboard/DataTable';
 import { 
   mockCustomerData, 

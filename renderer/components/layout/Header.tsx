@@ -15,11 +15,11 @@ import {
 import { Avatar } from "@mui/material";
 import { useRef } from "react";
 
-interface HeaderNewProps {
+interface HeaderProps {
   toggleFloatingWindow?: () => void;
 }
 
-const HeaderNew: React.FC<HeaderNewProps> = ({ toggleFloatingWindow }) => {
+const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
   // Ref to the main wrapper for handling "click outside"
   const quickAccessRef = useRef(null);
 
@@ -167,4 +167,4 @@ const HeaderNew: React.FC<HeaderNewProps> = ({ toggleFloatingWindow }) => {
   );
 };
 
-export default HeaderNew;
+export default Header;

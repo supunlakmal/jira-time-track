@@ -1,6 +1,6 @@
 import React from "react";
 import { Sidebar, sidebarSections } from "../navigation";
-import HeaderNew from "./HeaderNew";
+import Header from './Header';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({
         <Sidebar sections={sidebarSections} />
 
         <div className=" w-full dark:bg-darkblack-500">
-          <HeaderNew toggleFloatingWindow={toggleFloatingWindow} />
+          <Header toggleFloatingWindow={toggleFloatingWindow} />
 
           <main className="w-full dark:bg-darkblack-500">
             <div className="p-8">{children}</div>

@@ -19,5 +19,3 @@ export * from './tickets';
 // Dashboard Components
 export * from './dashboard';
 
-// Dialog Components
-export * from './dialogs';

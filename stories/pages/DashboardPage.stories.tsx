@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useEffect } from 'react';
-import Dashboard from '../../renderer/pages/dashbord';
+import Dashboard from '../../renderer/pages/dashboard';
 import { createMockUseSharedData, createMockIpc } from '../mocks/mockHooks';
 import { mockProjectTickets, mockSessions } from '../mocks/mockData';
 

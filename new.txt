@@ -1,6 +1,0 @@
-ok let creat new module .
-1) i shod be abel to set my hourly rate.
-2) eavry card  inned to see how musch it cost
-3) each project need to show how mumach it cose 
-4) i shod be abel to  creta invoice for each project.
-

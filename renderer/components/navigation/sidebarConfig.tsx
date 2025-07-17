@@ -1,21 +1,34 @@
 import {
-  AddTask,
+  Dashboard,
   Download,
   Receipt,
   RestartAlt,
   Settings,
   Upload,
+  AddTask,
+  FolderOpen,
 } from "@mui/icons-material";
 import { NavSectionProps } from "./NavSection";
 
 export const sidebarSections: NavSectionProps[] = [
   {
-    title: "Menu",
+    title: "Core",
     items: [
       {
-        label: "Dashboard",
+        label: "Overview",
         href: "/home",
-        icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
+        icon: <Dashboard className="text-bgray-600 dark:text-bgray-300" />,
+      },
+      {
+        label: "Projects",
+        href: "/projects",
+        icon: <FolderOpen className="text-bgray-600 dark:text-bgray-300" />,
+      },
+
+      {
+        label: "Projects View",
+        href: "/project-dashboard",
+        icon: <FolderOpen className="text-bgray-600 dark:text-bgray-300" />,
       },
       {
         label: "Add Manual Task",
@@ -27,11 +40,11 @@ export const sidebarSections: NavSectionProps[] = [
         href: "/billing",
         icon: <Receipt className="text-bgray-600 dark:text-bgray-300" />,
       },
-      {
-        label: "Jira Setting",
-        href: "/jira-settings",
-        icon: <Settings className="text-bgray-600 dark:text-bgray-300" />,
-      },
+    ],
+  },
+  {
+    title: "Data Management",
+    items: [
       {
         label: "Import CSV",
         href: "/import-csv",
@@ -46,6 +59,16 @@ export const sidebarSections: NavSectionProps[] = [
         label: "Reset Data",
         href: "/reset-data",
         icon: <RestartAlt className="text-bgray-600 dark:text-bgray-300" />,
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      {
+        label: "Jira Settings",
+        href: "/jira-settings",
+        icon: <Settings className="text-bgray-600 dark:text-bgray-300" />,
       },
     ],
   },

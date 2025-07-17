@@ -1,5 +1,6 @@
 import { configureStore, Middleware, AnyAction } from "@reduxjs/toolkit";
 import sessionsReducer from "./sessionsSlice";
+import projectsReducer from "./projectsSlice";
 
 // Custom middleware to log actions
 const loggerMiddleware: Middleware = (store) => (next) => (action: AnyAction) => {
@@ -14,6 +15,7 @@ const loggerMiddleware: Middleware = (store) => (next) => (action: AnyAction) =>
 export const store = configureStore({
   reducer: {
     sessions: sessionsReducer,
+    projects: projectsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(loggerMiddleware),

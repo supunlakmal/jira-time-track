@@ -1,169 +1,169 @@
-import React from "react";
-import Image from "next/image";
-import Button from "../ui/Button";
-import { ThemeToggle } from "../theme/ThemeToggle";
+// /components/Header.js
+
+"use client";
+
+import {
+  DarkMode,
+  KeyboardArrowDown,
+  LightMode,
+  PictureInPicture,
+  Search,
+  ZoomIn,
+  ZoomOut,
+  ZoomInMap,
+} from "@mui/icons-material";
+import { Avatar } from "@mui/material";
+import { useRef } from "react";
 
 interface HeaderProps {
-  toggleFloatingWindow: () => void;
-  setShowManualTaskDialog: (show: boolean) => void;
-  setShowCsvImportDialog: (show: boolean) => void;
-  setShowExportDialog: (show: boolean) => void;
-  setShowResetDialog: (show: boolean) => void;
+  toggleFloatingWindow?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  toggleFloatingWindow,
-  setShowManualTaskDialog,
-  setShowCsvImportDialog,
-  setShowExportDialog,
-  setShowResetDialog,
-}) => {
+const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
+  // Ref to the main wrapper for handling "click outside"
+  const quickAccessRef = useRef(null);
+
+  // Placeholder for theme toggle functionality
+  // In a real app, you'd use a library like next-themes
+  const handleThemeToggle = () => {
+    document.documentElement.classList.toggle("dark");
+  };
+
   return (
-    <div className="mb-8">
-      {/* Header Container */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        {/* Left Side - Logo and Title */}
-        <div className="flex items-center gap-4">
-          <Image
-            src="/images/logo.png"
-            alt="Logo"
-            width={80}
-            height={80}
-            className="flex-shrink-0"
-          />
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+    <header className=" z-30 w-full block ">
+      <div className=" flex h-[108px] w-full items-center justify-between bg-white px-10 dark:bg-darkblack-600 2xl:px-[76px]">
+        {/* Page Title */}
+        <div>
+          <h3 className="text-xl font-bold text-bgray-900 dark:text-bgray-50 lg:text-3xl lg:leading-[36.4px]">
             Dashboard
-          </h1>
+          </h3>
+          <p className="text-xs font-medium text-bgray-600 dark:text-bgray-50 lg:text-sm lg:leading-[25.2px]">
+            Let’s check your update today
+          </p>
         </div>
 
-        {/* Right Side - Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
-          {/* Primary Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Button
-              onClick={toggleFloatingWindow}
-              variant="primary"
-              size="sm"
-              className="w-full sm:w-auto"
-            >
-              Toggle Floating Timer
-            </Button>
-            <Button
-              onClick={() => setShowManualTaskDialog(true)}
-              variant="secondary"
-              size="sm"
-              title="Add a manual task"
-              className="w-full sm:w-auto"
-            >
-              Add Manual Task
-            </Button>
+        {/* Search Bar */}
+        {/* <div className="searchbar-wrapper">
+          <div className="px flex h-[56px] w-[300px] items-center justify-between rounded-lg border border-transparent bg-bgray-50 px-4 focus-within:border-success-300 dark:bg-darkblack-500 lg:w-[400px]">
+            <div className="flex w-full items-center space-x-3.5">
+              <span>
+                <Search
+                  className="text-bgray-900 dark:text-bgray-50"
+                  fontSize="small"
+                />
+              </span>
+              <label htmlFor="search" className="w-full">
+                <input
+                  type="text"
+                  id="search"
+                  placeholder="Search..."
+                  className="search-input w-full border-none bg-bgray-50 bg-none px-0 text-sm tracking-wide text-bgray-600 placeholder:text-sm placeholder:font-semibold focus:outline-none focus:ring-0 dark:bg-darkblack-500 dark:placeholder:text-bgray-500"
+                />
+              </label>
+            </div>
           </div>
+        </div> */}
 
-          {/* Data Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Button
-              onClick={() => setShowCsvImportDialog(true)}
-              variant="warning"
-              size="sm"
-              title="Import tasks from CSV file"
-              className="w-full sm:w-auto"
-            >
-              Import CSV
-            </Button>
-            <Button
-              onClick={() => setShowExportDialog(true)}
-              variant="success"
-              size="sm"
-              title="Export time tracking data"
-              className="w-full sm:w-auto"
-            >
-              Export Data
-            </Button>
-            <Button
-              onClick={() => setShowResetDialog(true)}
-              variant="danger"
-              size="sm"
-              title="Reset application data"
-              className="w-full sm:w-auto"
-            >
-              Reset Data
-            </Button>
-          </div>
+        {/* Quick Access Buttons and Profile */}
+        <div className="quick-access-wrapper relative" ref={quickAccessRef}>
+          <div className="flex items-center space-x-[43px]">
+            <div className="hidden items-center space-x-5 xl:flex">
+              {/* Floating Timer Toggle */}
+              {toggleFloatingWindow && (
+                <button
+                  onClick={toggleFloatingWindow}
+                  type="button"
+                  className="relative flex h-[52px] w-[52px] items-center justify-center rounded-[12px] border border-success-300 dark:border-darkblack-400 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Toggle Floating Timer"
+                >
+                  <PictureInPicture className="text-bgray-900 dark:text-bgray-50" />
+                </button>
+              )}
 
-          {/* Settings Controls */}
-          <div className="flex items-center justify-center sm:justify-start gap-3">
-            <ThemeToggle size="md" />
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-2 border border-success-300 dark:border-darkblack-400 rounded-[12px] p-1 bg-white dark:bg-darkblack-600">
+                <button
+                  onClick={() => window.ipc?.zoom?.out()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Zoom out (Ctrl+-)"
+                >
+                  <ZoomOut
+                    className="text-bgray-900 dark:text-bgray-50"
+                    fontSize="small"
+                  />
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.reset()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Reset zoom (Ctrl+0)"
+                >
+                  <ZoomInMap
+                    className="text-bgray-900 dark:text-bgray-50"
+                    fontSize="small"
+                  />
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.in()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Zoom in (Ctrl+=)"
+                >
+                  <ZoomIn
+                    className="text-bgray-900 dark:text-bgray-50"
+                    fontSize="small"
+                  />
+                </button>
+              </div>
 
-            {/* Zoom Controls */}
-            <div className="flex items-center gap-2 border border-gray-300 rounded-lg p-1 bg-white dark:bg-gray-800 dark:border-gray-600">
-              <Button
-                onClick={() => window.ipc?.zoom?.out()}
-                variant="gray"
-                size="icon"
-                className="w-10 h-10"
-                title="Zoom out (Ctrl+-)"
+              {/* Theme Toggle */}
+              <button
+                onClick={handleThemeToggle}
+                type="button"
+                className="relative flex h-[52px] w-[52px] items-center justify-center rounded-[12px] border border-success-300 dark:border-darkblack-400 hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                title="Toggle Theme"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 12H4"
-                  />
-                </svg>
-              </Button>
-              <Button
-                onClick={() => window.ipc?.zoom?.reset()}
-                variant="gray"
-                size="icon"
-                className="w-10 h-10"
-                title="Reset zoom (Ctrl+0)"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </Button>
-              <Button
-                onClick={() => window.ipc?.zoom?.in()}
-                variant="gray"
-                size="icon"
-                className="w-10 h-10"
-                title="Zoom in (Ctrl+=)"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </Button>
+                <span className="block dark:hidden">
+                  <DarkMode className="text-bgray-900" />
+                </span>
+                <span className="hidden dark:block">
+                  <LightMode className="text-bgray-50" />
+                </span>
+              </button>
+            </div>
+            <div className="hidden h-[48px] w-[1px] bg-bgray-300 dark:bg-darkblack-400 xl:block"></div>
+
+            {/* Author/Profile Area */}
+            <div className="flex cursor-pointer items-center space-x-0 lg:space-x-3">
+              <Avatar
+                sx={{
+                  width: 52,
+                  height: 52,
+                  border: "1px solid",
+                  borderColor: "var(--tw-colors-bgray-300)",
+                  borderRadius: "12px",
+                }}
+                alt="avatar"
+              />
+              <div className="hidden 2xl:block">
+                <div className="flex items-center space-x-2.5">
+                  <h3 className="text-base font-bold leading-[28px] text-bgray-900 dark:text-white">
+                    Free User
+                  </h3>
+                  <span>
+                    <KeyboardArrowDown className="text-bgray-900 dark:text-white" />
+                  </span>
+                </div>
+                <p className="text-sm font-medium leading-[20px] text-bgray-600 dark:text-bgray-50">
+                  Developer
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

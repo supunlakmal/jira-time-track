@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 // C:\Users\hp\Documents\GitHub\jira-time-track\renderer\types\dashboard.ts
 export interface ProjectSummary {
   name: string;
@@ -42,4 +44,69 @@ export interface TaskTimer {
     status: string;
   }>;
   storyPoints?: number;
+}
+
+// New Dashboard Section Types
+export interface StatsCardData {
+  id: string;
+  title: string;
+  value: string | number;
+  change: string;
+  changeType: "positive" | "negative";
+  icon: string;
+  chartId: string;
+  category?: "currency" | "time" | "number" | "percentage";
+  rawValue?: number; // For calculations when value is formatted
+  unit?: string; // For additional context (e.g., "tickets", "points", "hours")
+}
+
+export interface EfficiencyData {
+  arrival: number;
+  spending: number;
+  goal: number;
+  goalPercentage: number;
+  spendingPercentage: number;
+  othersPercentage: number;
+}
+
+export interface LocationData {
+  id: string;
+  country: string;
+  flagImage: string;
+  percentage: number;
+  progressColor: "success" | "warning" | "orange";
+}
+
+export interface CustomerData {
+  id: string;
+  name: string;
+  email: string;
+  location: string;
+  spent: string;
+  avatar?: string;
+}
+
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
+export interface DateRange {
+  label: string;
+  value: string;
+}
+
+export interface DashboardFilters {
+  dateRange: string;
+  location: string;
+  amountSpent: string;
+  transactionDate: string;
+  transactionType: string;
+  searchQuery: string;
+}
+
+export interface PaginationState {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
 }

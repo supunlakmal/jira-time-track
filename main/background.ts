@@ -6,10 +6,13 @@ import { createWindow } from "./helpers";
 import fs from "fs";
 import Store from "electron-store";
 import { spawn } from "child_process";
+import * as packageInfo from "../package.json";
+import { initializeJiraModule, shutdownJiraModule, getJiraModuleStatus } from "./modules/jira";
 
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
+let splashWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 
 // Store for project paths
@@ -25,16 +28,42 @@ const zoomStore = new Store<Record<string, number>>({
 });
 
 // ==================== CENTRALIZED DATA MANAGER ====================
+interface BillingData {
+  settings: {
+    globalHourlyRate?: number;
+    projectRates: Record<string, number>;
+    currency: string;
+    taxRate?: number;
+    companyName?: string;
+    companyAddress?: string;
+    invoicePrefix: string;
+  };
+  invoices: any[];
+}
+
 interface AppData {
   sessions: { [ticketNumber: string]: any };
   projectData: any[];
   manualTasks: any[];
+  billing: BillingData;
 }
 
 class DataManager {
   private store = new Store<AppData>({
     name: "app-data",
-    defaults: { sessions: {}, projectData: [], manualTasks: [] },
+    defaults: { 
+      sessions: {}, 
+      projectData: [], 
+      manualTasks: [],
+      billing: {
+        settings: {
+          projectRates: {},
+          currency: "USD",
+          invoicePrefix: "INV"
+        },
+        invoices: []
+      }
+    },
   });
 
   private windows: Set<BrowserWindow> = new Set();
@@ -171,6 +200,121 @@ class DataManager {
       projectPathsStore.clear();
     }
   }
+
+  // Billing methods
+  getBillingData() {
+    try {
+      const billing = this.store.get("billing");
+      console.log("DataManager: getBillingData called, returning:", billing);
+      return billing;
+    } catch (error) {
+      console.error("DataManager: Error in getBillingData:", error);
+      // Return default billing data on error
+      return {
+        settings: {
+          projectRates: {},
+          currency: "USD",
+          invoicePrefix: "INV"
+        },
+        invoices: []
+      };
+    }
+  }
+
+  setBillingSettings(settings: any) {
+    const billing = this.getBillingData();
+    billing.settings = { ...billing.settings, ...settings };
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log("DataManager: Billing settings updated");
+  }
+
+  getBillingSettings() {
+    return this.getBillingData().settings;
+  }
+
+  addInvoice(invoice: any) {
+    const billing = this.getBillingData();
+    billing.invoices.push(invoice);
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log(`DataManager: Invoice ${invoice.invoiceNumber} added`);
+    return invoice;
+  }
+
+  getInvoices() {
+    return this.getBillingData().invoices;
+  }
+
+  deleteInvoice(invoiceId: string) {
+    const billing = this.getBillingData();
+    billing.invoices = billing.invoices.filter(inv => inv.id !== invoiceId);
+    this.store.set("billing", billing);
+    this.broadcast("billing-updated", billing);
+    console.log(`DataManager: Invoice ${invoiceId} deleted`);
+  }
+
+  calculateTicketCost(ticketNumber: string) {
+    const sessions = this.getSessions();
+    const billing = this.getBillingSettings();
+    const sessionData = sessions[ticketNumber];
+
+    if (!sessionData) return null;
+
+    const projectData = this.getAllTasks();
+    const ticket = projectData.find(t => t.ticket_number === ticketNumber);
+    
+    if (!ticket) return null;
+
+    const projectName = ticket.project_name;
+    const hourlyRate = billing.projectRates[projectName] || billing.globalHourlyRate || 0;
+    const timeSpentMs = sessionData.totalElapsed || 0;
+    const timeSpentHours = timeSpentMs / (1000 * 60 * 60);
+    const totalCost = timeSpentHours * hourlyRate;
+
+    return {
+      ticketNumber,
+      ticketName: ticket.ticket_name,
+      projectName,
+      timeSpent: timeSpentMs,
+      timeSpentHours,
+      hourlyRate,
+      totalCost,
+      currency: billing.currency || "USD"
+    };
+  }
+
+  calculateProjectCosts() {
+    const sessions = this.getSessions();
+    const billing = this.getBillingSettings();
+    const projectData = this.getAllTasks();
+    const projectCosts = new Map();
+
+    Object.keys(sessions).forEach(ticketNumber => {
+      const cost = this.calculateTicketCost(ticketNumber);
+      if (cost && cost.projectName) {
+        const existing = projectCosts.get(cost.projectName) || {
+          projectName: cost.projectName,
+          totalTimeSpent: 0,
+          totalCost: 0,
+          ticketCount: 0,
+          currency: cost.currency
+        };
+
+        existing.totalTimeSpent += cost.timeSpent;
+        existing.totalCost += cost.totalCost;
+        existing.ticketCount += 1;
+        projectCosts.set(cost.projectName, existing);
+      }
+    });
+
+    return Array.from(projectCosts.values()).map(project => ({
+      ...project,
+      averageHourlyRate: project.totalTimeSpent > 0 
+        ? project.totalCost / (project.totalTimeSpent / (1000 * 60 * 60))
+        : 0
+    }));
+  }
 }
 
 const dataManager = new DataManager();
@@ -233,10 +377,22 @@ const createFloatingWindow = async () => {
 (async () => {
   await app.whenReady();
 
+  // Initialize Jira module (if enabled)
+  try {
+    await initializeJiraModule();
+    const jiraStatus = getJiraModuleStatus();
+    console.log('Jira module status:', jiraStatus);
+  } catch (error) {
+    console.error('Failed to initialize Jira module:', error);
+  }
+
+  // Create splash screen first
+  createSplashWindow();
+
   // Create system tray
   createTray();
 
-  // Create main window
+  // Create main window (hidden initially)
   mainWindow = createMainWindow();
 
   // Application starts with empty task list until CSV import
@@ -436,11 +592,116 @@ function updateTrayTitle(activeTimers: number = 0) {
   }
 }
 
+function createSplashWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  
+  splashWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    x: Math.round((width - 400) / 2),
+    y: Math.round((height - 300) / 2),
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "splash-preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // Load splash screen HTML
+  let splashPath;
+  if (isProd) {
+    // In production, the app directory structure is different
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  } else {
+    // In development, we need to go up from main directory
+    splashPath = path.join(__dirname, "..", "renderer", "pages", "splash.html");
+  }
+  
+  console.log("Main: Loading splash screen from:", splashPath);
+  console.log("Main: __dirname is:", __dirname);
+  console.log("Main: isProd is:", isProd);
+  
+  // Check if file exists
+  try {
+    if (fs.existsSync(splashPath)) {
+      console.log("Main: Splash file exists at:", splashPath);
+      splashWindow.loadFile(splashPath);
+    } else {
+      console.error("Main: Splash file does not exist at:", splashPath);
+      // Try alternative path
+      const altPath = path.join(__dirname, "..", "..", "renderer", "pages", "splash.html");
+      console.log("Main: Trying alternative path:", altPath);
+      if (fs.existsSync(altPath)) {
+        console.log("Main: Alternative path exists, loading from:", altPath);
+        splashWindow.loadFile(altPath);
+      } else {
+        console.error("Main: Alternative path also does not exist");
+      }
+    }
+  } catch (error) {
+    console.error("Main: Error checking splash file:", error);
+  }
+
+  splashWindow.once('ready-to-show', () => {
+    console.log("Main: Splash screen ready to show");
+    if (splashWindow) {
+      splashWindow.show();
+      
+      // Send app information to splash screen
+      try {
+        const appVersion = app.getVersion();
+        const appName = packageInfo.name || 'Project Time Tracker';
+        
+        splashWindow.webContents.send('app-info', {
+          version: appVersion,
+          name: appName
+        });
+        
+        console.log(`Main: Sent app info - version: ${appVersion}, name: ${appName}`);
+      } catch (error) {
+        console.error('Main: Error sending app info to splash screen:', error);
+        
+        // Send fallback values
+        splashWindow.webContents.send('app-info', {
+          version: '1.0.0',
+          name: 'Project Time Tracker'
+        });
+      }
+    }
+  });
+
+  splashWindow.on("closed", () => {
+    console.log("Main: Splash window closed");
+    splashWindow = null;
+  });
+
+  // Fallback timeout to ensure splash closes after 10 seconds
+  setTimeout(() => {
+    if (splashWindow) {
+      console.log("Main: Fallback timeout - closing splash screen");
+      splashWindow.close();
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }
+  }, 10000);
+
+  return splashWindow;
+}
+
 function createMainWindow() {
   mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
+    show: false, // Don't show initially
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -461,6 +722,37 @@ function createMainWindow() {
 
   return mainWindow;
 }
+
+// ==================== SPLASH SCREEN IPC ====================
+ipcMain.on("app-ready", () => {
+  console.log("Main: Received app-ready signal");
+  
+  // Smooth transition: fade out splash, then show main window
+  if (splashWindow && mainWindow) {
+    console.log("Main: Both splash and main windows exist, starting transition");
+    
+    // Add fade-out effect to splash
+    splashWindow.webContents.executeJavaScript(`
+      console.log('Splash: Starting fade-out');
+      document.body.style.transition = 'opacity 0.3s ease-out';
+      document.body.style.opacity = '0';
+    `);
+    
+    // Close splash and show main window after fade-out
+    setTimeout(() => {
+      console.log("Main: Closing splash and showing main window");
+      if (splashWindow) {
+        splashWindow.close();
+      }
+      if (mainWindow) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, 300);
+  } else {
+    console.log("Main: Missing windows - splash:", !!splashWindow, "main:", !!mainWindow);
+  }
+});
 
 // ==================== WINDOW CONTROL IPC ====================
 ipcMain.on("toggle-float-window", () => {
@@ -591,6 +883,82 @@ ipcMain.handle("delete-manual-task", (_, taskId) => {
   }
 });
 
+// ==================== BILLING IPC HANDLERS ====================
+ipcMain.handle("get-billing-data", () => {
+  try {
+    const billingData = dataManager.getBillingData();
+    console.log("Main: get-billing-data called, returning:", billingData);
+    return billingData;
+  } catch (error) {
+    console.error("Main: Error in get-billing-data:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("get-billing-settings", () => {
+  return dataManager.getBillingSettings();
+});
+
+ipcMain.handle("save-billing-settings", (_, settings) => {
+  try {
+    dataManager.setBillingSettings(settings);
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving billing settings:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("calculate-ticket-cost", (_, ticketNumber) => {
+  try {
+    const cost = dataManager.calculateTicketCost(ticketNumber);
+    return { success: true, cost };
+  } catch (error) {
+    console.error("Error calculating ticket cost:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("calculate-project-costs", () => {
+  try {
+    const costs = dataManager.calculateProjectCosts();
+    return { success: true, costs };
+  } catch (error) {
+    console.error("Error calculating project costs:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("add-invoice", (_, invoiceData) => {
+  try {
+    const invoice = dataManager.addInvoice(invoiceData);
+    return { success: true, invoice };
+  } catch (error) {
+    console.error("Error adding invoice:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-invoices", () => {
+  try {
+    const invoices = dataManager.getInvoices();
+    return { success: true, invoices };
+  } catch (error) {
+    console.error("Error getting invoices:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("delete-invoice", (_, invoiceId) => {
+  try {
+    dataManager.deleteInvoice(invoiceId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    return { success: false, error: error.message };
+  }
+});
+
 // ==================== PROJECT PATHS IPC ====================
 ipcMain.handle("get-project-paths", () => {
   return projectPathsStore.store;
@@ -712,6 +1080,181 @@ ipcMain.handle("get-current-branch", async (_, data) => {
   } catch (error) {
     console.error(`Exception in get-current-branch for ${projectName}:`, error);
     return { error: error.message };
+  }
+});
+
+ipcMain.handle("create-git-branch", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Attempting to switch to or create git branch '${branchName}' in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      // First, try to switch to existing branch
+      console.log(`Trying to switch to existing branch '${branchName}'`);
+      const switchProcess = spawn("git", ["checkout", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let switchOutput = "";
+      let switchError = "";
+
+      switchProcess.stdout.on("data", (data) => {
+        switchOutput += data.toString();
+      });
+
+      switchProcess.stderr.on("data", (data) => {
+        switchError += data.toString();
+      });
+
+      switchProcess.on("close", (switchCode) => {
+        if (switchCode === 0) {
+          // Successfully switched to existing branch
+          console.log(`Successfully switched to existing branch '${branchName}'`);
+          resolve({ success: true, message: `Switched to existing branch '${branchName}'`, action: "switched" });
+        } else {
+          // Switch failed, try to create new branch
+          console.log(`Switch failed, attempting to create new branch '${branchName}'`);
+          
+          const createProcess = spawn("git", ["checkout", "-b", branchName], {
+            cwd: projectPath,
+            stdio: ["ignore", "pipe", "pipe"],
+          });
+
+          let createOutput = "";
+          let createError = "";
+
+          createProcess.stdout.on("data", (data) => {
+            createOutput += data.toString();
+          });
+
+          createProcess.stderr.on("data", (data) => {
+            createError += data.toString();
+          });
+
+          createProcess.on("close", (createCode) => {
+            if (createCode === 0) {
+              console.log(`Successfully created and switched to new branch '${branchName}'`);
+              resolve({ success: true, message: `Created and switched to new branch '${branchName}'`, action: "created" });
+            } else {
+              console.error(`Failed to create branch:`, createError.trim());
+              const errorMessage = createError.trim() || "Failed to create branch";
+              
+              // Handle common errors with user-friendly messages
+              if (errorMessage.includes("not a git repository")) {
+                resolve({ success: false, error: "Not a git repository" });
+              } else if (errorMessage.includes("already exists")) {
+                resolve({ success: false, error: `Branch '${branchName}' already exists but cannot switch to it` });
+              } else {
+                resolve({ success: false, error: errorMessage });
+              }
+            }
+          });
+
+          createProcess.on("error", (err) => {
+            console.error(`Error running git create command:`, err.message);
+            resolve({ success: false, error: `Failed to run git create: ${err.message}` });
+          });
+
+          // Timeout for create process
+          setTimeout(() => {
+            createProcess.kill();
+            console.warn(`Git create command timeout`);
+            resolve({ success: false, error: "Git create command timeout" });
+          }, 10000);
+        }
+      });
+
+      switchProcess.on("error", (err) => {
+        console.error(`Error running git switch command:`, err.message);
+        resolve({ success: false, error: `Failed to run git switch: ${err.message}` });
+      });
+
+      // Timeout for switch process
+      setTimeout(() => {
+        switchProcess.kill();
+        console.warn(`Git switch command timeout`);
+        resolve({ success: false, error: "Git switch command timeout" });
+      }, 10000);
+    });
+  } catch (error) {
+    console.error(`Exception in create-git-branch:`, error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("check-git-branch-exists", async (_, { branchName, projectPath }) => {
+  if (!branchName || !projectPath) {
+    return { success: false, error: "Branch name and project path are required" };
+  }
+
+  // Check if the project directory exists
+  if (!fs.existsSync(projectPath)) {
+    return { success: false, error: "Project path does not exist" };
+  }
+
+  console.log(`Checking if git branch '${branchName}' exists in path: ${projectPath}`);
+
+  try {
+    return new Promise((resolve) => {
+      const gitProcess = spawn("git", ["branch", "--list", branchName], {
+        cwd: projectPath,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      let output = "";
+      let error = "";
+
+      gitProcess.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+
+      gitProcess.stderr.on("data", (data) => {
+        error += data.toString();
+      });
+
+      gitProcess.on("close", (code) => {
+        if (code === 0) {
+          // Check if output contains the branch name (means branch exists)
+          const branchExists = output.trim().includes(branchName);
+          console.log(`Branch '${branchName}' exists: ${branchExists}`);
+          resolve({ success: true, exists: branchExists });
+        } else {
+          console.error(`Git branch check failed:`, error.trim());
+          const errorMessage = error.trim() || "Git branch check failed";
+          
+          // Handle common errors
+          if (errorMessage.includes("not a git repository")) {
+            resolve({ success: false, error: "Not a git repository" });
+          } else {
+            resolve({ success: false, error: errorMessage });
+          }
+        }
+      });
+
+      gitProcess.on("error", (err) => {
+        console.error(`Error running git branch check:`, err.message);
+        resolve({ success: false, error: `Failed to run git: ${err.message}` });
+      });
+
+      // Timeout after 5 seconds (shorter for branch check)
+      setTimeout(() => {
+        gitProcess.kill();
+        console.warn(`Git branch check timeout`);
+        resolve({ success: false, error: "Git branch check timeout" });
+      }, 5000);
+    });
+  } catch (error) {
+    console.error(`Exception in check-git-branch-exists:`, error);
+    return { success: false, error: error.message };
   }
 });
 
@@ -1189,8 +1732,15 @@ ipcMain.on("message", async (event, arg) => {
 });
 
 // Cleanup on app quit
-app.on("before-quit", () => {
+app.on("before-quit", async () => {
   if (tray) {
     tray.destroy();
+  }
+  
+  // Shutdown Jira module
+  try {
+    await shutdownJiraModule();
+  } catch (error) {
+    console.error('Failed to shutdown Jira module:', error);
   }
 });

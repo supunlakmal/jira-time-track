@@ -6,6 +6,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   size?: 'sm' | 'md' | 'lg' | 'icon';
   loading?: boolean;
   children: React.ReactNode;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
@@ -14,6 +16,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   loading = false,
   disabled,
   children,
+  startIcon,
+  endIcon,
   className = '',
   ...props
 }, ref) => {
@@ -54,7 +58,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       {...props}
     >
       {loading && <LoadingSpinner size="sm" className="mr-2" />}
+      {!loading && startIcon && <span className="mr-2">{startIcon}</span>}
       {children}
+      {!loading && endIcon && <span className="ml-2">{endIcon}</span>}
     </button>
   );
 });

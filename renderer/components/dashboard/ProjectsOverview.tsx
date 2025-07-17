@@ -10,6 +10,8 @@ interface ProjectsOverviewProps {
   handleChooseProjectPath: (projectName: string) => void;
   refreshBranch: (projectName: string, projectPath: string) => void;
   formatTime: (ms: number) => string;
+  billingData?: any;
+  sessions?: any;
 }
 
 const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
@@ -19,7 +21,43 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
   handleChooseProjectPath,
   refreshBranch,
   formatTime,
+  billingData,
+  sessions,
 }) => {
+  
+  const calculateProjectCost = (projectName: string) => {
+    if (!billingData?.settings || !sessions) return null;
+    
+    let totalCost = 0;
+    let totalTime = 0;
+    
+    Object.keys(sessions).forEach(ticketNumber => {
+      if (ticketNumber.startsWith(projectName + '-') || ticketNumber.split('-')[0] === projectName) {
+        const session = sessions[ticketNumber];
+        if (session?.totalElapsed) {
+          const hourlyRate = billingData.settings.projectRates?.[projectName] || billingData.settings.globalHourlyRate;
+          if (hourlyRate) {
+            const timeSpentHours = session.totalElapsed / (1000 * 60 * 60);
+            totalCost += timeSpentHours * hourlyRate;
+            totalTime += session.totalElapsed;
+          }
+        }
+      }
+    });
+    
+    return totalCost > 0 ? {
+      cost: totalCost,
+      currency: billingData.settings.currency || 'USD',
+      rate: billingData.settings.projectRates?.[projectName] || billingData.settings.globalHourlyRate
+    } : null;
+  };
+  
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
+  };
   if (projectSummaryData.length === 0) {
     return null;
   }
@@ -59,6 +97,9 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Time Spent
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Project Cost
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-2/5">
                   Local Path
@@ -111,6 +152,28 @@ const ProjectsOverview: React.FC<ProjectsOverviewProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
                     {formatTime(proj.totalTimeSpent)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {(() => {
+                      const costData = calculateProjectCost(proj.name);
+                      if (!costData) {
+                        return (
+                          <span className="text-gray-400 dark:text-gray-500 italic">No billing rate</span>
+                        );
+                      }
+                      return (
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {formatCurrency(costData.cost, costData.currency)}
+                          </span>
+                          {costData.rate && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {formatCurrency(costData.rate, costData.currency)}/h
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                     <div className="flex items-center justify-between group">

@@ -8,6 +8,9 @@ import {
   LightMode,
   PictureInPicture,
   Search,
+  ZoomIn,
+  ZoomOut,
+  ZoomInMap,
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { useRef } from "react";
@@ -77,6 +80,34 @@ const HeaderNew: React.FC<HeaderNewProps> = ({ toggleFloatingWindow }) => {
                 </button>
               )}
               
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-2 border border-success-300 dark:border-darkblack-400 rounded-[12px] p-1 bg-white dark:bg-darkblack-600">
+                <button
+                  onClick={() => window.ipc?.zoom?.out()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Zoom out (Ctrl+-)"
+                >
+                  <ZoomOut className="text-bgray-900 dark:text-bgray-50" fontSize="small" />
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.reset()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Reset zoom (Ctrl+0)"
+                >
+                  <ZoomInMap className="text-bgray-900 dark:text-bgray-50" fontSize="small" />
+                </button>
+                <button
+                  onClick={() => window.ipc?.zoom?.in()}
+                  type="button"
+                  className="relative flex h-[40px] w-[40px] items-center justify-center rounded-[8px] hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors"
+                  title="Zoom in (Ctrl+=)"
+                >
+                  <ZoomIn className="text-bgray-900 dark:text-bgray-50" fontSize="small" />
+                </button>
+              </div>
+
               {/* Theme Toggle */}
               <button
                 onClick={handleThemeToggle}

@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import Overview from "../components/dashboard/Overview";
 import ProjectsOverview from "../components/dashboard/ProjectsOverview";
-import Header from "../components/layout/Header";
+
 import TicketTable from "../components/tickets/TicketTable";
 import TicketTableActions from "../components/tickets/TicketTableActions";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
@@ -22,12 +22,7 @@ export default function HomePage() {
   const [projectBranches, setProjectBranches] = useState<
     Record<string, string>
   >({});
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
-  const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const [showJiraSettingsDialog, setShowJiraSettingsDialog] = useState(false);
-  const [showBillingDialog, setShowBillingDialog] = useState(false);
+
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Signal app ready when all data is loaded
@@ -371,47 +366,47 @@ export default function HomePage() {
   };
 
   // Manual task handlers
-  const handleAddManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
-    try {
-      const result = await window.ipc.invoke("add-manual-task", taskData);
-      if (result.success) {
-        console.log("Manual task added successfully:", result.task);
-      } else {
-        alert(`Error adding task: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error adding manual task:", error);
-      alert("Failed to add task. Please try again.");
-    }
-  };
+  // const handleAddManualTask = async (taskData: {
+  //   ticket_number: string;
+  //   ticket_name: string;
+  //   story_points?: number;
+  // }) => {
+  //   try {
+  //     const result = await window.ipc.invoke("add-manual-task", taskData);
+  //     if (result.success) {
+  //       console.log("Manual task added successfully:", result.task);
+  //     } else {
+  //       alert(`Error adding task: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding manual task:", error);
+  //     alert("Failed to add task. Please try again.");
+  //   }
+  // };
 
-  const handleEditManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
-    if (!editingTask) return;
+  // const handleEditManualTask = async (taskData: {
+  //   ticket_number: string;
+  //   ticket_name: string;
+  //   story_points?: number;
+  // }) => {
+  //   if (!editingTask) return;
 
-    try {
-      const result = await window.ipc.invoke("update-manual-task", {
-        taskId: editingTask.ticket_number,
-        updates: taskData,
-      });
-      if (result.success) {
-        console.log("Manual task updated successfully:", result.task);
-        setEditingTask(null);
-      } else {
-        alert(`Error updating task: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error updating manual task:", error);
-      alert("Failed to update task. Please try again.");
-    }
-  };
+  //   try {
+  //     const result = await window.ipc.invoke("update-manual-task", {
+  //       taskId: editingTask.ticket_number,
+  //       updates: taskData,
+  //     });
+  //     if (result.success) {
+  //       console.log("Manual task updated successfully:", result.task);
+  //       setEditingTask(null);
+  //     } else {
+  //       alert(`Error updating task: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating manual task:", error);
+  //     alert("Failed to update task. Please try again.");
+  //   }
+  // };
 
   const handleDeleteManualTask = async (ticketNumber: string) => {
     if (!confirm("Are you sure you want to delete this manual task?")) {
@@ -436,82 +431,82 @@ export default function HomePage() {
 
   const openEditDialog = (task: any) => {
     setEditingTask(task);
-    setShowManualTaskDialog(true);
+    // setShowManualTaskDialog(true);
   };
 
-  const closeManualTaskDialog = () => {
-    setShowManualTaskDialog(false);
-    setEditingTask(null);
-  };
+  // const closeManualTaskDialog = () => {
+  //   setShowManualTaskDialog(false);
+  //   setEditingTask(null);
+  // };
 
   // CSV import handler
-  const handleCsvImport = async (csvData: any[]) => {
-    try {
-      const result = await window.ipc.invoke("import-csv-data", csvData);
-      if (result.success) {
-        console.log(
-          `Successfully imported ${result.importedCount} tasks from CSV`
-        );
-        // Data will be automatically refreshed via the shared data hook
-      } else {
-        alert(`Error importing CSV: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error importing CSV:", error);
-      alert("Failed to import CSV. Please try again.");
-    }
-  };
+  // const handleCsvImport = async (csvData: any[]) => {
+  //   try {
+  //     const result = await window.ipc.invoke("import-csv-data", csvData);
+  //     if (result.success) {
+  //       console.log(
+  //         `Successfully imported ${result.importedCount} tasks from CSV`
+  //       );
+  //       // Data will be automatically refreshed via the shared data hook
+  //     } else {
+  //       alert(`Error importing CSV: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error importing CSV:", error);
+  //     alert("Failed to import CSV. Please try again.");
+  //   }
+  // };
 
   // Jira import handler
-  const handleJiraImport = async (jiraIssues: JiraIssue[]) => {
-    try {
-      console.log(`Importing ${jiraIssues.length} Jira issues...`);
+  // const handleJiraImport = async (jiraIssues: JiraIssue[]) => {
+  //   try {
+  //     console.log(`Importing ${jiraIssues.length} Jira issues...`);
 
-      // Convert Jira issues to project tickets format
-      const result = await window.ipc.invoke(
-        "jira-convert-to-tickets",
-        jiraIssues
-      );
+  //     // Convert Jira issues to project tickets format
+  //     const result = await window.ipc.invoke(
+  //       "jira-convert-to-tickets",
+  //       jiraIssues
+  //     );
 
-      if (result.success && result.tickets) {
-        // Import the converted tickets using the existing CSV import mechanism
-        const importResult = await window.ipc.invoke(
-          "import-csv-data",
-          result.tickets
-        );
+  //     if (result.success && result.tickets) {
+  //       // Import the converted tickets using the existing CSV import mechanism
+  //       const importResult = await window.ipc.invoke(
+  //         "import-csv-data",
+  //         result.tickets
+  //       );
 
-        if (importResult.success) {
-          console.log(
-            `Successfully imported ${importResult.importedCount} tasks from Jira`
-          );
+  //       if (importResult.success) {
+  //         console.log(
+  //           `Successfully imported ${importResult.importedCount} tasks from Jira`
+  //         );
 
-          // Show success message to user
-          alert(
-            `Successfully imported ${importResult.importedCount} issues from Jira!`
-          );
+  //         // Show success message to user
+  //         alert(
+  //           `Successfully imported ${importResult.importedCount} issues from Jira!`
+  //         );
 
-          // Close the Jira settings dialog
-          setShowJiraSettingsDialog(false);
+  //         // Close the Jira settings dialog
+  //         setShowJiraSettingsDialog(false);
 
-          // Data will be automatically refreshed via the shared data hook
-        } else {
-          console.error(
-            "Error importing converted Jira tickets:",
-            importResult.error
-          );
-          alert(`Error importing Jira issues: ${importResult.error}`);
-        }
-      } else {
-        console.error("Error converting Jira issues:", result.error);
-        alert(
-          `Error converting Jira issues: ${result.error || "Unknown error"}`
-        );
-      }
-    } catch (error) {
-      console.error("Error importing Jira issues:", error);
-      alert("Failed to import Jira issues. Please try again.");
-    }
-  };
+  //         // Data will be automatically refreshed via the shared data hook
+  //       } else {
+  //         console.error(
+  //           "Error importing converted Jira tickets:",
+  //           importResult.error
+  //         );
+  //         alert(`Error importing Jira issues: ${importResult.error}`);
+  //       }
+  //     } else {
+  //       console.error("Error converting Jira issues:", result.error);
+  //       alert(
+  //         `Error converting Jira issues: ${result.error || "Unknown error"}`
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error importing Jira issues:", error);
+  //     alert("Failed to import Jira issues. Please try again.");
+  //   }
+  // };
 
   return (
     <React.Fragment>
@@ -524,16 +519,6 @@ export default function HomePage() {
             className="
           "
           >
-            <Header
-              toggleFloatingWindow={toggleFloatingWindow}
-              setShowManualTaskDialog={setShowManualTaskDialog}
-              setShowCsvImportDialog={setShowCsvImportDialog}
-              setShowExportDialog={setShowExportDialog}
-              setShowResetDialog={setShowResetDialog}
-              setShowJiraSettingsDialog={setShowJiraSettingsDialog}
-              setShowBillingDialog={setShowBillingDialog}
-            />
-
             {loading ? (
               <LoadingSpinner />
             ) : (

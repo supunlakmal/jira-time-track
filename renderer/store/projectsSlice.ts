@@ -98,10 +98,13 @@ const projectsSlice = createSlice({
     setProjects: (state, action: PayloadAction<Project[]>) => {
       state.projects = action.payload;
     },
+    addProject: (state, action: PayloadAction<Project>) => {
+      state.projects.push(action.payload);
+    },
   },
 });
 
-export const { setProjects } = projectsSlice.actions;
+export const { setProjects, addProject } = projectsSlice.actions;
 
 export const selectProjects = (state: RootState) => state.projects.projects;
 

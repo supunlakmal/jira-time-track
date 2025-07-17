@@ -1,16 +1,18 @@
 import Head from "next/head";
 import React, { useState } from "react";
 import Layout from "../components/layout/Layout";
-import { Search, FilterList, GridView, List } from "@mui/icons-material";
+import { Search, FilterList, GridView, List, Add } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectProjects } from "../store/projectsSlice";
-import { ProjectView } from "../components/projects";
+import { ProjectView, NewProjectModal } from "../components/projects";
+import Button from "../components/ui/Button";
 
 export default function ProjectDashboardPage() {
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
   const projects = useSelector(selectProjects);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
     <Layout toggleFloatingWindow={toggleFloatingWindow}>
@@ -36,6 +38,14 @@ export default function ProjectDashboardPage() {
                 </button>
               </div> */}
               <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => setIsCreateModalOpen(true)}
+                  startIcon={<Add />}
+                >
+                  Create Project
+                </Button>
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex items-center">
                   <button
                     onClick={() => setViewMode("grid")}
@@ -65,9 +75,22 @@ export default function ProjectDashboardPage() {
           </div>
         </div>
         <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50 dark:bg-gray-900 p-3 lg:p-6">
-          <ProjectView projects={projects} viewMode={viewMode} />
+          <ProjectView 
+            projects={projects} 
+            viewMode={viewMode} 
+            onCreateProject={() => setIsCreateModalOpen(true)}
+          />
         </main>
       </div>
+
+      <NewProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          // Could add success notification here
+          console.log("Project created successfully!");
+        }}
+      />
     </Layout>
   );
 }

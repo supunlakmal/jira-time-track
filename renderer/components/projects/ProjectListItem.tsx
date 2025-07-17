@@ -6,11 +6,15 @@ import { Project } from "../../store/projectsSlice";
 
 interface ProjectListItemProps {
   project: Project;
+  onClick?: () => void;
 }
 
-export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
+export const ProjectListItem: FC<ProjectListItemProps> = ({ project, onClick }) => {
   return (
-    <div className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+    <div 
+      className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+      onClick={onClick}
+    >
       <div className="flex items-center flex-1 space-x-4">
         <div
           className={`w-1.5 h-10 rounded-full ${ProjectHelper.getProgressBarColor(
@@ -72,7 +76,10 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project }) => {
       </div>
 
       <div className="flex items-center pl-4">
-        <button className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <button 
+          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreHoriz className="h-5 w-5" />
           <span className="sr-only">Project actions</span>
         </button>

@@ -11,11 +11,15 @@ import { Project } from "../../store/projectsSlice";
 
 interface ProjectCardProps {
   project: Project;
+  onClick?: () => void;
 }
 
-export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
+export const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden transition-all hover:shadow-md dark:bg-gray-800 dark:border-gray-700">
+    <div 
+      className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden transition-all hover:shadow-md dark:bg-gray-800 dark:border-gray-700 cursor-pointer hover:shadow-lg"
+      onClick={onClick}
+    >
       <div className="flex flex-col space-y-1.5 p-3 sm:p-6 pb-2">
         <div className="flex flex-wrap gap-2 justify-between items-start">
           <div className="flex items-start space-x-3">
@@ -48,7 +52,10 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
             <CalendarToday className="h-4 w-4 mr-1" />
             <span>Deadline: {project.deadline}</span>
           </div>
-          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg]:pointer-events-none [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 w-8 dark:hover:bg-gray-700">
+          <button 
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg]:pointer-events-none [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 w-8 dark:hover:bg-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreHoriz className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <span className="sr-only">Project actions</span>
           </button>

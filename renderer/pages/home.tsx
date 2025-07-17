@@ -1,58 +1,61 @@
 // renderer/pages/home.tsx
 import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
-import CsvImportDialog from "../components/dialogs/CsvImportDialog";
-import { ExportDialog } from "../components/dialogs/ExportDialog";
-import Header from "../components/layout/Header";
-import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { ManualTaskDialog } from "../components/dialogs/ManualTaskDialog";
+
 import Overview from "../components/dashboard/Overview";
 import ProjectsOverview from "../components/dashboard/ProjectsOverview";
-import { ResetDialog } from "../components/dialogs/ResetDialog";
+
 import TicketTable from "../components/tickets/TicketTable";
 import TicketTableActions from "../components/tickets/TicketTableActions";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { useSharedData } from "../hooks/useSharedData";
+import type { JiraIssue } from "../modules/jira";
 import { TimerSession } from "../store/sessionsSlice";
 import { DashboardStats, ProjectSummary } from "../types/dashboard";
+import Dashboard from "./dashboard";
 
 export default function HomePage() {
-  const { projectData: data, sessions, loading } = useSharedData();
+  const { projectData: data, sessions, billingData, loading } = useSharedData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
   const [projectBranches, setProjectBranches] = useState<
     Record<string, string>
   >({});
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const [showManualTaskDialog, setShowManualTaskDialog] = useState(false);
-  const [showCsvImportDialog, setShowCsvImportDialog] = useState(false);
-  const [showResetDialog, setShowResetDialog] = useState(false);
+
   const [editingTask, setEditingTask] = useState<any>(null);
 
   // Signal app ready when all data is loaded
   useEffect(() => {
-    console.log("HomePage: Checking app ready conditions - loading:", loading, "data:", !!data, "sessions:", !!sessions);
-    
-    if (!loading && typeof window !== 'undefined' && window.ipc) {
+    console.log(
+      "HomePage: Checking app ready conditions - loading:",
+      loading,
+      "data:",
+      !!data,
+      "sessions:",
+      !!sessions
+    );
+
+    if (!loading && typeof window !== "undefined" && window.ipc) {
       console.log("HomePage: Sending app-ready signal");
       // Add a small delay to ensure smooth loading
       const timer = setTimeout(() => {
         window.ipc.send("app-ready");
         console.log("HomePage: app-ready signal sent");
       }, 500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [loading, data, sessions]);
 
   // Fallback: Send app-ready signal after component mounts (regardless of data state)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ipc) {
+    if (typeof window !== "undefined" && window.ipc) {
       const fallbackTimer = setTimeout(() => {
         console.log("HomePage: Sending fallback app-ready signal");
         window.ipc.send("app-ready");
       }, 3000); // 3 second fallback
-      
+
       return () => clearTimeout(fallbackTimer);
     }
   }, []); // Run once on mount
@@ -363,47 +366,47 @@ export default function HomePage() {
   };
 
   // Manual task handlers
-  const handleAddManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
-    try {
-      const result = await window.ipc.invoke("add-manual-task", taskData);
-      if (result.success) {
-        console.log("Manual task added successfully:", result.task);
-      } else {
-        alert(`Error adding task: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error adding manual task:", error);
-      alert("Failed to add task. Please try again.");
-    }
-  };
+  // const handleAddManualTask = async (taskData: {
+  //   ticket_number: string;
+  //   ticket_name: string;
+  //   story_points?: number;
+  // }) => {
+  //   try {
+  //     const result = await window.ipc.invoke("add-manual-task", taskData);
+  //     if (result.success) {
+  //       console.log("Manual task added successfully:", result.task);
+  //     } else {
+  //       alert(`Error adding task: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding manual task:", error);
+  //     alert("Failed to add task. Please try again.");
+  //   }
+  // };
 
-  const handleEditManualTask = async (taskData: {
-    ticket_number: string;
-    ticket_name: string;
-    story_points?: number;
-  }) => {
-    if (!editingTask) return;
+  // const handleEditManualTask = async (taskData: {
+  //   ticket_number: string;
+  //   ticket_name: string;
+  //   story_points?: number;
+  // }) => {
+  //   if (!editingTask) return;
 
-    try {
-      const result = await window.ipc.invoke("update-manual-task", {
-        taskId: editingTask.ticket_number,
-        updates: taskData,
-      });
-      if (result.success) {
-        console.log("Manual task updated successfully:", result.task);
-        setEditingTask(null);
-      } else {
-        alert(`Error updating task: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error updating manual task:", error);
-      alert("Failed to update task. Please try again.");
-    }
-  };
+  //   try {
+  //     const result = await window.ipc.invoke("update-manual-task", {
+  //       taskId: editingTask.ticket_number,
+  //       updates: taskData,
+  //     });
+  //     if (result.success) {
+  //       console.log("Manual task updated successfully:", result.task);
+  //       setEditingTask(null);
+  //     } else {
+  //       alert(`Error updating task: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating manual task:", error);
+  //     alert("Failed to update task. Please try again.");
+  //   }
+  // };
 
   const handleDeleteManualTask = async (ticketNumber: string) => {
     if (!confirm("Are you sure you want to delete this manual task?")) {
@@ -428,123 +431,142 @@ export default function HomePage() {
 
   const openEditDialog = (task: any) => {
     setEditingTask(task);
-    setShowManualTaskDialog(true);
+    // setShowManualTaskDialog(true);
   };
 
-  const closeManualTaskDialog = () => {
-    setShowManualTaskDialog(false);
-    setEditingTask(null);
-  };
+  // const closeManualTaskDialog = () => {
+  //   setShowManualTaskDialog(false);
+  //   setEditingTask(null);
+  // };
 
   // CSV import handler
-  const handleCsvImport = async (csvData: any[]) => {
-    try {
-      const result = await window.ipc.invoke("import-csv-data", csvData);
-      if (result.success) {
-        console.log(
-          `Successfully imported ${result.importedCount} tasks from CSV`
-        );
-        // Data will be automatically refreshed via the shared data hook
-      } else {
-        alert(`Error importing CSV: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error importing CSV:", error);
-      alert("Failed to import CSV. Please try again.");
-    }
-  };
+  // const handleCsvImport = async (csvData: any[]) => {
+  //   try {
+  //     const result = await window.ipc.invoke("import-csv-data", csvData);
+  //     if (result.success) {
+  //       console.log(
+  //         `Successfully imported ${result.importedCount} tasks from CSV`
+  //       );
+  //       // Data will be automatically refreshed via the shared data hook
+  //     } else {
+  //       alert(`Error importing CSV: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error importing CSV:", error);
+  //     alert("Failed to import CSV. Please try again.");
+  //   }
+  // };
+
+  // Jira import handler
+  // const handleJiraImport = async (jiraIssues: JiraIssue[]) => {
+  //   try {
+  //     console.log(`Importing ${jiraIssues.length} Jira issues...`);
+
+  //     // Convert Jira issues to project tickets format
+  //     const result = await window.ipc.invoke(
+  //       "jira-convert-to-tickets",
+  //       jiraIssues
+  //     );
+
+  //     if (result.success && result.tickets) {
+  //       // Import the converted tickets using the existing CSV import mechanism
+  //       const importResult = await window.ipc.invoke(
+  //         "import-csv-data",
+  //         result.tickets
+  //       );
+
+  //       if (importResult.success) {
+  //         console.log(
+  //           `Successfully imported ${importResult.importedCount} tasks from Jira`
+  //         );
+
+  //         // Show success message to user
+  //         alert(
+  //           `Successfully imported ${importResult.importedCount} issues from Jira!`
+  //         );
+
+  //         // Close the Jira settings dialog
+  //         setShowJiraSettingsDialog(false);
+
+  //         // Data will be automatically refreshed via the shared data hook
+  //       } else {
+  //         console.error(
+  //           "Error importing converted Jira tickets:",
+  //           importResult.error
+  //         );
+  //         alert(`Error importing Jira issues: ${importResult.error}`);
+  //       }
+  //     } else {
+  //       console.error("Error converting Jira issues:", result.error);
+  //       alert(
+  //         `Error converting Jira issues: ${result.error || "Unknown error"}`
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error importing Jira issues:", error);
+  //     alert("Failed to import Jira issues. Please try again.");
+  //   }
+  // };
 
   return (
     <React.Fragment>
-      <Head>
-        <title>Project Time Tracker</title>
-      </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <Header
-            toggleFloatingWindow={toggleFloatingWindow}
-            setShowManualTaskDialog={setShowManualTaskDialog}
-            setShowCsvImportDialog={setShowCsvImportDialog}
-            setShowExportDialog={setShowExportDialog}
-            setShowResetDialog={setShowResetDialog}
-          />
+      <Dashboard toggleFloatingWindow={toggleFloatingWindow}>
+        <Head>
+          <title>Project Time Tracker</title>
+        </Head>
+        <div className="">
+          <div
+            className="
+          "
+          >
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <Overview
+                  dashboardStats={dashboardStats}
+                  projectSummaryData={projectSummaryData}
+                  formatTime={formatTime}
+                  billingData={billingData}
+                  sessions={sessions}
+                />
 
-          {loading ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              {/* Dashboard Stats Cards */}
-              <Overview
-                dashboardStats={dashboardStats}
-                projectSummaryData={projectSummaryData}
-                formatTime={formatTime}
-              />
+                <ProjectsOverview
+                  projectSummaryData={projectSummaryData}
+                  selectedProject={selectedProject}
+                  handleProjectSelect={handleProjectSelect}
+                  handleChooseProjectPath={handleChooseProjectPath}
+                  refreshBranch={refreshBranch}
+                  formatTime={formatTime}
+                  billingData={billingData}
+                  sessions={sessions}
+                />
 
-              <ProjectsOverview
-                projectSummaryData={projectSummaryData}
-                selectedProject={selectedProject}
-                handleProjectSelect={handleProjectSelect}
-                handleChooseProjectPath={handleChooseProjectPath}
-                refreshBranch={refreshBranch}
-                formatTime={formatTime}
-              />
+                <TicketTableActions
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedProject={selectedProject}
+                  loading={loading}
+                  refreshData={() => window.location.reload()}
+                />
 
-              <TicketTableActions
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                selectedProject={selectedProject}
-                loading={loading}
-                refreshData={() => window.location.reload()}
-              />
-
-              <TicketTable
-                ticketsToDisplay={ticketsToDisplay}
-                sessions={sessions}
-                selectedProject={selectedProject}
-                searchTerm={searchTerm}
-                formatTime={formatTime}
-                getProjectName={getProjectName}
-                openEditDialog={openEditDialog}
-                handleDeleteManualTask={handleDeleteManualTask}
-                data={data}
-              />
-            </>
-          )}
+                <TicketTable
+                  ticketsToDisplay={ticketsToDisplay}
+                  sessions={sessions}
+                  selectedProject={selectedProject}
+                  searchTerm={searchTerm}
+                  formatTime={formatTime}
+                  getProjectName={getProjectName}
+                  openEditDialog={openEditDialog}
+                  handleDeleteManualTask={handleDeleteManualTask}
+                  data={data}
+                  billingData={billingData}
+                />
+              </>
+            )}
+          </div>
         </div>
-
-        {/* Export Dialog */}
-        {showExportDialog && (
-          <ExportDialog
-            onClose={() => setShowExportDialog(false)}
-            projects={projectSummaryData.map((p) => p.name)}
-          />
-        )}
-
-        {/* Reset Dialog */}
-        {showResetDialog && (
-          <ResetDialog
-            onClose={() => setShowResetDialog(false)}
-          />
-        )}
-
-        {/* CSV Import Dialog */}
-        {showCsvImportDialog && (
-          <CsvImportDialog
-            onClose={() => setShowCsvImportDialog(false)}
-            onImport={handleCsvImport}
-          />
-        )}
-
-        {/* Manual Task Dialog */}
-        {showManualTaskDialog && (
-          <ManualTaskDialog
-            onClose={closeManualTaskDialog}
-            onSave={editingTask ? handleEditManualTask : handleAddManualTask}
-            editingTask={editingTask}
-            existingTickets={data.map((ticket) => ticket.ticket_number)}
-          />
-        )}
-      </div>
+      </Dashboard>
     </React.Fragment>
   );
 }

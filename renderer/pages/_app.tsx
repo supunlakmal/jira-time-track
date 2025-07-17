@@ -5,6 +5,8 @@ import { store } from "../store/store";
 import { ThemeProvider } from "../components/theme/ThemeProvider";
 
 import "../styles/globals.css";
+// import "../styles/output.css";
+// import "../styles/style.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

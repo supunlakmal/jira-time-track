@@ -1,19 +1,4 @@
-renderer/components/dialogs/CsvImportDialog.tsx:338:9 - error TS17002: Expected corresponding JSX closing tag for 'ModalWrapper'.
-
-338       </div>
-            ~~~
-
-renderer/components/dialogs/CsvImportDialog.tsx:339:5 - error TS1005: ')' expected.
-
-339     </ModalWrapper>
-        ~~
-
-renderer/components/dialogs/CsvImportDialog.tsx:340:3 - error TS1109: Expression expected.
-
-340   );
-      ~
-
-renderer/components/dialogs/CsvImportDialog.tsx:341:1 - error TS1128: Declaration or statement expected.
-
-341 };
-    ~
+ renderer/components/Template/src/pages/extra/Gallery/data.ts:30:3
+    30   src: string,
+         ~~~
+    The expected type comes from property 'src' which is declared here on type 'FilterImageType'

@@ -10,10 +10,7 @@ const meta: Meta<typeof Header> = {
   tags: ['autodocs'],
   argTypes: {
     toggleFloatingWindow: { action: 'toggleFloatingWindow' },
-    setShowManualTaskDialog: { action: 'setShowManualTaskDialog' },
-    setShowCsvImportDialog: { action: 'setShowCsvImportDialog' },
-    setShowExportDialog: { action: 'setShowExportDialog' },
-    setShowResetDialog: { action: 'setShowResetDialog' },
+    
   },
 };
 
@@ -23,10 +20,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     toggleFloatingWindow: () => console.log('Toggle Floating Window'),
-    setShowManualTaskDialog: (show) => console.log('Set Show Manual Task Dialog:', show),
-    setShowCsvImportDialog: (show) => console.log('Set Show CSV Import Dialog:', show),
-    setShowExportDialog: (show) => console.log('Set Show Export Dialog:', show),
-    setShowResetDialog: (show) => console.log('Set Show Reset Dialog:', show),
+    
   },
   render: (args) => {
     // Mock window.ipc for Storybook environment

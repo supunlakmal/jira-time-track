@@ -55,6 +55,15 @@ const validChannels = [
   "get-zoom-level",
   // Theme synchronization
   "theme-changed",
+  // Jira integration channels
+  "jira-check-secure-storage",
+  "jira-store-credentials",
+  "jira-get-credentials-status",
+  "jira-test-connection",
+  "jira-fetch-issues",
+  "jira-convert-to-tickets",
+  "jira-clear-credentials",
+  "jira-get-projects",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;

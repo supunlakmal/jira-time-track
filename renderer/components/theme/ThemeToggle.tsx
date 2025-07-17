@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme';
+import { LightMode, DarkMode, Settings } from '@mui/icons-material';
 
 interface ThemeToggleProps {
   className?: string;
@@ -19,9 +20,9 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const themes = [
-    { key: 'light', icon: '☀️', label: 'Light' },
-    { key: 'dark', icon: '🌙', label: 'Dark' },
-    { key: 'system', icon: '⚙️', label: 'System' }
+    { key: 'light', icon: <LightMode fontSize="small" />, label: 'Light' },
+    { key: 'dark', icon: <DarkMode fontSize="small" />, label: 'Dark' },
+    { key: 'system', icon: <Settings fontSize="small" />, label: 'System' }
   ] as const;
 
   const activeTheme = mounted ? theme : 'system';

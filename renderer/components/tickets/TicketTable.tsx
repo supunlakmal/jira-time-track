@@ -20,6 +20,7 @@ interface TicketTableProps {
   openEditDialog: (task: any) => void;
   handleDeleteManualTask: (ticketNumber: string) => void;
   data: any[];
+  billingData?: any;
 }
 
 const TicketTable: React.FC<TicketTableProps> = ({
@@ -32,7 +33,38 @@ const TicketTable: React.FC<TicketTableProps> = ({
   openEditDialog,
   handleDeleteManualTask,
   data,
+  billingData,
 }) => {
+  
+  const calculateTicketCost = (ticketNumber: string): { cost: number; currency: string } | null => {
+    if (!billingData?.settings) return null;
+    
+    const session = sessions[ticketNumber];
+    if (!session?.totalElapsed) return null;
+    
+    const ticket = data.find(t => t.ticket_number === ticketNumber);
+    if (!ticket) return null;
+    
+    const projectName = getProjectName(ticketNumber);
+    const hourlyRate = billingData.settings.projectRates?.[projectName] || billingData.settings.globalHourlyRate;
+    
+    if (!hourlyRate) return null;
+    
+    const timeSpentHours = session.totalElapsed / (1000 * 60 * 60);
+    const cost = timeSpentHours * hourlyRate;
+    
+    return {
+      cost,
+      currency: billingData.settings.currency || 'USD'
+    };
+  };
+  
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
+  };
   return (
     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
       <div className="p-4 border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 flex justify-between items-center">
@@ -74,6 +106,9 @@ const TicketTable: React.FC<TicketTableProps> = ({
                 Time Spent
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Cost
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -81,7 +116,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
             {ticketsToDisplay.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-300">
                   <div className="flex flex-col items-center">
                     <svg
                       className="w-12 h-12 text-gray-300 dark:text-gray-500 mb-4"
@@ -226,6 +261,28 @@ const TicketTable: React.FC<TicketTableProps> = ({
                           </span>
                         )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {(() => {
+                        const costData = calculateTicketCost(ticket.ticket_number);
+                        if (!costData) {
+                          return (
+                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                          );
+                        }
+                        return (
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {formatCurrency(costData.cost, costData.currency)}
+                            </span>
+                            {billingData?.settings?.globalHourlyRate && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatCurrency(billingData.settings.projectRates?.[getProjectName(ticket.ticket_number)] || billingData.settings.globalHourlyRate, costData.currency)}/h
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()} 
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex space-x-2">

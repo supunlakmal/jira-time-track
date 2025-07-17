@@ -6,6 +6,7 @@ type LoadingState = 'initializing' | 'loading-data' | 'ready';
 export function useSharedData() {
   const [projectData, setProjectData] = useState([]);
   const [sessions, setSessions] = useState({});
+  const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingState, setLoadingState] = useState<LoadingState>('initializing');
 
@@ -15,13 +16,18 @@ export function useSharedData() {
       try {
         setLoadingState('loading-data');
         
-        const [allTasks, sessionData] = await Promise.all([
+        const [allTasks, sessionData, billing] = await Promise.all([
           window.ipc.invoke("get-all-tasks"),
           window.ipc.invoke("get-sessions"),
+          window.ipc.invoke("get-billing-data").catch(error => {
+            console.error("Failed to load billing data:", error);
+            return null; // Return null as fallback
+          }),
         ]);
         
         setProjectData(allTasks || []);
         setSessions(sessionData || {});
+        setBillingData(billing || null);
         
         // Add a small delay to ensure smooth transitions
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -42,6 +48,10 @@ export function useSharedData() {
       window.ipc.invoke("get-all-tasks").then(setProjectData);
     });
     const cleanupSessions = window.ipc.on("sessions-updated", setSessions);
+    const cleanupBilling = window.ipc.on("billing-updated", (data) => {
+      console.log("Billing data updated:", data);
+      setBillingData(data);
+    });
 
     loadData();
 
@@ -49,6 +59,7 @@ export function useSharedData() {
       cleanupProject();
       cleanupManual();
       cleanupSessions();
+      cleanupBilling();
     };
   }, []);
 
@@ -59,6 +70,7 @@ export function useSharedData() {
   return { 
     projectData, 
     sessions, 
+    billingData,
     loading, 
     loadingState,
     isReady: loadingState === 'ready',

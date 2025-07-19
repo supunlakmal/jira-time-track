@@ -144,11 +144,12 @@ class DataManager {
     console.log(`DataManager: Manual tasks updated with ${tasks.length} tasks`);
   }
 
-  addManualTask(task: any) {
+  addManualTask(task: any, projectId?: string) {
     const manualTasks = this.getManualTasks();
     const newTask = {
       ...task,
       isManual: true,
+      projectId: projectId || task.projectId,
       createdAt: new Date().toISOString(),
     };
     manualTasks.push(newTask);
@@ -172,6 +173,131 @@ class DataManager {
     const filtered = manualTasks.filter((t) => t.ticket_number !== taskId);
     this.setManualTasks(filtered);
     return filtered;
+  }
+
+  // Project-associated manual task methods
+  getManualTasksByProject(projectId: string) {
+    const allTasks = this.getManualTasks();
+    return allTasks.filter((task) => task.projectId === projectId);
+  }
+
+  addManualTaskToProject(projectId: string, task: any) {
+    const newTask = {
+      ...task,
+      projectId,
+      isManual: true,
+      createdAt: new Date().toISOString(),
+    };
+    const manualTasks = this.getManualTasks();
+    manualTasks.push(newTask);
+    this.setManualTasks(manualTasks);
+    return newTask;
+  }
+
+  getManualTasksGroupedByProject() {
+    const allTasks = this.getManualTasks();
+    const grouped = {};
+    
+    allTasks.forEach((task) => {
+      const projectId = task.projectId || 'unassigned';
+      if (!grouped[projectId]) {
+        grouped[projectId] = [];
+      }
+      grouped[projectId].push(task);
+    });
+    
+    return grouped;
+  }
+
+  // Data migration methods
+  migrateManualTasksToProjects() {
+    const manualTasks = this.getManualTasks();
+    const projects = this.getProjects();
+    let migrationCount = 0;
+    let hasChanges = false;
+
+    // Create a map of project names to project IDs for quick lookup
+    const projectNameMap = new Map();
+    projects.forEach(project => {
+      // Use project name or create from ticket prefix
+      projectNameMap.set(project.name.toUpperCase(), project.id);
+    });
+
+    // Process each manual task
+    manualTasks.forEach((task, index) => {
+      // Skip if already has a projectId
+      if (task.projectId) {
+        return;
+      }
+
+      // Extract project name from ticket number (e.g., "PROJ-123" -> "PROJ")
+      const ticketParts = task.ticket_number.split('-');
+      if (ticketParts.length >= 2) {
+        const projectPrefix = ticketParts[0].toUpperCase();
+        
+        // Try to find existing project by name
+        let projectId = null;
+        for (const [projectName, id] of projectNameMap.entries()) {
+          if (projectName.includes(projectPrefix) || projectPrefix.includes(projectName)) {
+            projectId = id;
+            break;
+          }
+        }
+
+        // If no matching project found, create a new one
+        if (!projectId) {
+          const newProject = {
+            name: projectPrefix,
+            description: `Auto-created project for ${projectPrefix} tickets`,
+            status: 'active',
+            progress: 0,
+            deadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days from now
+            tasks: 1,
+            activities: 0,
+            client: 'Unknown',
+            budget: 0,
+            startDate: new Date().toISOString(),
+          };
+          const createdProject = this.addProject(newProject);
+          projectId = createdProject.id;
+          projectNameMap.set(projectPrefix, projectId);
+          console.log(`DataManager: Created new project "${projectPrefix}" for manual task migration`);
+        }
+
+        // Assign the task to the project
+        manualTasks[index] = { ...task, projectId };
+        migrationCount++;
+        hasChanges = true;
+      } else {
+        // For tasks without proper ticket format, assign to "unassigned" project
+        let unassignedProject = projects.find(p => p.name.toLowerCase() === 'unassigned');
+        if (!unassignedProject) {
+          unassignedProject = this.addProject({
+            name: 'Unassigned',
+            description: 'Tasks that could not be automatically assigned to a project',
+            status: 'active',
+            progress: 0,
+            deadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            tasks: 0,
+            activities: 0,
+            client: 'Unknown',
+            budget: 0,
+            startDate: new Date().toISOString(),
+          });
+        }
+        manualTasks[index] = { ...task, projectId: unassignedProject.id };
+        migrationCount++;
+        hasChanges = true;
+      }
+    });
+
+    // Save changes if any
+    if (hasChanges) {
+      this.setManualTasks(manualTasks);
+      console.log(`DataManager: Migrated ${migrationCount} manual tasks to projects`);
+    }
+
+    return migrationCount;
   }
 
   // Projects methods
@@ -381,6 +507,7 @@ class DataManager {
   getAllStoreData() {
     const sessions = this.getSessions();
     const projectData = this.getProjectData();
+    const projects = this.getProjects();
     const manualTasks = this.getManualTasks();
     const billing = this.getBillingData();
 
@@ -396,6 +523,7 @@ class DataManager {
       mainStore: {
         sessions,
         projectData,
+        projects,
         manualTasks,
         billing,
       },
@@ -404,6 +532,7 @@ class DataManager {
       summary: {
         totalSessions: Object.keys(sessions).length,
         totalProjectData: projectData.length,
+        totalProjects: projects.length,
         totalManualTasks: manualTasks.length,
         totalProjectPaths: Object.keys(projectPaths).length,
         activeSessions: Object.values(sessions).filter((session: any) =>
@@ -412,6 +541,7 @@ class DataManager {
         storeSize: JSON.stringify({
           sessions,
           projectData,
+          projects,
           manualTasks,
           billing,
         }).length,
@@ -491,6 +621,16 @@ const createFloatingWindow = async () => {
     console.log("Jira module status:", jiraStatus);
   } catch (error) {
     console.error("Failed to initialize Jira module:", error);
+  }
+
+  // Run data migration for manual tasks to projects
+  try {
+    const migratedCount = dataManager.migrateManualTasksToProjects();
+    if (migratedCount > 0) {
+      console.log(`Successfully migrated ${migratedCount} manual tasks to projects`);
+    }
+  } catch (error) {
+    console.error("Failed to migrate manual tasks:", error);
   }
 
   // Initialize projects with default data if needed
@@ -971,7 +1111,7 @@ ipcMain.handle("get-all-tasks", () => {
   return dataManager.getAllTasks();
 });
 
-ipcMain.handle("add-manual-task", (_, taskData) => {
+ipcMain.handle("add-manual-task", (_, { taskData, projectId }) => {
   try {
     // Validate task data
     if (!taskData.ticket_number || !taskData.ticket_name) {
@@ -987,7 +1127,7 @@ ipcMain.handle("add-manual-task", (_, taskData) => {
       throw new Error("Ticket number already exists");
     }
 
-    const newTask = dataManager.addManualTask(taskData);
+    const newTask = dataManager.addManualTask(taskData, projectId);
     return { success: true, task: newTask };
   } catch (error) {
     console.error("Error adding manual task:", error);
@@ -1015,6 +1155,51 @@ ipcMain.handle("delete-manual-task", (_, taskId) => {
     return { success: true };
   } catch (error) {
     console.error("Error deleting manual task:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Project-associated manual task IPC handlers
+ipcMain.handle("get-manual-tasks-by-project", (_, projectId) => {
+  try {
+    const tasks = dataManager.getManualTasksByProject(projectId);
+    return { success: true, tasks };
+  } catch (error) {
+    console.error("Error getting manual tasks by project:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-manual-tasks-grouped-by-project", () => {
+  try {
+    const groupedTasks = dataManager.getManualTasksGroupedByProject();
+    return { success: true, groupedTasks };
+  } catch (error) {
+    console.error("Error getting grouped manual tasks:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("add-manual-task-to-project", (_, { projectId, taskData }) => {
+  try {
+    // Validate task data
+    if (!taskData.ticket_number || !taskData.ticket_name) {
+      throw new Error("Ticket number and name are required");
+    }
+
+    // Check if ticket number already exists
+    const allTasks = dataManager.getAllTasks();
+    const exists = allTasks.some(
+      (t) => t.ticket_number === taskData.ticket_number
+    );
+    if (exists) {
+      throw new Error("Ticket number already exists");
+    }
+
+    const newTask = dataManager.addManualTaskToProject(projectId, taskData);
+    return { success: true, task: newTask };
+  } catch (error) {
+    console.error("Error adding manual task to project:", error);
     return { success: false, error: error.message };
   }
 });

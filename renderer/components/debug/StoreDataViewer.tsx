@@ -35,6 +35,32 @@ const StoreDataViewer: React.FC<StoreDataViewerProps> = ({ className = "" }) => 
 
   useEffect(() => {
     fetchStoreData();
+
+    // Listen for data updates and automatically refresh
+    const cleanupSessions = window.ipc.on("sessions-updated", () => {
+      fetchStoreData();
+    });
+    const cleanupProjectData = window.ipc.on("project-data-updated", () => {
+      fetchStoreData();
+    });
+    const cleanupManualTasks = window.ipc.on("manual-tasks-updated", () => {
+      fetchStoreData();
+    });
+    const cleanupBilling = window.ipc.on("billing-updated", () => {
+      fetchStoreData();
+    });
+    const cleanupProjects = window.ipc.on("projects-updated", () => {
+      fetchStoreData();
+    });
+
+    // Cleanup event listeners on unmount
+    return () => {
+      cleanupSessions();
+      cleanupProjectData();
+      cleanupManualTasks();
+      cleanupBilling();
+      cleanupProjects();
+    };
   }, []);
 
   const formatJson = (data: any) => {
@@ -114,7 +140,7 @@ const StoreDataViewer: React.FC<StoreDataViewerProps> = ({ className = "" }) => 
             <Storage className="w-4 h-4" />
             Store Summary
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
             <div>
               <span className="text-green-700 dark:text-green-300">Sessions:</span>
               <span className="ml-2 text-green-900 dark:text-green-100">
@@ -129,6 +155,12 @@ const StoreDataViewer: React.FC<StoreDataViewerProps> = ({ className = "" }) => 
             </div>
             <div>
               <span className="text-green-700 dark:text-green-300">Projects:</span>
+              <span className="ml-2 text-green-900 dark:text-green-100">
+                {storeData.summary.totalProjects}
+              </span>
+            </div>
+            <div>
+              <span className="text-green-700 dark:text-green-300">Project Data:</span>
               <span className="ml-2 text-green-900 dark:text-green-100">
                 {storeData.summary.totalProjectData}
               </span>

@@ -34,6 +34,10 @@ const validChannels = [
   "update-manual-task",
   "delete-manual-task",
   "manual-tasks-updated",
+  // Project-associated manual task channels
+  "get-manual-tasks-by-project",
+  "get-manual-tasks-grouped-by-project",
+  "add-manual-task-to-project",
   // Export functionality
   "export-time-data",
   "get-export-summary",

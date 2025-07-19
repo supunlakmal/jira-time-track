@@ -10,6 +10,7 @@ interface CreateTicketModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectName?: string;
+  projectId?: string;
   onSuccess?: () => void;
 }
 
@@ -55,6 +56,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   isOpen,
   onClose,
   projectName,
+  projectId,
   onSuccess,
 }) => {
   const { projectData } = useSharedData();
@@ -110,7 +112,10 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
         story_points: data.story_points ? parseFloat(data.story_points) : undefined,
       };
       
-      const result = await window.ipc.invoke("add-manual-task", taskData);
+      const result = await window.ipc.invoke("add-manual-task", { 
+        taskData, 
+        projectId 
+      });
       
       if (result.success) {
         reset();

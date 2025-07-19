@@ -5,6 +5,7 @@ export interface ProjectTicket {
   ticket_name: string;
   story_points: number;
   isManual?: boolean;
+  projectId?: string;
   createdAt?: string;
   // Jira-specific fields
   isJiraImported?: boolean;

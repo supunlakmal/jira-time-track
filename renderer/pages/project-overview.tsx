@@ -16,6 +16,15 @@ export default function ProjectOverviewPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingTask, setEditingTask] = useState<any>(null);
+  
+  // Project path and GitHub integration state
+  const [projectPath, setProjectPath] = useState<string>("");
+  const [currentBranch, setCurrentBranch] = useState<string>("");
+  const [projectCost, setProjectCost] = useState<{
+    cost: number;
+    currency: string;
+    rate: number;
+  } | null>(null);
 
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
@@ -62,8 +71,145 @@ export default function ProjectOverviewPage() {
     router.push("/project-dashboard");
   };
 
+  // Project path and GitHub integration functions
+  const handleChooseProjectPath = async () => {
+    if (!project || !window.ipc || typeof window.ipc.invoke !== "function") {
+      alert("Directory picker not available (IPC error).");
+      return;
+    }
+
+    try {
+      const result = await window.ipc.invoke(
+        "select-project-directory",
+        project.name
+      );
+      if (result && result.filePath) {
+        setProjectPath(result.filePath);
+        // Save to project paths store
+        const allPaths = await window.ipc.invoke("get-project-paths") || {};
+        const newPaths = { ...allPaths, [project.name]: result.filePath };
+        window.ipc.send("save-project-paths", newPaths);
+        
+        // Load branch info for the new path
+        loadCurrentBranch(result.filePath);
+      } else if (result && result.error) {
+        console.error("Error selecting directory:", result.error);
+        alert("Failed to select directory. Please try again.");
+      }
+    } catch (e) {
+      console.error("Error invoking select-project-directory:", e);
+      alert("Failed to open directory picker.");
+    }
+  };
+
+  const loadCurrentBranch = async (path: string) => {
+    if (!project || !window.ipc || typeof window.ipc.invoke !== "function") {
+      return;
+    }
+
+    try {
+      const branchResult = await window.ipc.invoke("get-current-branch", {
+        projectName: project.name,
+        projectPath: path,
+      });
+      if (branchResult && branchResult.branch) {
+        setCurrentBranch(branchResult.branch);
+      } else if (branchResult && branchResult.error) {
+        setCurrentBranch("Error");
+        console.warn(
+          `Failed to get branch for ${project.name}:`,
+          branchResult.error
+        );
+      }
+    } catch (e) {
+      console.error(`Error getting branch for ${project.name}:`, e);
+      setCurrentBranch("Unknown");
+    }
+  };
+
+  const refreshBranch = async () => {
+    if (!project || !projectPath) {
+      return;
+    }
+    loadCurrentBranch(projectPath);
+  };
+
+  // Project cost calculation and billing integration
+  const calculateProjectCost = () => {
+    if (!billingData?.settings || !sessions || !project) return null;
+    
+    let totalCost = 0;
+    let totalTime = 0;
+    
+    Object.keys(sessions).forEach(ticketNumber => {
+      if (ticketNumber.startsWith(project.name + '-') || ticketNumber.split('-')[0] === project.name) {
+        const session = sessions[ticketNumber];
+        if (session?.totalElapsed) {
+          const hourlyRate = billingData.settings.projectRates?.[project.name] || billingData.settings.globalHourlyRate;
+          if (hourlyRate) {
+            const timeSpentHours = session.totalElapsed / (1000 * 60 * 60);
+            totalCost += timeSpentHours * hourlyRate;
+            totalTime += session.totalElapsed;
+          }
+        }
+      }
+    });
+    
+    return totalCost > 0 ? {
+      cost: totalCost,
+      currency: billingData.settings.currency || 'USD',
+      rate: billingData.settings.projectRates?.[project.name] || billingData.settings.globalHourlyRate
+    } : null;
+  };
+  
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
+  };
+
   // Find project by name
   const project = projects.find((p) => p.name === name);
+
+  // Load project-specific data on component mount and project change
+  useEffect(() => {
+    const loadProjectPath = async () => {
+      if (!project || !window.ipc || typeof window.ipc.invoke !== "function") {
+        return;
+      }
+
+      try {
+        const storedPaths = await window.ipc.invoke("get-project-paths");
+        if (storedPaths && typeof storedPaths === "object" && storedPaths[project.name]) {
+          const path = storedPaths[project.name];
+          setProjectPath(path);
+          
+          // Load branch info for this path
+          loadCurrentBranch(path);
+        } else {
+          setProjectPath("");
+          setCurrentBranch("");
+        }
+      } catch (e) {
+        console.error("Failed to load project path via IPC:", e);
+        setProjectPath("");
+        setCurrentBranch("");
+      }
+    };
+
+    if (project) {
+      loadProjectPath();
+    }
+  }, [project]);
+
+  // Calculate and update project cost when billing data or sessions change
+  useEffect(() => {
+    if (project && billingData && sessions) {
+      const costData = calculateProjectCost();
+      setProjectCost(costData);
+    }
+  }, [project, billingData, sessions]);
 
   // Filter tickets for current project with search functionality
   const projectTickets = useMemo(() => {
@@ -207,7 +353,8 @@ export default function ProjectOverviewPage() {
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     {project.description}
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                    {/* Basic Project Info */}
                     <div>
                       <span className="font-medium text-gray-700 dark:text-gray-300">
                         Status:
@@ -231,7 +378,89 @@ export default function ProjectOverviewPage() {
                         Deadline:
                       </span>
                       <div className="mt-1 text-gray-900 dark:text-white">
-                        {project.deadline}
+                        {new Date(project.deadline).toLocaleDateString()}
+                      </div>
+                    </div>
+
+                    {/* Repository Information */}
+                    <div>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        Repository Path:
+                      </span>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span
+                          className={`truncate flex-grow text-xs ${
+                            !projectPath ? "italic text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"
+                          }`}
+                          title={projectPath || "Click 'Choose Path' to set"}
+                        >
+                          {projectPath || "Path not set"}
+                        </span>
+                        <button
+                          onClick={handleChooseProjectPath}
+                          className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded transition-colors"
+                          title="Choose project directory"
+                        >
+                          Choose
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        Current Branch:
+                      </span>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            currentBranch === "main" || currentBranch === "master"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : currentBranch === "Error"
+                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                              : currentBranch === "Unknown"
+                              ? "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                              : currentBranch
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : "bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+                          }`}
+                          title={currentBranch || "No branch information"}
+                        >
+                          {currentBranch || (projectPath ? "..." : "No path")}
+                        </span>
+                        {projectPath && (
+                          <button
+                            onClick={refreshBranch}
+                            className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded transition-colors"
+                            title="Refresh branch information"
+                          >
+                            ↻
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Billing Information */}
+                    <div>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        Project Cost:
+                      </span>
+                      <div className="mt-1">
+                        {projectCost ? (
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {formatCurrency(projectCost.cost, projectCost.currency)}
+                            </span>
+                            {projectCost.rate && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatCurrency(projectCost.rate, projectCost.currency)}/h
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500 italic text-xs">
+                            No billing rate
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

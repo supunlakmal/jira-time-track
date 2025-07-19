@@ -1,8 +1,7 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { ModalWrapper } from "../ui/ModalWrapper";
 import { ProjectForm } from "./ProjectForm";
-import { addProject, Project } from "../../store/projectsSlice";
+import { Project } from "../../types/projects";
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -15,22 +14,24 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const dispatch = useDispatch();
-
-  const handleSubmit = (projectData: Omit<Project, "tasks" | "activities">) => {
+  const handleSubmit = async (projectData: Omit<Project, "tasks" | "activities">) => {
     const newProject: Project = {
       ...projectData,
       tasks: 0,
       activities: 0,
     };
 
-    dispatch(addProject(newProject));
-    
-    if (onSuccess) {
-      onSuccess(newProject);
+    try {
+      const result = await window.ipc.invoke("add-project", newProject);
+      
+      if (result.success && onSuccess) {
+        onSuccess(result.project);
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error("Failed to create project:", error);
     }
-    
-    onClose();
   };
 
   if (!isOpen) return null;

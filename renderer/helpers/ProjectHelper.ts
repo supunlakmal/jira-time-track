@@ -1,4 +1,4 @@
-import { Project } from "../store/projectsSlice";
+import { Project } from "../types/projects";
 import { ProjectStatus } from "../constants/projectStatus";
 
 export class ProjectHelper {

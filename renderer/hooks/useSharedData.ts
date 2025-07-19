@@ -7,6 +7,7 @@ export function useSharedData() {
   const [projectData, setProjectData] = useState([]);
   const [sessions, setSessions] = useState({});
   const [billingData, setBillingData] = useState(null);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingState, setLoadingState] = useState<LoadingState>('initializing');
 
@@ -16,18 +17,23 @@ export function useSharedData() {
       try {
         setLoadingState('loading-data');
         
-        const [allTasks, sessionData, billing] = await Promise.all([
+        const [allTasks, sessionData, billing, projectsData] = await Promise.all([
           window.ipc.invoke("get-all-tasks"),
           window.ipc.invoke("get-sessions"),
           window.ipc.invoke("get-billing-data").catch(error => {
             console.error("Failed to load billing data:", error);
             return null; // Return null as fallback
           }),
+          window.ipc.invoke("get-projects").catch(error => {
+            console.error("Failed to load projects data:", error);
+            return []; // Return empty array as fallback
+          }),
         ]);
         
         setProjectData(allTasks || []);
         setSessions(sessionData || {});
         setBillingData(billing || null);
+        setProjects(projectsData || []);
         
         // Add a small delay to ensure smooth transitions
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -52,6 +58,10 @@ export function useSharedData() {
       console.log("Billing data updated:", data);
       setBillingData(data);
     });
+    const cleanupProjects = window.ipc.on("projects-updated", (data) => {
+      console.log("Projects data updated:", data);
+      setProjects(data);
+    });
 
     loadData();
 
@@ -60,6 +70,7 @@ export function useSharedData() {
       cleanupManual();
       cleanupSessions();
       cleanupBilling();
+      cleanupProjects();
     };
   }, []);
 
@@ -71,6 +82,7 @@ export function useSharedData() {
     projectData, 
     sessions, 
     billingData,
+    projects,
     loading, 
     loadingState,
     isReady: loadingState === 'ready',

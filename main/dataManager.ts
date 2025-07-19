@@ -170,6 +170,7 @@ class DataManager {
     };
   }
 
+
   // Reset methods
   getResetPreview() {
     const sessions = this.getSessions();

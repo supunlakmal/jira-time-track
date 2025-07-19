@@ -41,6 +41,18 @@ const validChannels = [
   "import-csv-data",
   "import-csv-file",
   "get-data-source-info",
+  "get-all-store-data",
+  // Billing functionality
+  "get-billing-data",
+  "get-billing-settings",
+  "save-billing-settings",
+  "billing-updated",
+  // Projects functionality
+  "get-projects",
+  "add-project",
+  "update-project",
+  "delete-project",
+  "projects-updated",
   // Reset functionality
   "get-reset-preview",
   "reset-data",

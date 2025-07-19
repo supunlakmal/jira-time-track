@@ -3,25 +3,17 @@ import Head from "next/head";
 import React, { useEffect, useMemo, useState } from "react";
 
 import ProjectsOverview from "../components/dashboard/ProjectsOverview";
-import TicketTable from "../components/tickets/TicketTable";
-import TicketTableActions from "../components/tickets/TicketTableActions";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { useSharedData } from "../hooks/useSharedData";
-import type { JiraIssue } from "../modules/jira";
-import { TimerSession } from "../store/sessionsSlice";
 import { ProjectSummary } from "../types/dashboard";
 import Dashboard from "./dashboard";
 
 export default function ProjectsPage() {
   const { projectData: data, sessions, billingData, loading } = useSharedData();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
   const [projectBranches, setProjectBranches] = useState<
     Record<string, string>
   >({});
-
-  const [editingTask, setEditingTask] = useState<any>(null);
 
   // Load project paths from main process on component mount
   useEffect(() => {
@@ -176,30 +168,12 @@ export default function ProjectsPage() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [data, projectPaths, projectBranches, sessions]);
 
-  const ticketsToDisplay = useMemo(() => {
-    let currentTickets = data;
-    if (selectedProject) {
-      currentTickets = currentTickets.filter(
-        (ticket) => getProjectName(ticket.ticket_number) === selectedProject
-      );
-    }
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      currentTickets = currentTickets.filter(
-        (ticket) =>
-          ticket.ticket_number.toLowerCase().includes(searchLower) ||
-          ticket.ticket_name.toLowerCase().includes(searchLower)
-      );
-    }
-    return currentTickets;
-  }, [data, selectedProject, searchTerm]);
 
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);
 
   const handleProjectSelect = (projectName: string | null) => {
-    setSelectedProject(projectName);
-    setSearchTerm("");
+    // Project selection handled by navigation to project overview page
   };
 
   const handleChooseProjectPath = async (projectName: string) => {
@@ -256,30 +230,6 @@ export default function ProjectsPage() {
     }
   };
 
-  const handleDeleteManualTask = async (ticketNumber: string) => {
-    if (!confirm("Are you sure you want to delete this manual task?")) {
-      return;
-    }
-
-    try {
-      const result = await window.ipc.invoke(
-        "delete-manual-task",
-        ticketNumber
-      );
-      if (result.success) {
-        console.log("Manual task deleted successfully");
-      } else {
-        alert(`Error deleting task: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("Error deleting manual task:", error);
-      alert("Failed to delete task. Please try again.");
-    }
-  };
-
-  const openEditDialog = (task: any) => {
-    setEditingTask(task);
-  };
 
   return (
     <React.Fragment>
@@ -295,34 +245,13 @@ export default function ProjectsPage() {
               <>
                 <ProjectsOverview
                   projectSummaryData={projectSummaryData}
-                  selectedProject={selectedProject}
+                  selectedProject={null}
                   handleProjectSelect={handleProjectSelect}
                   handleChooseProjectPath={handleChooseProjectPath}
                   refreshBranch={refreshBranch}
                   formatTime={formatTime}
                   billingData={billingData}
                   sessions={sessions}
-                />
-
-                <TicketTableActions
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  selectedProject={selectedProject}
-                  loading={loading}
-                  refreshData={() => window.location.reload()}
-                />
-
-                <TicketTable
-                  ticketsToDisplay={ticketsToDisplay}
-                  sessions={sessions}
-                  selectedProject={selectedProject}
-                  searchTerm={searchTerm}
-                  formatTime={formatTime}
-                  getProjectName={getProjectName}
-                  openEditDialog={openEditDialog}
-                  handleDeleteManualTask={handleDeleteManualTask}
-                  data={data}
-                  billingData={billingData}
                 />
               </>
             )}

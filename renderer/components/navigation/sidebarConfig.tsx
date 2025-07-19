@@ -7,6 +7,8 @@ import {
   Upload,
   AddTask,
   FolderOpen,
+  DataObject,
+  Storage,
 } from "@mui/icons-material";
 import { NavSectionProps } from "./NavSection";
 
@@ -69,6 +71,16 @@ export const sidebarSections: NavSectionProps[] = [
         label: "Jira Settings",
         href: "/jira-settings",
         icon: <Settings className="text-bgray-600 dark:text-bgray-300" />,
+      },
+      {
+        label: "Redux Data",
+        href: "/redux-data",
+        icon: <DataObject className="text-bgray-600 dark:text-bgray-300" />,
+      },
+      {
+        label: "Store Data",
+        href: "/store-data",
+        icon: <Storage className="text-bgray-600 dark:text-bgray-300" />,
       },
     ],
   },

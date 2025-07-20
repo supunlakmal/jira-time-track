@@ -2,6 +2,12 @@ appId: com.project.timetrack
 productName: Project Time Track
 artifactName: "${name}-Setup-${version}.${ext}"
 copyright: Copyright © 2025
+# Code Signing Notes:
+# 1. For development: verifyUpdateCodeSignature is set to false
+# 2. For production: Get a code signing certificate from a trusted CA
+# 3. Set environment variables: CSC_LINK (certificate path) and CSC_KEY_PASSWORD
+# 4. Update publisherName to match your certificate exactly
+# 5. Set verifyUpdateCodeSignature to true for production releases
 directories:
   output: dist
   buildResources: resources
@@ -20,6 +26,20 @@ win:
       arch: [x64]
   publisherName: "Project Time Track"
   icon: resources/icon.png
+  # Code Signing Configuration
+  signAndEditExecutable: true
+  signingHashAlgorithms: ["sha256"]
+  verifyUpdateCodeSignature: false  # Set to true in production with proper certificate
+  # Certificate Configuration (uncomment and configure for production):
+  # certificateSubjectName: "Project Time Track"  # Must match your certificate
+  # Environment variables needed: CSC_LINK (path to .p12/.pfx) and CSC_KEY_PASSWORD
+  # 
+  # Alternative: Azure Trusted Signing (uncomment for Azure setup):
+  # azureSignOptions:
+  #   tenantId: "your-tenant-id"
+  #   clientId: "your-client-id" 
+  #   clientSecret: "your-client-secret"  # Use environment variable: AZURE_CLIENT_SECRET
+  #   certificateProfileName: "your-certificate-profile"
 mac:
   target:
     - target: dmg

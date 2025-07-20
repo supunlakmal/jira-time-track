@@ -1,11 +1,8 @@
-
-import React, { FC } from "react";
 import { useRouter } from "next/router";
-import { Project } from "../../store/projectsSlice";
+import { FC } from "react";
+import { Project } from "../../types/projects";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectListItem } from "./ProjectListItem";
-import { CreateProjectCard } from "./CreateProjectCard";
-import { CreateProjectListItem } from "./CreateProjectListItem";
 
 interface ProjectViewProps {
   projects: Project[];
@@ -13,7 +10,11 @@ interface ProjectViewProps {
   onCreateProject?: () => void;
 }
 
-export const ProjectView: FC<ProjectViewProps> = ({ projects, viewMode, onCreateProject }) => {
+export const ProjectView: FC<ProjectViewProps> = ({
+  projects,
+  viewMode,
+  onCreateProject,
+}) => {
   const router = useRouter();
 
   const handleProjectClick = (project: Project) => {
@@ -22,13 +23,13 @@ export const ProjectView: FC<ProjectViewProps> = ({ projects, viewMode, onCreate
   if (viewMode === "grid") {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 xl:gap-6">
-        {onCreateProject && (
+        {/* {onCreateProject && (
           <CreateProjectCard onClick={onCreateProject} />
-        )}
+        )} */}
         {projects.map((project) => (
-          <ProjectCard 
-            key={project.name} 
-            project={project} 
+          <ProjectCard
+            key={project.name}
+            project={project}
             onClick={() => handleProjectClick(project)}
           />
         ))}
@@ -38,15 +39,13 @@ export const ProjectView: FC<ProjectViewProps> = ({ projects, viewMode, onCreate
 
   return (
     <div className="space-y-3">
-      {onCreateProject && (
-        <CreateProjectListItem onClick={onCreateProject} />
-      )}
+      {/* {onCreateProject && <CreateProjectListItem onClick={onCreateProject} />} */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         <div className="divide-y divide-gray-200 dark:divide-gray-700">
           {projects.map((project) => (
-            <ProjectListItem 
-              key={project.name} 
-              project={project} 
+            <ProjectListItem
+              key={project.name}
+              project={project}
               onClick={() => handleProjectClick(project)}
             />
           ))}

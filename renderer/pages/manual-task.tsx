@@ -11,6 +11,7 @@ type FormData = {
   ticket_number: string;
   ticket_name: string;
   story_points?: string;
+  projectId?: string;
 };
 
 const createFormSchema = (existingTickets: string[]) => {
@@ -42,11 +43,14 @@ const createFormSchema = (existingTickets: string[]) => {
           return !isNaN(points) && points >= 0 && points <= 100;
         }
       ),
+    projectId: yup
+      .string()
+      .optional(),
   }) as yup.ObjectSchema<FormData>;
 };
 
 export default function ManualTaskPage() {
-  const { projectData } = useSharedData();
+  const { projectData, projects } = useSharedData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -68,6 +72,7 @@ export default function ManualTaskPage() {
       ticket_number: "",
       ticket_name: "",
       story_points: "",
+      projectId: "",
     },
   });
 
@@ -83,7 +88,10 @@ export default function ManualTaskPage() {
         story_points: data.story_points ? parseFloat(data.story_points) : undefined,
       };
       
-      const result = await window.ipc.invoke("add-manual-task", taskData);
+      const result = await window.ipc.invoke("add-manual-task", { 
+        taskData, 
+        projectId: data.projectId || undefined 
+      });
       
       if (result.success) {
         setSuccessMessage("Manual task added successfully!");
@@ -187,6 +195,32 @@ export default function ManualTaskPage() {
               {errors.ticket_name && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.ticket_name.message}</p>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Project
+              </label>
+              <select
+                id="projectId"
+                {...register("projectId")}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
+                  errors.projectId ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                <option value="">Select a project (optional)</option>
+                {projects.map((project: any) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+              {errors.projectId && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.projectId.message}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Optional. Associate this task with a specific project
+              </p>
             </div>
 
             <div>

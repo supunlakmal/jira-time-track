@@ -34,6 +34,10 @@ const validChannels = [
   "update-manual-task",
   "delete-manual-task",
   "manual-tasks-updated",
+  // Project-associated manual task channels
+  "get-manual-tasks-by-project",
+  "get-manual-tasks-grouped-by-project",
+  "add-manual-task-to-project",
   // Export functionality
   "export-time-data",
   "get-export-summary",
@@ -41,6 +45,18 @@ const validChannels = [
   "import-csv-data",
   "import-csv-file",
   "get-data-source-info",
+  "get-all-store-data",
+  // Billing functionality
+  "get-billing-data",
+  "get-billing-settings",
+  "save-billing-settings",
+  "billing-updated",
+  // Projects functionality
+  "get-projects",
+  "add-project",
+  "update-project",
+  "delete-project",
+  "projects-updated",
   // Reset functionality
   "get-reset-preview",
   "reset-data",

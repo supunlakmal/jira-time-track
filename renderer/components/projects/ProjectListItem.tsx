@@ -2,7 +2,7 @@ import { MoreHoriz } from "@mui/icons-material";
 import { FC } from "react";
 import { projectStatusColors } from "../../constants/projectStatus";
 import { ProjectHelper } from "../../helpers/ProjectHelper";
-import { Project } from "../../store/projectsSlice";
+import { Project } from "../../types/projects";
 
 interface ProjectListItemProps {
   project: Project;

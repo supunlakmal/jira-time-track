@@ -8,3 +8,5 @@ export { default as Sidebar } from './Sidebar';
 export type { SidebarProps } from './Sidebar';
 
 export { sidebarSections } from './sidebarConfig';
+
+export { shouldShowNavItem, isPathMatch } from './navigationUtils';

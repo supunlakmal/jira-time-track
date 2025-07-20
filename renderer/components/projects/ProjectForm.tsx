@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Project } from "../../store/projectsSlice";
+import { Project } from "../../types/projects";
 import { ProjectStatus } from "../../constants/projectStatus";
 import { TextInput, TextArea, NumberInput, Button } from "../ui";
 

@@ -1,5 +1,6 @@
 appId: com.project.timetrack
 productName: Project Time Track
+artifactName: "${productName}-Setup-${version}.${ext}"
 copyright: Copyright © 2025
 directories:
   output: dist

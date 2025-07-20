@@ -80,6 +80,12 @@ const validChannels = [
   "jira-convert-to-tickets",
   "jira-clear-credentials",
   "jira-get-projects",
+  // Auto-update channels
+  "check-for-updates",
+  "download-update",
+  "install-update",
+  "get-update-info",
+  "update-status",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;
@@ -214,6 +220,24 @@ const handler = {
     checkBranchExists: async (branchName: string, projectPath: string) => {
       console.log("[IPC PRELOAD GIT] Check Branch Exists", branchName, projectPath);
       return await ipcRenderer.invoke("check-git-branch-exists", { branchName, projectPath });
+    },
+  },
+  update: {
+    checkForUpdates: async () => {
+      console.log("[IPC PRELOAD UPDATE] Check for updates");
+      return await ipcRenderer.invoke("check-for-updates");
+    },
+    downloadUpdate: async () => {
+      console.log("[IPC PRELOAD UPDATE] Download update");
+      return await ipcRenderer.invoke("download-update");
+    },
+    installUpdate: async () => {
+      console.log("[IPC PRELOAD UPDATE] Install update");
+      return await ipcRenderer.invoke("install-update");
+    },
+    getUpdateInfo: async () => {
+      console.log("[IPC PRELOAD UPDATE] Get update info");
+      return await ipcRenderer.invoke("get-update-info");
     },
   },
 };

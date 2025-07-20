@@ -9,11 +9,25 @@ files:
     filter:
       - package.json
       - app
-publish: null
+publish:
+  provider: github
+  owner: supunlakmal
+  repo: project-time-track
 win:
-  target: portable
+  target: 
+    - target: nsis
+      arch: [x64]
+  publisherName: "Project Time Track"
   icon: resources/icon.png
 mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
   icon: resources/icon.png
+  category: public.app-category.productivity
 linux:
+  target:
+    - target: AppImage
+      arch: [x64]
   icon: resources/icon.png
+  category: Office

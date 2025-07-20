@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "../ui/Button";
 import { IpcHandler } from "../../types/electron";
+import { Remove, CenterFocusStrong, Add, Close } from '@mui/icons-material';
 
 interface FloatingWindowHeaderProps {
   selectedTicketNumber: string | null;
@@ -45,7 +46,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
             className="w-5 h-5 text-xs"
             title="Zoom out (Ctrl+-)"
           >
-            -
+            <Remove fontSize="small" />
           </Button>
           <Button
             onClick={() => (ipc || window.ipc)?.zoom?.reset()}
@@ -54,7 +55,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
             className="w-5 h-5 text-xs"
             title="Reset zoom (Ctrl+0)"
           >
-            ⊙
+            <CenterFocusStrong fontSize="small" />
           </Button>
           <Button
             onClick={() => (ipc || window.ipc)?.zoom?.in()}
@@ -63,7 +64,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
             className="w-5 h-5 text-xs"
             title="Zoom in (Ctrl+=)"
           >
-            +
+            <Add fontSize="small" />
           </Button>
         </div>
         <Button
@@ -73,7 +74,7 @@ const FloatingWindowHeader: React.FC<FloatingWindowHeaderProps> = ({
           className="w-6 h-6 text-xs hover:bg-red-500"
           title="Close"
         >
-          ×
+          <Close fontSize="small" />
         </Button>
       </div>
     </div>

@@ -5,7 +5,19 @@ export interface ProjectTicket {
   ticket_name: string;
   story_points: number;
   isManual?: boolean;
+  projectId?: string;
   createdAt?: string;
+  // Jira-specific fields
+  isJiraImported?: boolean;
+  jiraId?: string;
+  status?: string;
+  issueType?: string;
+  priority?: string;
+  project?: string;
+  assignee?: string;
+  created?: string;
+  updated?: string;
+  importedAt?: string;
 }
 
 export interface TaskTimer {
@@ -118,6 +130,201 @@ export interface IpcHandler {
     error?: string;
   }>;
 
+  // Billing integration methods
+  invoke(channel: "get-billing-data"): Promise<{
+    settings: {
+      globalHourlyRate?: number;
+      projectRates: Record<string, number>;
+      currency: string;
+      taxRate?: number;
+      companyName?: string;
+      companyAddress?: string;
+      invoicePrefix: string;
+    };
+    invoices: any[];
+  }>;
+  invoke(channel: "get-billing-settings"): Promise<{
+    globalHourlyRate?: number;
+    projectRates: Record<string, number>;
+    currency: string;
+    taxRate?: number;
+    companyName?: string;
+    companyAddress?: string;
+    invoicePrefix: string;
+  }>;
+  invoke(
+    channel: "save-billing-settings",
+    settings: {
+      globalHourlyRate?: number;
+      projectRates: Record<string, number>;
+      currency: string;
+      taxRate?: number;
+      companyName?: string;
+      companyAddress?: string;
+      invoicePrefix: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "calculate-ticket-cost",
+    ticketNumber: string
+  ): Promise<{
+    success: boolean;
+    cost?: {
+      ticketNumber: string;
+      ticketName: string;
+      projectName: string;
+      timeSpent: number;
+      timeSpentHours: number;
+      hourlyRate: number;
+      totalCost: number;
+      currency: string;
+    };
+    error?: string;
+  }>;
+  invoke(channel: "calculate-project-costs"): Promise<{
+    success: boolean;
+    costs?: Array<{
+      projectName: string;
+      totalTimeSpent: number;
+      totalCost: number;
+      ticketCount: number;
+      averageHourlyRate: number;
+      currency: string;
+    }>;
+    error?: string;
+  }>;
+  invoke(
+    channel: "add-invoice",
+    invoiceData: {
+      id: string;
+      invoiceNumber: string;
+      projectName?: string;
+      clientName?: string;
+      dateRange: { start: Date; end: Date };
+      items: any[];
+      subtotal: number;
+      taxAmount: number;
+      totalCost: number;
+      totalHours: number;
+      currency: string;
+      generatedAt: Date;
+    }
+  ): Promise<{
+    success: boolean;
+    invoice?: any;
+    error?: string;
+  }>;
+  invoke(channel: "get-invoices"): Promise<{
+    success: boolean;
+    invoices?: any[];
+    error?: string;
+  }>;
+  invoke(
+    channel: "delete-invoice",
+    invoiceId: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "get-sessions"): Promise<Record<string, any>>;
+
+  // Jira integration methods
+  invoke(channel: "jira-check-secure-storage"): Promise<{
+    success: boolean;
+    isAvailable: boolean;
+    hasCredentials: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-store-credentials",
+    credentials: {
+      domain: string;
+      email: string;
+      apiToken: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "jira-get-credentials-status"): Promise<{
+    success: boolean;
+    hasCredentials: boolean;
+    isAvailable: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-test-connection",
+    credentials?: {
+      domain: string;
+      email: string;
+      apiToken: string;
+    }
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-fetch-issues",
+    options?: {
+      jql?: string;
+      maxResults?: number;
+      startAt?: number;
+      fetchAll?: boolean;
+    }
+  ): Promise<{
+    success: boolean;
+    data?: {
+      issues: Array<{
+        id: string;
+        key: string;
+        summary: string;
+        description?: string;
+        status: string;
+        assignee?: {
+          displayName: string;
+          emailAddress: string;
+        };
+        created: string;
+        updated: string;
+        storyPoints?: number;
+        issueType: string;
+        priority: string;
+        project: {
+          key: string;
+          name: string;
+        };
+      }>;
+      total: number;
+      maxResults: number;
+      startAt: number;
+    };
+    error?: string;
+  }>;
+  invoke(
+    channel: "jira-convert-to-tickets",
+    issues: any[]
+  ): Promise<{
+    success: boolean;
+    tickets?: ProjectTicket[];
+    error?: string;
+  }>;
+  invoke(channel: "jira-clear-credentials"): Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+  invoke(channel: "jira-get-projects"): Promise<{
+    success: boolean;
+    projects?: Array<{
+      key: string;
+      name: string;
+      id: string;
+    }>;
+    error?: string;
+  }>;
+
   on(
     channel: "task-started",
     listener: (data: {
@@ -146,6 +353,29 @@ export interface IpcHandler {
     channel: "theme-changed",
     listener: (theme: string) => void
   ): () => void;
+  on(
+    channel: "billing-updated",
+    listener: (billingData: {
+      settings: {
+        globalHourlyRate?: number;
+        projectRates: Record<string, number>;
+        currency: string;
+        taxRate?: number;
+        companyName?: string;
+        companyAddress?: string;
+        invoicePrefix: string;
+      };
+      invoices: any[];
+    }) => void
+  ): () => void;
+  on(
+    channel: "sessions-updated",
+    listener: (sessions: Record<string, any>) => void
+  ): () => void;
+  on(
+    channel: "project-data-updated", 
+    listener: (data: any[]) => void
+  ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 
   window: {
@@ -159,6 +389,19 @@ export interface IpcHandler {
     in(): void;
     out(): void;
     reset(): void;
+  };
+  git: {
+    createBranch(branchName: string, projectPath: string): Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+      action?: string;
+    }>;
+    checkBranchExists(branchName: string, projectPath: string): Promise<{
+      success: boolean;
+      exists?: boolean;
+      error?: string;
+    }>;
   };
 }
 

@@ -15,6 +15,8 @@ const validChannels = [
   "save-project-paths",
   "select-project-directory",
   "get-current-branch",
+  "create-git-branch",
+  "check-git-branch-exists",
   "run-github-action",
   // Add any other channels your application might use between renderer and main
   "task-started", // For main-to-renderer
@@ -32,6 +34,10 @@ const validChannels = [
   "update-manual-task",
   "delete-manual-task",
   "manual-tasks-updated",
+  // Project-associated manual task channels
+  "get-manual-tasks-by-project",
+  "get-manual-tasks-grouped-by-project",
+  "add-manual-task-to-project",
   // Export functionality
   "export-time-data",
   "get-export-summary",
@@ -39,6 +45,18 @@ const validChannels = [
   "import-csv-data",
   "import-csv-file",
   "get-data-source-info",
+  "get-all-store-data",
+  // Billing functionality
+  "get-billing-data",
+  "get-billing-settings",
+  "save-billing-settings",
+  "billing-updated",
+  // Projects functionality
+  "get-projects",
+  "add-project",
+  "update-project",
+  "delete-project",
+  "projects-updated",
   // Reset functionality
   "get-reset-preview",
   "reset-data",
@@ -53,6 +71,15 @@ const validChannels = [
   "get-zoom-level",
   // Theme synchronization
   "theme-changed",
+  // Jira integration channels
+  "jira-check-secure-storage",
+  "jira-store-credentials",
+  "jira-get-credentials-status",
+  "jira-test-connection",
+  "jira-fetch-issues",
+  "jira-convert-to-tickets",
+  "jira-clear-credentials",
+  "jira-get-projects",
 ];
 
 const originalIpcRendererSend = ipcRenderer.send;
@@ -177,6 +204,16 @@ const handler = {
     getLevel: async () => {
       console.log("[IPC PRELOAD ZOOM] Get Zoom Level");
       return await ipcRenderer.invoke("get-zoom-level");
+    },
+  },
+  git: {
+    createBranch: async (branchName: string, projectPath: string) => {
+      console.log("[IPC PRELOAD GIT] Create Branch", branchName, projectPath);
+      return await ipcRenderer.invoke("create-git-branch", { branchName, projectPath });
+    },
+    checkBranchExists: async (branchName: string, projectPath: string) => {
+      console.log("[IPC PRELOAD GIT] Check Branch Exists", branchName, projectPath);
+      return await ipcRenderer.invoke("check-git-branch-exists", { branchName, projectPath });
     },
   },
 };

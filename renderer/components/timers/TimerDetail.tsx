@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import { TaskTimer } from "../../types/dashboard";
 
@@ -26,6 +26,101 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
   handleTimerAction,
   setSelectedTicketNumber,
 }) => {
+  const [projectPaths, setProjectPaths] = useState<Record<string, string>>({});
+  const [isCreatingBranch, setIsCreatingBranch] = useState(false);
+  const [branchMessage, setBranchMessage] = useState<string | null>(null);
+  const [branchExists, setBranchExists] = useState<boolean | null>(null);
+  const [isCheckingBranch, setIsCheckingBranch] = useState(false);
+
+  // Load project paths
+  useEffect(() => {
+    const loadPaths = async () => {
+      try {
+        if (window.ipc && typeof window.ipc.invoke === "function") {
+          const storedPaths = await window.ipc.invoke("get-project-paths");
+          setProjectPaths(
+            storedPaths && typeof storedPaths === "object" ? storedPaths : {}
+          );
+        }
+      } catch (e) {
+        console.error("Failed to load project paths:", e);
+        setProjectPaths({});
+      }
+    };
+    loadPaths();
+  }, []);
+
+  // Check if branch exists
+  const checkBranchExists = async () => {
+    const projectName = timer.ticketNumber.split('-')[0];
+    const projectPath = projectPaths[projectName];
+    
+    if (!projectPath) {
+      setBranchExists(null);
+      return;
+    }
+
+    setIsCheckingBranch(true);
+    try {
+      const result = await window.ipc.git.checkBranchExists(timer.ticketNumber, projectPath);
+      if (result.success) {
+        setBranchExists(result.exists || false);
+      } else {
+        setBranchExists(null);
+      }
+    } catch (error) {
+      console.error("Error checking branch existence:", error);
+      setBranchExists(null);
+    } finally {
+      setIsCheckingBranch(false);
+    }
+  };
+
+  // Check branch existence when project paths change
+  useEffect(() => {
+    checkBranchExists();
+  }, [projectPaths, timer.ticketNumber]);
+
+  // Handle git branch creation/switching
+  const handleCreateGitBranch = async () => {
+    const projectName = timer.ticketNumber.split('-')[0];
+    const projectPath = projectPaths[projectName];
+    
+    if (!projectPath) {
+      setBranchMessage(`No project path configured for ${projectName}`);
+      setTimeout(() => setBranchMessage(null), 3000);
+      return;
+    }
+
+    setIsCreatingBranch(true);
+    setBranchMessage(null);
+
+    try {
+      const result = await window.ipc.git.createBranch(timer.ticketNumber, projectPath);
+      
+      if (result.success) {
+        // Show different messages based on the action taken
+        if (result.action === "switched") {
+          setBranchMessage(`✓ Switched to existing branch '${timer.ticketNumber}'`);
+        } else if (result.action === "created") {
+          setBranchMessage(`✓ Created and switched to new branch '${timer.ticketNumber}'`);
+        } else {
+          setBranchMessage(`✓ ${result.message || 'Branch operation successful'}`);
+        }
+      } else {
+        setBranchMessage(`✗ ${result.error || 'Failed to create/switch branch'}`);
+      }
+    } catch (error) {
+      console.error("Error with git branch operation:", error);
+      setBranchMessage(`✗ Error: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsCreatingBranch(false);
+      setTimeout(() => setBranchMessage(null), 5000);
+      // Refresh branch existence after operation
+      checkBranchExists();
+    }
+  };
+
   const estimatedTimeMs = (timer.storyPoints || 0) * 60 * 60 * 1000;
   let progressWidthPercentage = 0;
   let progressBarColorClass = "bg-blue-600";
@@ -222,6 +317,48 @@ const TimerDetail: React.FC<TimerDetailProps> = ({
             </Button>
           )}
       </div>
+      
+      {/* Git Branch Creation Section */}
+      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={handleCreateGitBranch}
+            disabled={isCreatingBranch || isCheckingBranch}
+            variant="secondary"
+            size="sm"
+            className="flex-1"
+          >
+            {isCreatingBranch ? (
+              <>
+                <span className="animate-spin mr-1">⏳</span>
+                {branchExists ? 'Switching...' : 'Creating...'}
+              </>
+            ) : isCheckingBranch ? (
+              <>
+                <span className="animate-spin mr-1">⏳</span>
+                Checking...
+              </>
+            ) : (
+              <>
+                <span className="mr-1">🌿</span>
+                {branchExists === true ? 'Switch to Branch' : 
+                 branchExists === false ? 'Create Git Branch' : 
+                 'Git Branch'}
+              </>
+            )}
+          </Button>
+        </div>
+        {branchMessage && (
+          <div className={`mt-2 text-xs px-2 py-1 rounded ${
+            branchMessage.startsWith('✓') 
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
+              : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+          }`}>
+            {branchMessage}
+          </div>
+        )}
+      </div>
+
       {timer.sessions.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
           <details className="text-xs">

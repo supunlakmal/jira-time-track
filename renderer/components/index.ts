@@ -4,6 +4,9 @@ export * from './ui';
 // Layout Components
 export * from './layout';
 
+// Navigation Components
+export * from './navigation';
+
 // Theme Components
 export * from './theme';
 
@@ -16,5 +19,3 @@ export * from './tickets';
 // Dashboard Components
 export * from './dashboard';
 
-// Dialog Components
-export * from './dialogs';

@@ -1,19 +1,22 @@
-renderer/components/dialogs/CsvImportDialog.tsx:338:9 - error TS17002: Expected corresponding JSX closing tag for 'ModalWrapper'.
+renderer/components/projects/ProjectCard.tsx:11:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
 
-338       </div>
-            ~~~
+11 import { Project } from "../../store/projectsSlice";
+            ~~~~~~~
 
-renderer/components/dialogs/CsvImportDialog.tsx:339:5 - error TS1005: ')' expected.
+renderer/components/projects/ProjectListItem.tsx:5:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
 
-339     </ModalWrapper>
-        ~~
+5 import { Project } from "../../store/projectsSlice";
+           ~~~~~~~
 
-renderer/components/dialogs/CsvImportDialog.tsx:340:3 - error TS1109: Expression expected.
+renderer/components/projects/ProjectView.tsx:3:10 - error TS2614: Module '"../../store/projectsSlice"' has no exported member 'Project'. Did you mean to use 'import Project from "../../store/projectsSlice"' instead?
 
-340   );
-      ~
+3 import { Project } from "../../store/projectsSlice";
+           ~~~~~~~
 
-renderer/components/dialogs/CsvImportDialog.tsx:341:1 - error TS1128: Declaration or statement expected.
 
-341 };
-    ~
+Found 3 errors in 3 files.
+
+Errors  Files
+     1  renderer/components/projects/ProjectCard.tsx:11
+     1  renderer/components/projects/ProjectListItem.tsx:5
+     1  renderer/components/projects/ProjectView.tsx:3

@@ -149,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
               <div className="hidden 2xl:block">
                 <div className="flex items-center space-x-2.5">
                   <h3 className="text-base font-bold leading-[28px] text-bgray-900 dark:text-white">
-                    Free User
+                    Free User 2.0
                   </h3>
                   <span>
                     <KeyboardArrowDown className="text-bgray-900 dark:text-white" />

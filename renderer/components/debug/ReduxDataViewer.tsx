@@ -90,12 +90,6 @@ const ReduxDataViewer: React.FC<ReduxDataViewerProps> = ({ className = "" }) => 
               {Object.keys(reduxState.sessions.sessions).length} active
             </span>
           </div>
-          <div>
-            <span className="text-blue-700 dark:text-blue-300">Projects:</span>
-            <span className="ml-2 text-blue-900 dark:text-blue-100">
-              {reduxState.projects.projects.length} total
-            </span>
-          </div>
         </div>
       </div>
     </div>

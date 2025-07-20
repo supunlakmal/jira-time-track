@@ -1,14 +1,12 @@
 import {
-  Dashboard,
+  DataObject,
   Download,
+  FolderOpen,
   Receipt,
   RestartAlt,
   Settings,
-  Upload,
-  AddTask,
-  FolderOpen,
-  DataObject,
   Storage,
+  Upload,
 } from "@mui/icons-material";
 import { NavSectionProps } from "./NavSection";
 
@@ -16,27 +14,32 @@ export const sidebarSections: NavSectionProps[] = [
   {
     title: "Core",
     items: [
-      {
-        label: "Overview",
-        href: "/home",
-        icon: <Dashboard className="text-bgray-600 dark:text-bgray-300" />,
-      },
+      // {
+      //   label: "Overview",
+      //   href: "/home",
+      //   icon: <Dashboard className="text-bgray-600 dark:text-bgray-300" />,
+      // },
       {
         label: "Projects",
-        href: "/projects",
+        href: "/home",
         icon: <FolderOpen className="text-bgray-600 dark:text-bgray-300" />,
       },
 
-      {
-        label: "Projects View",
-        href: "/project-dashboard",
-        icon: <FolderOpen className="text-bgray-600 dark:text-bgray-300" />,
-      },
-      {
-        label: "Add Manual Task",
-        href: "/manual-task",
-        icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
-      },
+      // {
+      //   label: "Projects View",
+      //   href: "/project-dashboard",
+      //   icon: <FolderOpen className="text-bgray-600 dark:text-bgray-300" />,
+      // },
+      // {
+      //   label: "Add Manual Task",
+      //   href: "/manual-task",
+      //   icon: <AddTask className="text-bgray-600 dark:text-bgray-300" />,
+      // },
+    ],
+  },
+  {
+    title: "Billing",
+    items: [
       {
         label: "Billing",
         href: "/billing",
@@ -57,11 +60,6 @@ export const sidebarSections: NavSectionProps[] = [
         href: "/export-data",
         icon: <Download className="text-bgray-600 dark:text-bgray-300" />,
       },
-      {
-        label: "Reset Data",
-        href: "/reset-data",
-        icon: <RestartAlt className="text-bgray-600 dark:text-bgray-300" />,
-      },
     ],
   },
   {
@@ -81,6 +79,12 @@ export const sidebarSections: NavSectionProps[] = [
         label: "Store Data",
         href: "/store-data",
         icon: <Storage className="text-bgray-600 dark:text-bgray-300" />,
+      },
+
+      {
+        label: "Reset Data",
+        href: "/reset-data",
+        icon: <RestartAlt className="text-bgray-600 dark:text-bgray-300" />,
       },
     ],
   },

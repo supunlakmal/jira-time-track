@@ -237,7 +237,7 @@ class DataManager {
         
         // Try to find existing project by name
         let projectId = null;
-        for (const [projectName, id] of projectNameMap.entries()) {
+        for (const [projectName, id] of Array.from(projectNameMap.entries())) {
           if (projectName.includes(projectPrefix) || projectPrefix.includes(projectName)) {
             projectId = id;
             break;

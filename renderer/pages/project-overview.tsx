@@ -11,12 +11,13 @@ import { useSharedData } from "../hooks/useSharedData";
 export default function ProjectOverviewPage() {
   const router = useRouter();
   const { name } = router.query;
-  const { projectData, sessions, billingData, projects, loading } = useSharedData();
+  const { projectData, sessions, billingData, projects, loading } =
+    useSharedData();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingTask, setEditingTask] = useState<any>(null);
-  
+
   // Project path and GitHub integration state
   const [projectPath, setProjectPath] = useState<string>("");
   const [currentBranch, setCurrentBranch] = useState<string>("");
@@ -86,10 +87,10 @@ export default function ProjectOverviewPage() {
       if (result && result.filePath) {
         setProjectPath(result.filePath);
         // Save to project paths store
-        const allPaths = await window.ipc.invoke("get-project-paths") || {};
+        const allPaths = (await window.ipc.invoke("get-project-paths")) || {};
         const newPaths = { ...allPaths, [project.name]: result.filePath };
         window.ipc.send("save-project-paths", newPaths);
-        
+
         // Load branch info for the new path
         loadCurrentBranch(result.filePath);
       } else if (result && result.error) {
@@ -137,15 +138,20 @@ export default function ProjectOverviewPage() {
   // Project cost calculation and billing integration
   const calculateProjectCost = () => {
     if (!billingData?.settings || !sessions || !project) return null;
-    
+
     let totalCost = 0;
     let totalTime = 0;
-    
-    Object.keys(sessions).forEach(ticketNumber => {
-      if (ticketNumber.startsWith(project.name + '-') || ticketNumber.split('-')[0] === project.name) {
+
+    Object.keys(sessions).forEach((ticketNumber) => {
+      if (
+        ticketNumber.startsWith(project.name + "-") ||
+        ticketNumber.split("-")[0] === project.name
+      ) {
         const session = sessions[ticketNumber];
         if (session?.totalElapsed) {
-          const hourlyRate = billingData.settings.projectRates?.[project.name] || billingData.settings.globalHourlyRate;
+          const hourlyRate =
+            billingData.settings.projectRates?.[project.name] ||
+            billingData.settings.globalHourlyRate;
           if (hourlyRate) {
             const timeSpentHours = session.totalElapsed / (1000 * 60 * 60);
             totalCost += timeSpentHours * hourlyRate;
@@ -154,17 +160,21 @@ export default function ProjectOverviewPage() {
         }
       }
     });
-    
-    return totalCost > 0 ? {
-      cost: totalCost,
-      currency: billingData.settings.currency || 'USD',
-      rate: billingData.settings.projectRates?.[project.name] || billingData.settings.globalHourlyRate
-    } : null;
+
+    return totalCost > 0
+      ? {
+          cost: totalCost,
+          currency: billingData.settings.currency || "USD",
+          rate:
+            billingData.settings.projectRates?.[project.name] ||
+            billingData.settings.globalHourlyRate,
+        }
+      : null;
   };
-  
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+
+  const formatCurrency = (amount: number, currency: string = "USD") => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
     }).format(amount);
   };
@@ -181,10 +191,14 @@ export default function ProjectOverviewPage() {
 
       try {
         const storedPaths = await window.ipc.invoke("get-project-paths");
-        if (storedPaths && typeof storedPaths === "object" && storedPaths[project.name]) {
+        if (
+          storedPaths &&
+          typeof storedPaths === "object" &&
+          storedPaths[project.name]
+        ) {
           const path = storedPaths[project.name];
           setProjectPath(path);
-          
+
           // Load branch info for this path
           loadCurrentBranch(path);
         } else {
@@ -214,26 +228,29 @@ export default function ProjectOverviewPage() {
   // Filter tickets for current project with search functionality
   const projectTickets = useMemo(() => {
     if (!project) return [];
-    
+
     // Filter by project association (either by projectId or ticket number prefix)
     let filteredTickets = projectData.filter((ticket: any) => {
       // Check if ticket is directly associated with this project via projectId
       if (ticket.projectId === project.id) {
         return true;
       }
-      
+
       // Fallback: Check project name from ticket number prefix (for legacy tickets)
       const ticketProjectName = getProjectName(ticket.ticket_number);
-      return ticketProjectName.toLowerCase() === project.name.toLowerCase() ||
-             ticket.ticket_number.toLowerCase().includes(project.name.toLowerCase());
+      return (
+        ticketProjectName.toLowerCase() === project.name.toLowerCase() ||
+        ticket.ticket_number.toLowerCase().includes(project.name.toLowerCase())
+      );
     });
 
     // Apply search filter if searchTerm is provided
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filteredTickets = filteredTickets.filter((ticket: any) =>
-        ticket.ticket_number.toLowerCase().includes(searchLower) ||
-        ticket.ticket_name.toLowerCase().includes(searchLower)
+      filteredTickets = filteredTickets.filter(
+        (ticket: any) =>
+          ticket.ticket_number.toLowerCase().includes(searchLower) ||
+          ticket.ticket_name.toLowerCase().includes(searchLower)
       );
     }
 
@@ -255,7 +272,7 @@ export default function ProjectOverviewPage() {
               The project "{name}" could not be found.
             </p>
             <button
-              onClick={() => router.push("/project-dashboard")}
+              onClick={() => router.push("/home")}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Back to Projects
@@ -277,7 +294,7 @@ export default function ProjectOverviewPage() {
         <div className="">
           <div className="mb-6">
             <button
-              onClick={() => router.push("/project-dashboard")}
+              onClick={() => router.push("/home")}
               className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
             >
               <svg
@@ -390,7 +407,9 @@ export default function ProjectOverviewPage() {
                       <div className="mt-1 flex items-center justify-between">
                         <span
                           className={`truncate flex-grow text-xs ${
-                            !projectPath ? "italic text-gray-400 dark:text-gray-500" : "text-gray-900 dark:text-white"
+                            !projectPath
+                              ? "italic text-gray-400 dark:text-gray-500"
+                              : "text-gray-900 dark:text-white"
                           }`}
                           title={projectPath || "Click 'Choose Path' to set"}
                         >
@@ -413,7 +432,8 @@ export default function ProjectOverviewPage() {
                       <div className="mt-1 flex items-center justify-between">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${
-                            currentBranch === "main" || currentBranch === "master"
+                            currentBranch === "main" ||
+                            currentBranch === "master"
                               ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                               : currentBranch === "Error"
                               ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
@@ -448,11 +468,18 @@ export default function ProjectOverviewPage() {
                         {projectCost ? (
                           <div className="flex flex-col">
                             <span className="font-medium text-gray-900 dark:text-white">
-                              {formatCurrency(projectCost.cost, projectCost.currency)}
+                              {formatCurrency(
+                                projectCost.cost,
+                                projectCost.currency
+                              )}
                             </span>
                             {projectCost.rate && (
                               <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatCurrency(projectCost.rate, projectCost.currency)}/h
+                                {formatCurrency(
+                                  projectCost.rate,
+                                  projectCost.currency
+                                )}
+                                /h
                               </span>
                             )}
                           </div>

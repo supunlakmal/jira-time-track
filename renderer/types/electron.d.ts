@@ -376,6 +376,17 @@ export interface IpcHandler {
     channel: "project-data-updated", 
     listener: (data: any[]) => void
   ): () => void;
+  on(
+    channel: "update-status",
+    listener: (updateInfo: {
+      updateAvailable: boolean;
+      updateDownloaded: boolean;
+      version?: string;
+      releaseNotes?: string;
+      progress?: number;
+      error?: string;
+    }) => void
+  ): () => void;
   on(channel: string, listener: (...args: any[]) => void): () => void;
 
   window: {
@@ -401,6 +412,32 @@ export interface IpcHandler {
       success: boolean;
       exists?: boolean;
       error?: string;
+    }>;
+  };
+  update: {
+    checkForUpdates(): Promise<{
+      success: boolean;
+      updateCheckResult?: any;
+      error?: string;
+    }>;
+    downloadUpdate(): Promise<{
+      success: boolean;
+      error?: string;
+    }>;
+    installUpdate(): Promise<{
+      success: boolean;
+      error?: string;
+    }>;
+    getUpdateInfo(): Promise<{
+      success: boolean;
+      updateInfo: {
+        updateAvailable: boolean;
+        updateDownloaded: boolean;
+        version?: string;
+        releaseNotes?: string;
+        progress?: number;
+        error?: string;
+      };
     }>;
   };
 }

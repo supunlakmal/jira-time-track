@@ -58,6 +58,30 @@ export const Default: Story = {
             return Promise.resolve({ exists: false });
           },
         },
+        update: {
+          checkForUpdates: async () => {
+            console.log('Mock Update Check');
+            return Promise.resolve({ success: true });
+          },
+          downloadUpdate: async () => {
+            console.log('Mock Update Download');
+            return Promise.resolve({ success: true });
+          },
+          installUpdate: async () => {
+            console.log('Mock Update Install');
+            return Promise.resolve({ success: true });
+          },
+          getUpdateInfo: async () => {
+            console.log('Mock Get Update Info');
+            return Promise.resolve({ 
+              success: true, 
+              updateInfo: { 
+                updateAvailable: false, 
+                updateDownloaded: false 
+              } 
+            });
+          },
+        },
       };
     }
     return <Header {...args} />;

@@ -89,7 +89,17 @@ export default function ProjectOverviewPage() {
         // Save to project paths store
         const allPaths = (await window.ipc.invoke("get-project-paths")) || {};
         const newPaths = { ...allPaths, [project.name]: result.filePath };
+        
+        console.log('=== PROJECT OVERVIEW SAVE DEBUG ===');
+        console.log('Project name:', project.name);
+        console.log('Selected path:', result.filePath);
+        console.log('All existing paths:', allPaths);
+        console.log('New paths being saved:', newPaths);
+        
         window.ipc.send("save-project-paths", newPaths);
+        
+        // Broadcast that project paths have been updated
+        window.ipc.send("project-paths-updated");
 
         // Load branch info for the new path
         loadCurrentBranch(result.filePath);

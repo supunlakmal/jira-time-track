@@ -2,6 +2,7 @@
 
 "use client";
 
+import { appConfig } from "../../constants/config";
 import {
   DarkMode,
   KeyboardArrowDown,
@@ -67,9 +68,9 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
         {/* Quick Access Buttons and Profile */}
         <div className="quick-access-wrapper relative" ref={quickAccessRef}>
           <div className="flex items-center space-x-[43px]">
-            <div className="hidden items-center space-x-5 xl:flex">
+            <div className=" items-center space-x-5 flex">
               {/* Floating Timer Toggle */}
-              {toggleFloatingWindow && (
+              {appConfig.featureFlags.floatingTimer && toggleFloatingWindow && (
                 <button
                   onClick={toggleFloatingWindow}
                   type="button"
@@ -132,7 +133,7 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
                 </span>
               </button>
             </div>
-            <div className="hidden h-[48px] w-[1px] bg-bgray-300 dark:bg-darkblack-400 xl:block"></div>
+            {/* <div className="hidden h-[48px] w-[1px] bg-bgray-300 dark:bg-darkblack-400 xl:block"></div> */}
 
             {/* Author/Profile Area */}
             <div className="flex cursor-pointer items-center space-x-0 lg:space-x-3">
@@ -149,7 +150,7 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
               <div className="hidden 2xl:block">
                 <div className="flex items-center space-x-2.5">
                   <h3 className="text-base font-bold leading-[28px] text-bgray-900 dark:text-white">
-                    Free User
+                    Free User 3.0
                   </h3>
                   <span>
                     <KeyboardArrowDown className="text-bgray-900 dark:text-white" />

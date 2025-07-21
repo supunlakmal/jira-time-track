@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { action } from 'storybook/actions';
 import { ProjectView } from '../../renderer/components/projects/ProjectView';
 import { ProjectStatus } from '../../renderer/constants/projectStatus';
-import { fn } from '@storybook/test';
 
 const mockProjects = [
   {

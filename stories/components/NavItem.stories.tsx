@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import NavItem from '../../renderer/components/navigation/NavItem';
 import { Home } from '@mui/icons-material';
-import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof NavItem> = {
   title: 'Navigation/NavItem',
@@ -22,11 +21,9 @@ const meta: Meta<typeof NavItem> = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter initialEntries={['/']}>
-        <div style={{ width: '200px', border: '1px solid #ccc', padding: '10px' }}>
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div style={{ width: '200px', border: '1px solid #ccc', padding: '10px' }}>
+        <Story />
+      </div>
     ),
   ],
 };

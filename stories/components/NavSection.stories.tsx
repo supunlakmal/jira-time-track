@@ -16,11 +16,9 @@ const meta: Meta<typeof NavSection> = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter initialEntries={['/']}>
-        <div style={{ width: '250px', border: '1px solid #ccc', padding: '10px' }}>
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div style={{ width: '250px', border: '1px solid #ccc', padding: '10px' }}>
+        <Story />
+      </div>
     ),
   ],
 };

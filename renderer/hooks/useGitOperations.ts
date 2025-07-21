@@ -26,9 +26,11 @@ export function useGitOperations(): UseGitOperationsReturn {
     try {
       if (window.ipc && typeof window.ipc.invoke === "function") {
         const storedPaths = await window.ipc.invoke("get-project-paths");
-        setProjectPaths(
-          storedPaths && typeof storedPaths === "object" ? storedPaths : {}
-        );
+        console.log('=== PROJECT PATHS REFRESH ===');
+        console.log('Raw stored paths from IPC:', storedPaths);
+        const finalPaths = storedPaths && typeof storedPaths === "object" ? storedPaths : {};
+        console.log('Final paths being set:', finalPaths);
+        setProjectPaths(finalPaths);
       }
     } catch (e) {
       console.error("Failed to load project paths:", e);
@@ -65,7 +67,55 @@ export function useGitOperations(): UseGitOperationsReturn {
   // Handle git branch creation/switching
   const createOrSwitchBranch = useCallback(async (ticketNumber: string) => {
     const projectName = ticketNumber.split('-')[0];
-    const projectPath = projectPaths[projectName];
+    
+    console.log('=== GIT OPERATIONS DEBUG ===');
+    console.log('Ticket Number:', ticketNumber);
+    console.log('Extracted Project Name:', projectName);
+    console.log('Available Project Paths:', projectPaths);
+    console.log('Available Keys:', Object.keys(projectPaths));
+    
+    let projectPath = projectPaths[projectName];
+    console.log('Direct Lookup Result:', projectPath);
+    
+    // Try case-insensitive lookup if direct lookup fails
+    if (!projectPath) {
+      console.log('Trying case-insensitive lookup...');
+      const lowerProjectName = projectName.toLowerCase();
+      const matchingKey = Object.keys(projectPaths).find(
+        key => key.toLowerCase() === lowerProjectName
+      );
+      console.log('Case-insensitive match found:', matchingKey);
+      if (matchingKey) {
+        projectPath = projectPaths[matchingKey];
+        console.log('Using case-insensitive path:', projectPath);
+      }
+    }
+    
+    // If no project path found, try refreshing project paths first
+    if (!projectPath) {
+      console.log(`No project path found for ${projectName}, refreshing project paths...`);
+      await refreshProjectPaths();
+      
+      // Re-fetch project paths after refresh
+      const refreshedPaths = await window.ipc.invoke("get-project-paths");
+      console.log('Refreshed paths from IPC:', refreshedPaths);
+      if (refreshedPaths && typeof refreshedPaths === "object") {
+        projectPath = refreshedPaths[projectName];
+        console.log('Path after refresh:', projectPath);
+        
+        // Try case-insensitive on refreshed paths too
+        if (!projectPath) {
+          const lowerProjectName = projectName.toLowerCase();
+          const matchingKey = Object.keys(refreshedPaths).find(
+            key => key.toLowerCase() === lowerProjectName
+          );
+          if (matchingKey) {
+            projectPath = refreshedPaths[matchingKey];
+            console.log('Using case-insensitive path from refresh:', projectPath);
+          }
+        }
+      }
+    }
     
     if (!projectPath) {
       setBranchMessage(`No project path configured for ${projectName}`);
@@ -102,9 +152,25 @@ export function useGitOperations(): UseGitOperationsReturn {
     }
   }, [projectPaths, checkBranchExists]);
 
-  // Load project paths on mount
+  // Load project paths on mount and listen for updates
   useEffect(() => {
     refreshProjectPaths();
+    
+    // Listen for project path updates from other components
+    let cleanup: (() => void) | undefined;
+    
+    if (window.ipc && typeof window.ipc.on === "function") {
+      cleanup = window.ipc.on("project-paths-updated", () => {
+        console.log("Project paths updated, refreshing...");
+        refreshProjectPaths();
+      });
+    }
+    
+    return () => {
+      if (cleanup) {
+        cleanup();
+      }
+    };
   }, [refreshProjectPaths]);
 
   return {

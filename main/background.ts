@@ -1453,7 +1453,19 @@ ipcMain.on("save-project-paths", (_, paths) => {
     Object.entries(paths).forEach(([key, value]) => {
       projectPathsStore.set(key, value as string);
     });
+    
+    // Broadcast to all windows that project paths have been updated
+    BrowserWindow.getAllWindows().forEach(window => {
+      window.webContents.send("project-paths-updated");
+    });
   }
+});
+
+ipcMain.on("project-paths-updated", () => {
+  // Broadcast to all windows that project paths have been updated
+  BrowserWindow.getAllWindows().forEach(window => {
+    window.webContents.send("project-paths-updated");
+  });
 });
 
 ipcMain.handle("select-project-directory", async (_, projectName) => {

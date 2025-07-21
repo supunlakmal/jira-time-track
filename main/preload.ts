@@ -13,6 +13,7 @@ const validChannels = [
   "load-project-data",
   "get-project-paths",
   "save-project-paths",
+  "project-paths-updated",
   "select-project-directory",
   "get-current-branch",
   "create-git-branch",

@@ -61,112 +61,26 @@ const TicketTable: React.FC<TicketTableProps> = ({
     createOrSwitchBranch,
   } = useGitOperations();
 
-  // Track branch status for each ticket
-  const [ticketBranchStatus, setTicketBranchStatus] = useState<Record<string, boolean | null>>({});
-  const [ticketBranchMessages, setTicketBranchMessages] = useState<Record<string, string | null>>({});
-  const [creatingBranchForTicket, setCreatingBranchForTicket] = useState<string | null>(null);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
   
   // Helper function to get timer for a ticket
   const getTimerForTicket = (ticketNumber: string) => {
     return timers.find(timer => timer.ticketNumber === ticketNumber);
   };
 
-  // Check branch existence for a specific ticket
-  const checkTicketBranchExists = async (ticketNumber: string) => {
-    const projectName = ticketNumber.split('-')[0];
-    const projectPath = projectPaths[projectName];
-    
-    if (!projectPath) {
-      setTicketBranchStatus(prev => ({ ...prev, [ticketNumber]: null }));
-      return;
-    }
-
-    try {
-      const result = await window.ipc.git.checkBranchExists(ticketNumber, projectPath);
-      if (result.success) {
-        setTicketBranchStatus(prev => ({ 
-          ...prev, 
-          [ticketNumber]: result.exists || false 
-        }));
-      } else {
-        setTicketBranchStatus(prev => ({ ...prev, [ticketNumber]: null }));
-      }
-    } catch (error) {
-      console.error("Error checking branch existence for", ticketNumber, error);
-      setTicketBranchStatus(prev => ({ ...prev, [ticketNumber]: null }));
-    }
-  };
-
   // Handle git branch creation/switching for a specific ticket
   const handleCreateGitBranch = async (ticketNumber: string) => {
-    const projectName = ticketNumber.split('-')[0];
-    const projectPath = projectPaths[projectName];
-    
-    if (!projectPath) {
-      setTicketBranchMessages(prev => ({ 
-        ...prev, 
-        [ticketNumber]: `No project path configured for ${projectName}` 
-      }));
-      setTimeout(() => {
-        setTicketBranchMessages(prev => ({ ...prev, [ticketNumber]: null }));
-      }, 3000);
-      return;
-    }
-
-    setCreatingBranchForTicket(ticketNumber);
-    setTicketBranchMessages(prev => ({ ...prev, [ticketNumber]: null }));
-
-    try {
-      const result = await window.ipc.git.createBranch(ticketNumber, projectPath);
-      
-      if (result.success) {
-        // Show different messages based on the action taken
-        if (result.action === "switched") {
-          setTicketBranchMessages(prev => ({ 
-            ...prev, 
-            [ticketNumber]: `✓ Switched to existing branch '${ticketNumber}'` 
-          }));
-        } else if (result.action === "created") {
-          setTicketBranchMessages(prev => ({ 
-            ...prev, 
-            [ticketNumber]: `✓ Created and switched to new branch '${ticketNumber}'` 
-          }));
-        } else {
-          setTicketBranchMessages(prev => ({ 
-            ...prev, 
-            [ticketNumber]: `✓ ${result.message || 'Branch operation successful'}` 
-          }));
-        }
-      } else {
-        setTicketBranchMessages(prev => ({ 
-          ...prev, 
-          [ticketNumber]: `✗ ${result.error || 'Failed to create/switch branch'}` 
-        }));
-      }
-    } catch (error) {
-      console.error("Error with git branch operation:", error);
-      setTicketBranchMessages(prev => ({ 
-        ...prev, 
-        [ticketNumber]: `✗ Error: ${error.message || 'Unknown error'}` 
-      }));
-    } finally {
-      setCreatingBranchForTicket(null);
-      setTimeout(() => {
-        setTicketBranchMessages(prev => ({ ...prev, [ticketNumber]: null }));
-      }, 5000);
-      // Refresh branch existence after operation
-      await checkTicketBranchExists(ticketNumber);
-    }
+    await createOrSwitchBranch(ticketNumber);
   };
 
   // Check branch existence for all visible tickets when project paths change
   useEffect(() => {
     if (Object.keys(projectPaths).length > 0) {
       ticketsToDisplay.forEach(ticket => {
-        checkTicketBranchExists(ticket.ticket_number);
+        checkBranchExists(ticket.ticket_number);
       });
     }
-  }, [projectPaths, ticketsToDisplay]);
+  }, [projectPaths, ticketsToDisplay, checkBranchExists]);
   
   const calculateTicketCost = (ticketNumber: string): { cost: number; currency: string } | null => {
     if (!billingData?.settings) return null;
@@ -216,6 +130,12 @@ const TicketTable: React.FC<TicketTableProps> = ({
               .toFixed(1)}{' '}
             points
           </span>
+          <button
+            onClick={() => setShowDebugInfo(!showDebugInfo)}
+            className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
+          >
+            {showDebugInfo ? 'Hide' : 'Show'} Git Debug
+          </button>
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -245,6 +165,23 @@ const TicketTable: React.FC<TicketTableProps> = ({
               </th>
             </tr>
           </thead>
+          {showDebugInfo && (
+            <tbody className="bg-yellow-50 dark:bg-yellow-900/20">
+              <tr>
+                <td colSpan={7} className="px-6 py-4">
+                  <div className="text-xs">
+                    <h4 className="font-bold mb-2 text-yellow-800 dark:text-yellow-200">Git Debug Information</h4>
+                    <div className="space-y-1">
+                      <div><strong>Available Project Paths:</strong> {JSON.stringify(projectPaths)}</div>
+                      <div><strong>Project Path Keys:</strong> [{Object.keys(projectPaths).join(', ')}]</div>
+                      <div><strong>Sample Ticket Numbers:</strong> [{ticketsToDisplay.slice(0, 3).map(t => t.ticket_number).join(', ')}]</div>
+                      <div><strong>Extracted Project Names:</strong> [{ticketsToDisplay.slice(0, 3).map(t => t.ticket_number.split('-')[0]).join(', ')}]</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          )}
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
             {ticketsToDisplay.length === 0 ? (
               <tr>
@@ -609,28 +546,28 @@ const TicketTable: React.FC<TicketTableProps> = ({
                         {/* Git Branch button */}
                         <Button
                           onClick={() => handleCreateGitBranch(ticket.ticket_number)}
-                          disabled={creatingBranchForTicket === ticket.ticket_number}
+                          disabled={isCreatingBranch}
                           variant="secondary"
                           size="sm"
                           className="text-xs"
                           title={
-                            ticketBranchStatus[ticket.ticket_number] === true
+                            branchExists === true
                               ? `Switch to branch '${ticket.ticket_number}'`
-                              : ticketBranchStatus[ticket.ticket_number] === false
+                              : branchExists === false
                               ? `Create git branch '${ticket.ticket_number}'`
                               : 'Git branch operation'
                           }
                         >
-                          {creatingBranchForTicket === ticket.ticket_number ? (
+                          {isCreatingBranch ? (
                             <>
                               <span className="animate-spin mr-1">⏳</span>
-                              {ticketBranchStatus[ticket.ticket_number] ? 'Switching...' : 'Creating...'}
+                              {branchExists ? 'Switching...' : 'Creating...'}
                             </>
                           ) : (
                             <>
                               <span className="mr-1">🌿</span>
-                              {ticketBranchStatus[ticket.ticket_number] === true ? 'Switch Branch' : 
-                               ticketBranchStatus[ticket.ticket_number] === false ? 'Git Branch' : 
+                              {branchExists === true ? 'Switch Branch' : 
+                               branchExists === false ? 'Git Branch' : 
                                'Git Branch'}
                             </>
                           )}
@@ -665,15 +602,15 @@ const TicketTable: React.FC<TicketTableProps> = ({
                     </td>
                   </tr>
                   {/* Git Branch Message Row */}
-                  {ticketBranchMessages[ticket.ticket_number] && (
+                  {branchMessage && (
                     <tr>
                       <td colSpan={7} className="px-6 py-2 bg-gray-50 dark:bg-gray-700">
                         <div className={`text-xs px-3 py-2 rounded ${
-                          ticketBranchMessages[ticket.ticket_number]?.startsWith('✓') 
+                          branchMessage?.startsWith('✓') 
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
                             : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
                         }`}>
-                          {ticketBranchMessages[ticket.ticket_number]}
+                          {branchMessage}
                         </div>
                       </td>
                     </tr>

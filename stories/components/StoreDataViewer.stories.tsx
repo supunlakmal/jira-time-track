@@ -60,7 +60,7 @@ export const Default: Story = {
           },
           send: () => {},
           window: { minimize: () => {}, maximize: () => {}, close: () => {}, hide: () => {}, show: () => {} },
-          zoom: { in: async () => {}, out: async () => {}, reset: async () => {} },
+          zoom: { in: async () => {}, out: async () => {}, reset: async () => {}, getLevel: async () => {} },
           git: { createBranch: async () => ({ success: true }), checkBranchExists: async () => ({ success: true }) },
           update: { checkForUpdates: async () => ({ success: true }), downloadUpdate: async () => ({ success: true }), installUpdate: async () => ({ success: true }), getUpdateInfo: async () => ({ success: true, updateInfo: { updateAvailable: false, updateDownloaded: false } }) }
         };

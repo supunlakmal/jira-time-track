@@ -28,6 +28,19 @@ const config: StorybookConfig = {
         require('autoprefixer'),
       ],
     };
+    config.build = config.build || {};
+    config.build.rollupOptions = config.build.rollupOptions || {};
+    config.build.rollupOptions.external = [...(config.build.rollupOptions.external || []), 'storybook-addon-react-router-v6', '@mui/icons-material', '@mui/material'];
+    config.build.rollupOptions.treeshake = false;
+
+    // Attempt to optimize MUI dependencies
+    config.optimizeDeps = config.optimizeDeps || {};
+    config.optimizeDeps.include = [
+      ...(config.optimizeDeps.include || []),
+      '@mui/icons-material',
+      '@mui/material',
+    ];
+
     return config;
   }
 };

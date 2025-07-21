@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import NavItem from '../../renderer/components/navigation/NavItem';
 import { Home } from '@mui/icons-material';
-import { MemoryRouter } from 'storybook-addon-react-router-v6';
+import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof NavItem> = {
   title: 'Navigation/NavItem',
@@ -16,8 +16,8 @@ const meta: Meta<typeof NavItem> = {
     icon: { control: 'object' },
     subMenu: { control: 'object' },
     extras: { control: 'object' },
-    visibleOnPaths: { control: 'array' },
-    hiddenOnPaths: { control: 'array' },
+    visibleOnPaths: { control: 'object' },
+    hiddenOnPaths: { control: 'object' },
     visibilityCondition: { action: 'visibilityCondition' },
   },
   decorators: [

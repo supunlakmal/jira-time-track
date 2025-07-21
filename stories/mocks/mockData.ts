@@ -89,19 +89,26 @@ export const mockProjects = [
 ];
 
 export const mockCustomerData = [
-  { id: '1', name: 'Customer A', email: 'a@example.com' },
-  { id: '2', name: 'Customer B', email: 'b@example.com' },
+  { id: '1', name: 'Customer A', email: 'a@example.com', location: 'New York', spent: '$1,234.50' },
+  { id: '2', name: 'Customer B', email: 'b@example.com', location: 'Los Angeles', spent: '$2,456.75' },
+  { id: '3', name: 'Customer C', email: 'c@example.com', location: 'Chicago', spent: '$3,678.90' },
+  { id: '4', name: 'Customer D', email: 'd@example.com', location: 'Houston', spent: '$4,901.25' },
+  { id: '5', name: 'Customer E', email: 'e@example.com', location: 'Phoenix', spent: '$5,123.60' },
 ];
 
 export const mockDashboardFilters = {
   dateRange: 'last7days',
-  project: 'all',
-  status: 'all',
+  location: 'all',
+  amountSpent: 'all',
+  transactionDate: 'all',
+  transactionType: 'all',
+  searchQuery: '',
 };
 
 export const mockPaginationState = {
-  pageIndex: 0,
-  pageSize: 10,
+  currentPage: 1,
+  itemsPerPage: 10,
+  totalItems: 100,
 };
 
 export const mockFilterOptions = [
@@ -111,10 +118,12 @@ export const mockFilterOptions = [
 ];
 
 export const mockEfficiencyData = {
-  totalTimeSpent: 12345678,
-  averageDailyHours: 4.5,
-  projectCompletionRate: 0.75,
-  onTimeDeliveryRate: 0.90,
+  arrival: 85,
+  spending: 65,
+  goal: 90,
+  goalPercentage: 85,
+  spendingPercentage: 65,
+  othersPercentage: 15,
 };
 
 

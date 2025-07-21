@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import NavSection from '../../renderer/components/navigation/NavSection';
 import { Home, Settings } from '@mui/icons-material';
-import { MemoryRouter } from 'storybook-addon-react-router-v6';
+import { MemoryRouter } from 'react-router-dom';
 
 const meta: Meta<typeof NavSection> = {
   title: 'Navigation/NavSection',

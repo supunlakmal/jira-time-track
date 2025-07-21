@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
 import { ProjectView } from '../../renderer/components/projects/ProjectView';
 import { ProjectStatus } from '../../renderer/constants/projectStatus';
 import { fn } from '@storybook/test';

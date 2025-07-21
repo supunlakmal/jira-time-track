@@ -8,7 +8,7 @@ const meta: Meta<typeof ThemeProvider> = {
   component: ThemeProvider,
   tags: ['autodocs'],
   argTypes: {
-    children: { control: 'none' },
+    children: { control: false },
   },
 };
 

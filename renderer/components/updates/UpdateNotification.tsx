@@ -11,18 +11,56 @@ interface UpdateInfo {
 
 interface UpdateNotificationProps {
   onClose: () => void;
+  debugMode?: boolean;
+  mockUpdateInfo?: UpdateInfo;
 }
 
-const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
-  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+/**
+ * UpdateNotification Component
+ * 
+ * Supports two modes:
+ * 1. Production Mode (debugMode=false): Uses real Electron autoUpdater with IPC
+ * 2. Debug Mode (debugMode=true + mockUpdateInfo): Simulates download progress
+ * 
+ * Both modes provide identical UI behavior and state transitions:
+ * - Available → Downloading (with progress bar) → Downloaded → Install
+ * 
+ * Real mode gets progress from autoUpdater events via IPC broadcasts
+ * Debug mode simulates progress with 10-second timer for testing
+ */
+
+const UpdateNotification: React.FC<UpdateNotificationProps> = ({ 
+  onClose, 
+  debugMode = false, 
+  mockUpdateInfo 
+}) => {
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(
+    mockUpdateInfo ? { ...mockUpdateInfo } : null
+  );
   const [isDownloading, setIsDownloading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
+    // Skip IPC setup in debug mode with mock data
+    if (debugMode && mockUpdateInfo) {
+      if (debugMode) console.log('Using mock data, skipping IPC setup');
+      setUpdateInfo({ ...mockUpdateInfo });
+      return;
+    }
+
     // Listen for update status changes
     const cleanup = window.ipc.on('update-status', (info: UpdateInfo) => {
+      if (debugMode) console.log('Update status received:', info);
       setUpdateInfo(info);
-      setIsDownloading(false);
+      
+      // Keep downloading state if progress is being updated
+      if (info.progress !== undefined && info.progress < 100) {
+        setIsDownloading(true);
+        if (debugMode) console.log(`Real download progress: ${info.progress}%`);
+      } else {
+        setIsDownloading(false);
+      }
+      
       setIsChecking(false);
     });
 
@@ -30,11 +68,13 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
     getUpdateInfo();
 
     return cleanup;
-  }, []);
+  }, [debugMode, mockUpdateInfo]);
 
   const getUpdateInfo = async () => {
     try {
+      if (debugMode) console.log('Getting update info...');
       const result = await window.ipc.update.getUpdateInfo();
+      if (debugMode) console.log('Update info result:', result);
       if (result.success) {
         setUpdateInfo(result.updateInfo);
       }
@@ -44,9 +84,11 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
   };
 
   const checkForUpdates = async () => {
+    if (debugMode) console.log('Checking for updates...');
     setIsChecking(true);
     try {
       const result = await window.ipc.update.checkForUpdates();
+      if (debugMode) console.log('Check for updates result:', result);
       if (!result.success) {
         console.error('Update check failed:', result.error);
       }
@@ -55,10 +97,51 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
     }
   };
 
+  const simulateMockDownload = () => {
+    if (debugMode) console.log('Starting 10-second mock download simulation...');
+    let progress = 0;
+    
+    const interval = setInterval(() => {
+      progress += 1; // Increment by 1% every 100ms (10 seconds total)
+      
+      // Update the mock updateInfo with progress
+      setUpdateInfo(prevInfo => ({
+        ...prevInfo,
+        progress: progress
+      }));
+      
+      if (debugMode) console.log(`Mock download progress: ${progress}%`);
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        setIsDownloading(false);
+        
+        // Update to downloaded state
+        setUpdateInfo(prevInfo => ({
+          ...prevInfo,
+          updateDownloaded: true,
+          progress: 100
+        }));
+        
+        if (debugMode) console.log('Mock download completed!');
+      }
+    }, 100); // Update every 100ms for smooth animation
+  };
+
   const downloadUpdate = async () => {
+    if (debugMode) console.log('Starting update download...');
     setIsDownloading(true);
+    
+    // Handle mock mode with simulation
+    if (debugMode && mockUpdateInfo) {
+      if (debugMode) console.log('Starting mock download simulation...');
+      simulateMockDownload();
+      return;
+    }
+    
     try {
       const result = await window.ipc.update.downloadUpdate();
+      if (debugMode) console.log('Download update result:', result);
       if (!result.success) {
         console.error('Update download failed:', result.error);
         setIsDownloading(false);
@@ -70,6 +153,7 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
   };
 
   const installUpdate = async () => {
+    if (debugMode) console.log('Installing update and restarting...');
     try {
       await window.ipc.update.installUpdate();
     } catch (error) {
@@ -78,7 +162,16 @@ const UpdateNotification: React.FC<UpdateNotificationProps> = ({ onClose }) => {
   };
 
   if (!updateInfo) {
+    if (debugMode) console.log('No update info available, hiding notification');
     return null;
+  }
+
+  if (debugMode) {
+    console.log('Rendering UpdateNotification with state:', {
+      updateInfo,
+      isDownloading,
+      isChecking,
+    });
   }
 
   return (

@@ -20,6 +20,8 @@ publish:
   provider: github
   owner: supunlakmal
   repo: project-time-track
+
+  # TODO convert application in to  portable app
 win:
   target: 
     - target: nsis

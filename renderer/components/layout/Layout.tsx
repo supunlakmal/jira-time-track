@@ -25,10 +25,19 @@ const Layout: React.FC<LayoutProps> = ({ children, toggleFloatingWindow }) => {
           </main>
         </div>
       </div>
-      
+
       {/* Update Notification */}
       {showNotification && (
-        <UpdateNotification onClose={dismissNotification} />
+        <UpdateNotification
+          onClose={dismissNotification}
+          // mockUpdateInfo={{
+          //   updateAvailable: true,
+          //   updateDownloaded: false,
+          //   version: "2.3.1",
+          //   releaseNotes: "🚀 What's New in v2.3.1",
+          // }}
+          // debugMode
+        />
       )}
     </div>
   );

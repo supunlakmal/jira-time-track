@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "nextron",
-    "build": "nextron build",
+    "build": "nextron build --publish=never",
     "build:release": "nextron build --publish=never",
     "release": "nextron build --publish=always",
     "prepare-release": "node scripts/prepare-release.js",

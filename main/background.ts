@@ -23,6 +23,8 @@ import {
   getJiraModuleStatus,
 } from "./modules/jira";
 
+import { appConfig } from "../renderer/constants/config";
+
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
@@ -742,7 +744,9 @@ const createFloatingWindow = async () => {
 
   // Application starts with empty task list until CSV import
 
-  await createFloatingWindow();
+  if (appConfig.featureFlags.floatingTimer) {
+    await createFloatingWindow();
+  }
 
   if (isProd) {
     await mainWindow.loadURL("app://./home");
@@ -805,6 +809,7 @@ function createTray() {
     },
     {
       label: "Toggle Floating Timer",
+      enabled: appConfig.featureFlags.floatingTimer,
       click: () => {
         if (floatingWindow?.isVisible()) {
           floatingWindow.hide();
@@ -822,6 +827,7 @@ function createTray() {
       submenu: [
         {
           label: "Start New Timer",
+          enabled: appConfig.featureFlags.floatingTimer,
           click: () => {
             // Show floating window for timer selection
             if (!floatingWindow) {

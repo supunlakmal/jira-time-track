@@ -2,6 +2,7 @@
 
 "use client";
 
+import { appConfig } from "../../constants/config";
 import {
   DarkMode,
   KeyboardArrowDown,
@@ -69,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
           <div className="flex items-center space-x-[43px]">
             <div className=" items-center space-x-5 flex">
               {/* Floating Timer Toggle */}
-              {toggleFloatingWindow && (
+              {appConfig.featureFlags.floatingTimer && toggleFloatingWindow && (
                 <button
                   onClick={toggleFloatingWindow}
                   type="button"

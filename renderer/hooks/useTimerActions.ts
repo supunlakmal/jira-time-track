@@ -2,8 +2,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useSharedData } from "./useSharedData";
 import { TaskTimer } from "../types/dashboard";
+import { TimerSession } from "../store/sessionsSlice";
 
 export type TimerActionType = "start" | "pause" | "resume" | "hold" | "complete" | "stop";
+
+export interface TimerActionPayload {
+  ticketName?: string;
+  storyPoints?: number;
+}
 
 export interface UseTimerActionsReturn {
   // State
@@ -11,7 +17,7 @@ export interface UseTimerActionsReturn {
   ticketData: { [key: string]: string };
   
   // Actions
-  handleTimerAction: (action: TimerActionType, ticketNumber: string) => void;
+  handleTimerAction: (action: TimerActionType, ticketNumber: string, payload?: TimerActionPayload) => void;
   handleDeleteTimer: (ticketNumber: string) => void;
   
   // Utilities
@@ -23,10 +29,56 @@ export interface UseTimerActionsReturn {
 }
 
 export function useTimerActions(targetTicketId?: string): UseTimerActionsReturn {
-  const { saveSession } = useSharedData();
+  const { saveSession, sessions } = useSharedData();
   const [timers, setTimers] = useState<TaskTimer[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [ticketData, setTicketData] = useState<{ [key: string]: string }>({});
+
+  // Load existing timers from Redux sessions on mount
+  useEffect(() => {
+    if (sessions && Object.keys(sessions).length > 0) {
+      const sessionsRecord = sessions as { [key: string]: TimerSession };
+      const existingTimers: TaskTimer[] = Object.values(sessionsRecord).map(sessionData => {
+        // Find the last session to determine current status
+        const lastSession = sessionData.sessions[sessionData.sessions.length - 1];
+        let currentStatus: TaskTimer["status"] = "stopped";
+        let isRunning = false;
+        
+        if (lastSession) {
+          // If the last session has no end time, it's active
+          if (!lastSession.endTime) {
+            isRunning = true;
+            currentStatus = lastSession.status === "running" ? "running" : 
+                          lastSession.status === "paused" ? "paused" :
+                          lastSession.status === "hold" ? "hold" : "running";
+          } else {
+            // Session has ended, use the session status
+            currentStatus = lastSession.status === "completed" ? "completed" : "stopped";
+          }
+        }
+        
+        return {
+          ticketNumber: sessionData.ticketNumber,
+          ticketName: sessionData.ticketName,
+          startTime: sessionData.sessions[0]?.startTime || Date.now(),
+          elapsedTime: 0, // Reset elapsed time as it will be calculated by the interval
+          isRunning,
+          status: currentStatus,
+          totalElapsed: sessionData.totalElapsed,
+          sessions: sessionData.sessions,
+          storyPoints: sessionData.storyPoints,
+        };
+      }).filter(timer => 
+        // Only include timers that have active sessions (running, paused, or on hold)
+        timer.status === "running" || timer.status === "paused" || timer.status === "hold"
+      );
+      
+      if (existingTimers.length > 0) {
+        console.log("useTimerActions: Loading existing timers:", existingTimers);
+        setTimers(existingTimers);
+      }
+    }
+  }, []); // Only run once on mount
 
   // Load ticket data on mount
   useEffect(() => {
@@ -135,9 +187,55 @@ export function useTimerActions(targetTicketId?: string): UseTimerActionsReturn 
   // Main timer action handler
   const handleTimerAction = (
     action: TimerActionType,
-    ticketNumber: string
+    ticketNumber: string,
+    payload?: TimerActionPayload
   ) => {
     const actionTime = Date.now();
+    const existingTimer = timers.find((t) => t.ticketNumber === ticketNumber);
+
+    // Handle starting a timer that doesn't exist in the active list
+    if (action === "start" && !existingTimer) {
+      const ticketName = payload?.ticketName || ticketData[ticketNumber] || ticketNumber;
+      const storyPoints = payload?.storyPoints;
+
+      // Check if there's a previous session in Redux store to get totalElapsed from
+      const previousSession = sessions && sessions[ticketNumber];
+      const totalElapsed = previousSession ? previousSession.totalElapsed : 0;
+      const existingSessions = previousSession ? previousSession.sessions : [];
+
+      const newTimer: TaskTimer = {
+        ticketNumber,
+        ticketName,
+        storyPoints,
+        startTime: actionTime,
+        elapsedTime: 0,
+        isRunning: true,
+        status: "running",
+        totalElapsed: totalElapsed, // Carry over total elapsed time
+        sessions: [
+          ...existingSessions,
+          { startTime: actionTime, duration: 0, status: "running" },
+        ],
+      };
+
+      setTimers((prevTimers) => [...prevTimers, newTimer]);
+
+      saveSession({
+        ticketNumber: newTimer.ticketNumber,
+        ticketName: newTimer.ticketName,
+        storyPoints: newTimer.storyPoints,
+        sessions: newTimer.sessions,
+        totalElapsed: newTimer.totalElapsed,
+      });
+
+      window.ipc.send("start-task", {
+        ticket: ticketNumber,
+        name: ticketName,
+        storyPoints: storyPoints,
+      });
+      return;
+    }
+    
     let ticketNameForIPC = "";
 
     setTimers((prevTimers) =>
@@ -343,11 +441,11 @@ export function useTimerActions(targetTicketId?: string): UseTimerActionsReturn 
               storyPoints: storyPoints,
               startTime: eventTime,
               elapsedTime: 0,
-              isRunning: false,
-              status: "queue", // Initial status is queue
+              isRunning: true,
+              status: "running", // Initial status is queue
               totalElapsed: 0,
               sessions: [
-                { startTime: eventTime, duration: 0, status: "queue" },
+                { startTime: eventTime, duration: 0, status: "running" },
               ],
             },
           ];

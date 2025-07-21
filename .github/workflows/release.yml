@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.7.1)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript type checking
+        run: npx tsc --noEmit
+
+      - name: Build application
+        run: npm run build
+
+      - name: Prepare for signing (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          # Add macOS code signing setup here if you have certificates
+          echo "macOS build - certificates would be configured here"
+
+      - name: Prepare for signing (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Add Windows code signing setup here if you have certificates
+          echo "Windows build - certificates would be configured here"
+
+      - name: Build and publish to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Build and publish the release
+          npx electron-builder --publish=always
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-build
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.zip
+          retention-days: 30
+
+  create-release:
+    needs: release
+    runs-on: ubuntu-latest
+    if: always() && contains(needs.release.result, 'success')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Extract version from tag or input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ github.ref_name }}"
+          fi
+          
+          # Create release notes
+          RELEASE_NOTES="## What's New in $VERSION
+
+          ### Features
+          - Auto-update system implementation
+          - Improved update notifications
+          - Enhanced release workflow
+
+          ### Bug Fixes
+          - Various stability improvements
+
+          ### Technical
+          - Added electron-updater integration
+          - Implemented GitHub releases distribution
+          - Enhanced CI/CD pipeline
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v1.6.0...$VERSION"
+
+          # Check if release already exists
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists, updating..."
+            gh release edit "$VERSION" --notes "$RELEASE_NOTES"
+          else
+            echo "Creating new release $VERSION..."
+            gh release create "$VERSION" \
+              --title "Project Time Track $VERSION" \
+              --notes "$RELEASE_NOTES" \
+              --draft=false \
+              --prerelease=false
+          fi
+
+  notify-completion:
+    needs: [release, create-release]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Notify completion
+        run: |
+          if [ "${{ needs.release.result }}" = "success" ] && [ "${{ needs.create-release.result }}" = "success" ]; then
+            echo "✅ Release completed successfully!"
+          else
+            echo "❌ Release failed - check the logs"
+            exit 1
+          fi

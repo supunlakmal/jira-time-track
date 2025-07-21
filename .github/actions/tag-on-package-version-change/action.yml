@@ -1,58 +1,86 @@
-name: Tag Branch on Package Version Change
-branding:
-  icon: package
-  color: green
-description: Creates a new Git tag whenever the npm package version has changed, with a branch-specific suffix.
+name: 'Tag on Package Version Change'
+description: 'Creates a git tag when package.json version changes'
 inputs:
-  git-user-name:
-    description: Git user.name.
-    default: github-actions[bot]
-  git-user-email:
-    description: Git user.email.
-    default: github-actions[bot]@users.noreply.github.com
   branch-suffix-map:
-    description: 'A JSON string mapping branch names to tag suffixes. e.g., ''{"main": "-rc", "develop": "-dev"}''. Must be valid JSON.'
+    description: 'JSON mapping of branch names to tag suffixes'
     required: false
     default: '{}'
 
 runs:
-  using: composite
+  using: 'composite'
   steps:
-    - shell: bash
+    - name: Get package version
+      id: package-version
+      shell: bash
       run: |
-        #!/bin/bash
-        set -eux
+        VERSION=$(node -p "require('./package.json').version")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Package version: $VERSION"
 
+    - name: Check if version changed
+      id: version-changed
+      shell: bash
+      run: |
+        # Get the version from the previous commit
+        git fetch origin --depth=2
+        PREV_VERSION=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).version" 2>/dev/null || echo "0.0.0")
+        CURRENT_VERSION="${{ steps.package-version.outputs.version }}"
+        
+        echo "Previous version: $PREV_VERSION"
+        echo "Current version: $CURRENT_VERSION"
+        
+        if [ "$PREV_VERSION" != "$CURRENT_VERSION" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "Version changed from $PREV_VERSION to $CURRENT_VERSION"
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "Version unchanged"
+        fi
+
+    - name: Determine tag suffix
+      id: tag-suffix
+      shell: bash
+      run: |
         BRANCH_NAME="${{ github.ref_name }}"
-        BRANCH_SUFFIX=$(echo "${INPUT_BRANCH_SUFFIX_MAP}" | jq -r --arg bn "$BRANCH_NAME" '.[$bn] // ""')
-
-        if [ ! -f package.json ]; then
-          # Error messages to stderr are generally kept for script failure diagnosis
-          echo "Error: package.json not found." >&2
-          exit 1
+        SUFFIX_MAP='${{ inputs.branch-suffix-map }}'
+        
+        if [ -n "$SUFFIX_MAP" ] && [ "$SUFFIX_MAP" != "{}" ]; then
+          SUFFIX=$(echo "$SUFFIX_MAP" | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'))['$BRANCH_NAME'] || ''")
+        else
+          SUFFIX=""
         fi
+        
+        echo "suffix=$SUFFIX" >> $GITHUB_OUTPUT
+        echo "Branch: $BRANCH_NAME, Suffix: $SUFFIX"
 
-        RAW_PACKAGE_VERSION=$(jq -r '.version' package.json)
+    - name: Create and push tag
+      if: steps.version-changed.outputs.changed == 'true'
+      shell: bash
+      run: |
+        VERSION="${{ steps.package-version.outputs.version }}"
+        SUFFIX="${{ steps.tag-suffix.outputs.suffix }}"
+        TAG="v${VERSION}${SUFFIX}"
+        
+        echo "Creating tag: $TAG"
+        
+        # Configure git
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Create and push tag
+        git tag -a "$TAG" -m "Release $TAG"
+        git push origin "$TAG"
+        
+        echo "Tag $TAG created and pushed successfully"
 
-        if [ -z "$RAW_PACKAGE_VERSION" ] || [ "$RAW_PACKAGE_VERSION" == "null" ]; then
-          echo "Error: Could not read version from package.json, or version is null." >&2
-          exit 1
+    - name: Output tag information
+      shell: bash
+      run: |
+        if [ "${{ steps.version-changed.outputs.changed }}" == "true" ]; then
+          VERSION="${{ steps.package-version.outputs.version }}"
+          SUFFIX="${{ steps.tag-suffix.outputs.suffix }}"
+          TAG="v${VERSION}${SUFFIX}"
+          echo "::notice::Created tag $TAG for version $VERSION"
+        else
+          echo "::notice::No version change detected, skipping tag creation"
         fi
-
-        PACKAGE_VERSION=$(echo "$RAW_PACKAGE_VERSION" | sed 's/+/-/g')
-        TAG_NAME="${PACKAGE_VERSION}${BRANCH_SUFFIX}"
-
-        git fetch --tags --force
-
-        if ! git rev-parse -q --verify "refs/tags/${TAG_NAME}" >/dev/null 2>&1; then
-          git config user.name "${GIT_USER_NAME}"
-          git config user.email "${GIT_USER_EMAIL}"
-          git tag -a "${TAG_NAME}" -m "Version ${TAG_NAME}"
-          git push origin "refs/tags/${TAG_NAME}"
-        # else
-          # Tag already exists, no action needed and no output necessary
-        fi
-      env:
-        GIT_USER_NAME: ${{ inputs.git-user-name }}
-        GIT_USER_EMAIL: ${{ inputs.git-user-email }}
-        INPUT_BRANCH_SUFFIX_MAP: ${{ inputs.branch-suffix-map }}

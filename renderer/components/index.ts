@@ -19,3 +19,6 @@ export * from './tickets';
 // Dashboard Components
 export * from './dashboard';
 
+// Update Components
+export * from './updates';
+

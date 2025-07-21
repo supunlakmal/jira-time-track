@@ -4,8 +4,7 @@ import { Provider } from 'react-redux'
 import { store } from '../renderer/store/store'
 import { ThemeProvider } from '../renderer/components/theme/ThemeProvider'
 import '../renderer/styles/globals.css'
-
-
+import '../stories/mocks/electron'; // Import the mock to ensure window.ipc is set
 
 const preview: Preview = {
   parameters: {

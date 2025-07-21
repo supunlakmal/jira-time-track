@@ -11,22 +11,8 @@ const MockedDashboardPage: React.FC<{
   sessions?: any;
   children?: React.ReactNode;
 }> = ({ loading, projectData, sessions, children }) => {
-  // Mock useSharedData hook
-  const useSharedData = createMockUseSharedData({
-    loading,
-    projectData,
-    sessions,
-  });
-
-  // Mock window.ipc
-  useEffect(() => {
-    const originalIpc = (window as any).ipc;
-    (window as any).ipc = createMockIpc();
-
-    return () => {
-      (window as any).ipc = originalIpc;
-    };
-  }, []);
+  // Mock window.ipc directly
+  (window as any).ipc = createMockIpc();
 
   // Render the actual Dashboard component
   return <Dashboard>{children}</Dashboard>;

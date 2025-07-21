@@ -10,6 +10,7 @@ import {
   Menu,
   nativeImage,
 } from "electron";
+import { autoUpdater } from "electron-updater";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import fs from "fs";
@@ -22,11 +23,107 @@ import {
   getJiraModuleStatus,
 } from "./modules/jira";
 
+import { appConfig } from "../renderer/constants/config";
+
 const isProd = process.env.NODE_ENV === "production";
 let floatingWindow: BrowserWindow | null = null;
 let mainWindow: BrowserWindow | null = null;
 let splashWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
+
+// ==================== AUTO-UPDATER CONFIGURATION ====================
+if (isProd) {
+  autoUpdater.checkForUpdatesAndNotify();
+}
+
+interface UpdateInfo {
+  updateAvailable: boolean;
+  updateDownloaded: boolean;
+  version?: string;
+  releaseNotes?: string;
+  progress?: number;
+  error?: string;
+}
+
+// Helper function to convert release notes to string
+function formatReleaseNotes(releaseNotes: any): string | undefined {
+  if (!releaseNotes) return undefined;
+  if (typeof releaseNotes === 'string') return releaseNotes;
+  if (Array.isArray(releaseNotes)) {
+    return releaseNotes.map(note => note.note || note.toString()).join('\n');
+  }
+  return releaseNotes.toString();
+}
+
+let updateInfo: UpdateInfo = {
+  updateAvailable: false,
+  updateDownloaded: false,
+};
+
+// Auto-updater event handlers
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for updates...');
+  updateInfo = { updateAvailable: false, updateDownloaded: false };
+  broadcastUpdateStatus();
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info.version);
+  updateInfo = {
+    updateAvailable: true,
+    updateDownloaded: false,
+    version: info.version,
+    releaseNotes: formatReleaseNotes(info.releaseNotes),
+  };
+  broadcastUpdateStatus();
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('Update not available:', info.version);
+  updateInfo = { updateAvailable: false, updateDownloaded: false };
+  broadcastUpdateStatus();
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Auto-updater error:', err);
+  updateInfo = {
+    updateAvailable: false,
+    updateDownloaded: false,
+    error: err.message,
+  };
+  broadcastUpdateStatus();
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  const percent = Math.round(progressObj.percent);
+  console.log(`Download progress: ${percent}%`);
+  updateInfo = {
+    ...updateInfo,
+    progress: percent,
+  };
+  broadcastUpdateStatus();
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info.version);
+  updateInfo = {
+    updateAvailable: true,
+    updateDownloaded: true,
+    version: info.version,
+    releaseNotes: formatReleaseNotes(info.releaseNotes),
+    progress: 100,
+  };
+  broadcastUpdateStatus();
+});
+
+function broadcastUpdateStatus() {
+  const allWindows = BrowserWindow.getAllWindows();
+  allWindows.forEach((window) => {
+    if (!window.isDestroyed()) {
+      window.webContents.send('update-status', updateInfo);
+    }
+  });
+}
 
 // Store for project paths
 const projectPathsStore = new Store<Record<string, string>>({
@@ -647,7 +744,9 @@ const createFloatingWindow = async () => {
 
   // Application starts with empty task list until CSV import
 
-  await createFloatingWindow();
+  if (appConfig.featureFlags.floatingTimer) {
+    await createFloatingWindow();
+  }
 
   if (isProd) {
     await mainWindow.loadURL("app://./home");
@@ -710,6 +809,7 @@ function createTray() {
     },
     {
       label: "Toggle Floating Timer",
+      enabled: appConfig.featureFlags.floatingTimer,
       click: () => {
         if (floatingWindow?.isVisible()) {
           floatingWindow.hide();
@@ -727,6 +827,7 @@ function createTray() {
       submenu: [
         {
           label: "Start New Timer",
+          enabled: appConfig.featureFlags.floatingTimer,
           click: () => {
             // Show floating window for timer selection
             if (!floatingWindow) {
@@ -1352,7 +1453,19 @@ ipcMain.on("save-project-paths", (_, paths) => {
     Object.entries(paths).forEach(([key, value]) => {
       projectPathsStore.set(key, value as string);
     });
+    
+    // Broadcast to all windows that project paths have been updated
+    BrowserWindow.getAllWindows().forEach(window => {
+      window.webContents.send("project-paths-updated");
+    });
   }
+});
+
+ipcMain.on("project-paths-updated", () => {
+  // Broadcast to all windows that project paths have been updated
+  BrowserWindow.getAllWindows().forEach(window => {
+    window.webContents.send("project-paths-updated");
+  });
 });
 
 ipcMain.handle("select-project-directory", async (_, projectName) => {
@@ -2192,6 +2305,56 @@ ipcMain.handle("get-current-theme", () => {
   // This will be used by newly opened windows to get the current theme
   // For now, we'll rely on localStorage in each window
   return { success: true };
+});
+
+// ==================== AUTO-UPDATE IPC HANDLERS ====================
+ipcMain.handle("check-for-updates", async () => {
+  try {
+    if (!isProd) {
+      return { success: false, error: "Updates only available in production" };
+    }
+    
+    console.log("Manual update check triggered");
+    const result = await autoUpdater.checkForUpdates();
+    return { success: true, updateCheckResult: result };
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("download-update", async () => {
+  try {
+    if (!updateInfo.updateAvailable) {
+      return { success: false, error: "No update available" };
+    }
+    
+    console.log("Manual update download triggered");
+    await autoUpdater.downloadUpdate();
+    return { success: true };
+  } catch (error) {
+    console.error("Error downloading update:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("install-update", async () => {
+  try {
+    if (!updateInfo.updateDownloaded) {
+      return { success: false, error: "No update downloaded" };
+    }
+    
+    console.log("Installing update and restarting...");
+    autoUpdater.quitAndInstall();
+    return { success: true };
+  } catch (error) {
+    console.error("Error installing update:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("get-update-info", () => {
+  return { success: true, updateInfo };
 });
 
 // Legacy IPC channel (kept for compatibility)

@@ -10,11 +10,6 @@ import {
 } from "@mui/icons-material";
 import { ReactElement } from "react";
 
-// Example configurations for path-based visibility:
-// - visibleOnPaths: ['/', '/home'] - Only show on these exact paths
-// - hiddenOnPaths: ['/login'] - Hide on these paths
-// - visibilityCondition: (path) => path.startsWith('/admin') - Custom logic
-
 export const sidebarSections: {
   label: string;
   href: string;

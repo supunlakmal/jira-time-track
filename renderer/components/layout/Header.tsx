@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
 
   return (
     <header className=" z-30 w-full block ">
-      <div className=" flex h-[108px] w-full items-center justify-between bg-white px-10 dark:bg-darkblack-600 2xl:px-[76px]">
+      <div className=" flex h-[64px] w-full items-center justify-between bg-white px-10 dark:bg-darkblack-600 2xl:px-[76px]">
         {/* Page Title */}
         <div>
           <h3 className="text-xl font-bold text-bgray-900 dark:text-bgray-50 lg:text-3xl lg:leading-[36.4px]">
@@ -42,28 +42,6 @@ const Header: React.FC<HeaderProps> = ({ toggleFloatingWindow }) => {
             Let’s check your update today
           </p>
         </div>
-
-        {/* Search Bar */}
-        {/* <div className="searchbar-wrapper">
-          <div className="px flex h-[56px] w-[300px] items-center justify-between rounded-lg border border-transparent bg-bgray-50 px-4 focus-within:border-success-300 dark:bg-darkblack-500 lg:w-[400px]">
-            <div className="flex w-full items-center space-x-3.5">
-              <span>
-                <Search
-                  className="text-bgray-900 dark:text-bgray-50"
-                  fontSize="small"
-                />
-              </span>
-              <label htmlFor="search" className="w-full">
-                <input
-                  type="text"
-                  id="search"
-                  placeholder="Search..."
-                  className="search-input w-full border-none bg-bgray-50 bg-none px-0 text-sm tracking-wide text-bgray-600 placeholder:text-sm placeholder:font-semibold focus:outline-none focus:ring-0 dark:bg-darkblack-500 dark:placeholder:text-bgray-500"
-                />
-              </label>
-            </div>
-          </div>
-        </div> */}
 
         {/* Quick Access Buttons and Profile */}
         <div className="quick-access-wrapper relative" ref={quickAccessRef}>

@@ -16,8 +16,10 @@ import { sidebarSections } from "./sidebarConfig";
  * Navigation Item Component
  */
 const NavItem = ({ href, icon, children, isActive }) => {
-  const activeClasses = "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
-  const inactiveClasses = "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
+  const activeClasses =
+    "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
+  const inactiveClasses =
+    "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
   const iconActiveClasses = "text-blue-700 dark:text-blue-300";
   const iconInactiveClasses = "text-gray-500 dark:text-gray-400";
 
@@ -61,16 +63,18 @@ const Sidebar = () => {
       <div className="h-[calc(100vh-4rem)]">
         <div className="px-3 py-4">
           <nav className="space-y-1 mb-6">
-            {sidebarSections.map((item) => (
-              <NavItem
-                key={item.label}
-                href={item.href}
-                icon={item.icon}
-                isActive={true}
-              >
-                {item.label}
-              </NavItem>
-            ))}
+            {sidebarSections
+              .filter((item) => item.isActive)
+              .map((item) => (
+                <NavItem
+                  key={item.label}
+                  href={item.href}
+                  icon={item.icon}
+                  isActive={true}
+                >
+                  {item.label}
+                </NavItem>
+              ))}
           </nav>
         </div>
       </div>

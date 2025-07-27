@@ -74,11 +74,7 @@ export default function ProjectDashboardPage() {
           </div>
         </div>
         <main className="flex-1 overflow-y-auto min-h-0 pt-4 ">
-          <ProjectView
-            projects={projects}
-            viewMode={viewMode}
-            onCreateProject={() => setIsCreateModalOpen(true)}
-          />
+          <ProjectView projects={projects} viewMode={viewMode} />
         </main>
       </div>
 

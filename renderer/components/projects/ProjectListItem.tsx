@@ -1,4 +1,3 @@
-import { MoreHoriz } from "@mui/icons-material";
 import { FC } from "react";
 import { projectStatusColors } from "../../constants/projectStatus";
 import { ProjectHelper } from "../../helpers/ProjectHelper";
@@ -9,9 +8,12 @@ interface ProjectListItemProps {
   onClick?: () => void;
 }
 
-export const ProjectListItem: FC<ProjectListItemProps> = ({ project, onClick }) => {
+export const ProjectListItem: FC<ProjectListItemProps> = ({
+  project,
+  onClick,
+}) => {
   return (
-    <div 
+    <div
       className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
       onClick={onClick}
     >
@@ -56,33 +58,6 @@ export const ProjectListItem: FC<ProjectListItemProps> = ({ project, onClick }) 
             ></div>
           </div>
         </div>
-
-        {/* <div className="flex -space-x-2">
-          {project.team.slice(0, 3).map((member) => (
-            <span
-              key={member.name}
-              className="relative flex shrink-0 overflow-hidden rounded-full h-6 w-6 border border-white dark:border-gray-800"
-            >
-              <Image
-                className="aspect-square h-full w-full"
-                alt={member.name}
-                src={member.avatar}
-                width={24}
-                height={24}
-              />
-            </span>
-          ))}
-        </div> */}
-      </div>
-
-      <div className="flex items-center pl-4">
-        <button 
-          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MoreHoriz className="h-5 w-5" />
-          <span className="sr-only">Project actions</span>
-        </button>
       </div>
     </div>
   );

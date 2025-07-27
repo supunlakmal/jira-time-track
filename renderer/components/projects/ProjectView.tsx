@@ -7,14 +7,9 @@ import { ProjectListItem } from "./ProjectListItem";
 interface ProjectViewProps {
   projects: Project[];
   viewMode: "grid" | "list";
-  onCreateProject?: () => void;
 }
 
-export const ProjectView: FC<ProjectViewProps> = ({
-  projects,
-  viewMode,
-  onCreateProject,
-}) => {
+export const ProjectView: FC<ProjectViewProps> = ({ projects, viewMode }) => {
   const router = useRouter();
 
   const handleProjectClick = (project: Project) => {
@@ -23,9 +18,6 @@ export const ProjectView: FC<ProjectViewProps> = ({
   if (viewMode === "grid") {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 xl:gap-6">
-        {/* {onCreateProject && (
-          <CreateProjectCard onClick={onCreateProject} />
-        )} */}
         {projects.map((project) => (
           <ProjectCard
             key={project.name}

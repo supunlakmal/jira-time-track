@@ -56,7 +56,7 @@ export const sidebarSections: {
     icon: <DataObject className="text-bgray-600 dark:text-bgray-300" />,
   },
   {
-    isActive: false,
+    isActive: true,
     label: "Store Data",
     href: "/store-data",
     icon: <Storage className="text-bgray-600 dark:text-bgray-300" />,

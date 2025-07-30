@@ -7,6 +7,7 @@ import TicketTable from "../components/tickets/TicketTable";
 import TicketTableActions from "../components/tickets/TicketTableActions";
 import { DeleteProjectModal } from "../components/projects";
 import { useSharedData } from "../hooks/useSharedData";
+import { ProjectCost } from "../types/projects";
 
 export default function ProjectOverviewPage() {
   const router = useRouter();
@@ -21,11 +22,7 @@ export default function ProjectOverviewPage() {
   // Project path and GitHub integration state
   const [projectPath, setProjectPath] = useState<string>("");
   const [currentBranch, setCurrentBranch] = useState<string>("");
-  const [projectCost, setProjectCost] = useState<{
-    cost: number;
-    currency: string;
-    rate: number;
-  } | null>(null);
+  const [projectCost, setProjectCost] = useState<ProjectCost | null>(null);
 
   const toggleFloatingWindow = () =>
     window.ipc?.send("toggle-float-window", true);

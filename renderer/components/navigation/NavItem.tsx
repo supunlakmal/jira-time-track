@@ -1,73 +1,33 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
-import { shouldShowNavItem } from "./navigationUtils";
 
-export interface NavItemProps {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  subMenu?: React.ReactNode;
-  extras?: React.ReactNode;
-  visibleOnPaths?: string[];
-  hiddenOnPaths?: string[];
-  visibilityCondition?: (currentPath: string) => boolean;
-}
-
-const NavItem: React.FC<NavItemProps> = ({ 
-  href, 
-  icon, 
-  label, 
-  subMenu, 
-  extras, 
-  visibleOnPaths, 
-  hiddenOnPaths, 
-  visibilityCondition 
-}) => {
-  const router = useRouter();
-  const isActive = router.pathname === href;
-  
-  // Check if item should be visible based on path rules
-  const isVisible = shouldShowNavItem(
-    router.pathname,
-    visibleOnPaths,
-    hiddenOnPaths,
-    visibilityCondition
-  );
-
-  // Don't render if item should be hidden
-  if (!isVisible) {
-    return null;
-  }
+/**
+ * Navigation Item Component
+ */
+const NavItem = ({ href, icon, children, isActive }) => {
+  const activeClasses =
+    "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300";
+  const inactiveClasses =
+    "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800";
+  const iconActiveClasses = "text-blue-700 dark:text-blue-300";
+  const iconInactiveClasses = "text-gray-500 dark:text-gray-400";
 
   return (
-    <li className="item py-[11px] text-bgray-900 dark:text-white">
-      <Link href={href}>
-        <div className={`flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 hover:bg-bgray-100 dark:hover:bg-darkblack-500 ${
-          isActive 
-            ? 'bg-success-50 border-l-4 border-success-300 text-success-700 dark:bg-success-900/20 dark:border-success-500 dark:text-success-400' 
-            : ''
-        }`}>
-          <div className="flex items-center space-x-2.5">
-            <span className={`item-ico transition-colors duration-200 ${
-              isActive 
-                ? 'text-success-600 dark:text-success-400' 
-                : 'text-bgray-600 dark:text-bgray-300'
-            }`}>
-              {icon}
-            </span>
-            <span className={`item-text text-lg font-medium leading-none transition-colors duration-200 ${
-              isActive 
-                ? 'text-success-700 dark:text-success-400' 
-                : ''
-            }`}>
-              {label}
-            </span>
-          </div>
-          {extras && <>{extras}</>}
-        </div>
-      </Link>
-    </li>
+    <Link
+      href={href}
+      className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+        isActive ? activeClasses : inactiveClasses
+      }`}
+    >
+      {icon &&
+        React.cloneElement(icon, {
+          className: `h-5 w-5 mr-3 ${
+            isActive ? iconActiveClasses : iconInactiveClasses
+          }`,
+          "aria-hidden": "true",
+        })}
+      {children}
+    </Link>
   );
 };
 

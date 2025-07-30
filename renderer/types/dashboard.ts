@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 
 // C:\Users\hp\Documents\GitHub\jira-time-track\renderer\types\dashboard.ts
 export interface ProjectSummary {
@@ -109,4 +109,9 @@ export interface PaginationState {
   currentPage: number;
   itemsPerPage: number;
   totalItems: number;
+}
+
+export interface DashboardProps {
+  children: ReactNode;
+  toggleFloatingWindow?: () => void;
 }

@@ -1,3 +1,9 @@
+import {
+  CREATE_TICKET_BUTTON_TEXT,
+  CREATE_TICKET_MODAL_TITLE,
+  TICKET_NAME_LABEL,
+  TICKET_NAME_PLACEHOLDER,
+} from "../../constants/config";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -140,7 +146,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <ModalWrapper onClose={handleClose} title="Create New Ticket">
+    <ModalWrapper onClose={handleClose} title={CREATE_TICKET_MODAL_TITLE}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Error Message */}
         {errorMessage && (
@@ -183,13 +189,13 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
         {/* Ticket Name */}
         <div>
           <label htmlFor="ticket_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Ticket Name *
+            {TICKET_NAME_LABEL}
           </label>
           <input
             type="text"
             id="ticket_name"
             {...register("ticket_name")}
-            placeholder="e.g., Implement user authentication"
+            placeholder={TICKET_NAME_PLACEHOLDER}
             className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
               errors.ticket_name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
@@ -241,7 +247,7 @@ const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             size="md"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Creating..." : "Create Ticket"}
+            {isSubmitting ? "Creating..." : CREATE_TICKET_BUTTON_TEXT}
           </Button>
         </div>
       </form>

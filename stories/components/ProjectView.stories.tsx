@@ -53,7 +53,6 @@ const meta: Meta<typeof ProjectView> = {
   argTypes: {
     projects: { control: 'object' },
     viewMode: { control: 'select', options: ['grid', 'list'] },
-    onCreateProject: { action: 'onCreateProject' },
   },
   parameters: {
     nextjs: {

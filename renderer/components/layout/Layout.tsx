@@ -1,8 +1,8 @@
 import React from "react";
-import { Sidebar, sidebarSections } from "../navigation";
-import Header from "./Header";
-import { UpdateNotification } from "../updates";
 import { useUpdates } from "../../hooks/useUpdates";
+import { Sidebar } from "../navigation";
+import { UpdateNotification } from "../updates";
+import Header from "./Header";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children, toggleFloatingWindow }) => {
   return (
     <div className="">
       <div className=" flex ">
-        <Sidebar sections={sidebarSections} />
+        <Sidebar />
 
         <div className="bg-white  w-full dark:bg-darkblack-500">
           <Header toggleFloatingWindow={toggleFloatingWindow} />

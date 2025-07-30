@@ -19,8 +19,8 @@ export default function ProjectDashboardPage() {
         <title>Project Dashboard - Project Time Tracker</title>
       </Head>
       <div className="flex flex-col h-full">
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-          <div className="px-4 sm:px-6 lg:px-8 py-3">
+        <div className=" border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+          <div className="mb-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
               {/* <div className="flex items-center space-x-3 w-full sm:w-auto">
                 <div className="relative w-full sm:w-64">
@@ -73,12 +73,8 @@ export default function ProjectDashboardPage() {
             </div>
           </div>
         </div>
-        <main className="flex-1 overflow-y-auto min-h-0 bg-gray-50 dark:bg-gray-900 p-3 lg:p-6">
-          <ProjectView
-            projects={projects}
-            viewMode={viewMode}
-            onCreateProject={() => setIsCreateModalOpen(true)}
-          />
+        <main className="flex-1 overflow-y-auto min-h-0 pt-4 ">
+          <ProjectView projects={projects} viewMode={viewMode} />
         </main>
       </div>
 

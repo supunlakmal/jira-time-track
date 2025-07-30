@@ -1,13 +1,9 @@
-import {
-  BarChart,
-  CalendarToday,
-  Description,
-  MoreHoriz,
-} from "@mui/icons-material";
-import { FC } from "react";
+import { BarChart, CalendarToday, Description } from "@mui/icons-material";
+import { FC, useMemo } from "react";
 import { projectStatusColors } from "../../constants/projectStatus";
 import { ProjectHelper } from "../../helpers/ProjectHelper";
 import { Project } from "../../types/projects";
+import { useSharedData } from "../../hooks/useSharedData";
 
 interface ProjectCardProps {
   project: Project;
@@ -15,8 +11,22 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
+  const { projectData } = useSharedData();
+
+  // Calculate the actual task count for this project
+  const taskCount = useMemo(() => {
+    if (!projectData || !project.id) return 0;
+    
+    // Count tasks that belong to this project
+    // This includes both imported tasks and manual tasks with matching projectId
+    return projectData.filter(task => 
+      task.projectId === project.id || 
+      (task.project === project.name) // For imported Jira tasks that might use project name
+    ).length;
+  }, [projectData, project.id, project.name]);
+
   return (
-    <div 
+    <div
       className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden transition-all hover:shadow-md dark:bg-gray-800 dark:border-gray-700 cursor-pointer hover:shadow-lg"
       onClick={onClick}
     >
@@ -52,13 +62,6 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
             <CalendarToday className="h-4 w-4 mr-1" />
             <span>Deadline: {project.deadline}</span>
           </div>
-          <button 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg]:pointer-events-none [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-8 w-8 dark:hover:bg-gray-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MoreHoriz className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            <span className="sr-only">Project actions</span>
-          </button>
         </div>
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
@@ -77,26 +80,10 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
           </div>
         </div>
         <div className="mt-4 flex justify-between items-center">
-          {/* <div className="flex -space-x-2">
-            {project.team.map((member) => (
-              <span
-                key={member.name}
-                className="relative flex shrink-0 overflow-hidden rounded-full h-8 w-8 border-2 border-white dark:border-gray-800"
-              >
-                <Image
-                  className="aspect-square h-full w-full"
-                  alt={member.name}
-                  src={member.avatar}
-                  width={32}
-                  height={32}
-                />
-              </span>
-            ))}
-          </div> */}
           <div className="flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center">
               <Description className="h-3.5 w-3.5 mr-1" />
-              <span>{project.tasks} tasks</span>
+              <span>{taskCount} tasks</span>
             </div>
             <div className="flex items-center">
               <BarChart className="h-3.5 w-3.5 mr-1" />
@@ -129,14 +116,6 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project, onClick }) => {
                 {project.startDate}
               </p>
             </div>
-            {/* <div>
-              <p className="text-gray-500 dark:text-gray-400 mb-1">Priority</p>
-              <div
-                className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent font-medium ${project.priorityColor}`}
-              >
-                {project.priority}
-              </div>
-            </div> */}
           </div>
         </div>
       </div>

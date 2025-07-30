@@ -1,10 +1,6 @@
 import React from "react";
 import Layout from "../components/layout/Layout";
-
-interface DashboardProps {
-  children: React.ReactNode;
-  toggleFloatingWindow?: () => void;
-}
+import { DashboardProps } from "../types/dashboard";
 
 const Dashboard: React.FC<DashboardProps> = ({
   children,

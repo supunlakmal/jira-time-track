@@ -1,3 +1,4 @@
+import { ADD_MANUAL_TASK_TITLE } from "../constants/config";
 import Head from "next/head";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -120,7 +121,7 @@ export default function ManualTaskPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Add Manual Task
+            {ADD_MANUAL_TASK_TITLE}
           </h1>
         </div>
         {/* Success Message */}

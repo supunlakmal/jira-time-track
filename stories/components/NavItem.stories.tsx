@@ -11,13 +11,7 @@ const meta: Meta<typeof NavItem> = {
   tags: ['autodocs'],
   argTypes: {
     href: { control: 'text' },
-    label: { control: 'text' },
     icon: { control: 'object' },
-    subMenu: { control: 'object' },
-    extras: { control: 'object' },
-    visibleOnPaths: { control: 'object' },
-    hiddenOnPaths: { control: 'object' },
-    visibilityCondition: { action: 'visibilityCondition' },
   },
   decorators: [
     (Story) => (
@@ -34,7 +28,7 @@ type Story = StoryObj<typeof NavItem>;
 export const Default: Story = {
   args: {
     href: '/',
-    label: 'Dashboard',
+    children: 'Dashboard',
     icon: <Home />,
   },
 };
@@ -42,7 +36,7 @@ export const Default: Story = {
 export const Active: Story = {
   args: {
     href: '/',
-    label: 'Dashboard',
+    children: 'Dashboard',
     icon: <Home />,
   },
   parameters: {
@@ -55,25 +49,4 @@ export const Active: Story = {
   },
 };
 
-export const WithSubMenu: Story = {
-  args: {
-    href: '/',
-    label: 'Settings',
-    icon: <Home />,
-    subMenu: (
-      <ul style={{ paddingLeft: '20px', fontSize: '0.9em' }}>
-        <li>Sub Item 1</li>
-        <li>Sub Item 2</li>
-      </ul>
-    ),
-  },
-};
 
-export const WithExtras: Story = {
-  args: {
-    href: '/',
-    label: 'Notifications',
-    icon: <Home />,
-    extras: <span style={{ marginLeft: 'auto', padding: '2px 8px', borderRadius: '12px', background: '#ff784b', color: 'white', fontSize: '0.7em' }}>5</span>,
-  },
-};

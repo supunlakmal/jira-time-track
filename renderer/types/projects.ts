@@ -2,7 +2,7 @@ import { ProjectStatus } from "../constants/projectStatus";
 
 export interface Project {
   id?: string;
-  name: string;
+  name:string;
   description: string;
   status: ProjectStatus;
   progress: number;
@@ -13,4 +13,10 @@ export interface Project {
   budget: number;
   startDate: string;
   createdAt?: string;
+}
+
+export interface ProjectCost {
+  cost: number;
+  currency: string;
+  rate: number;
 }

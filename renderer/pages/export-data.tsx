@@ -1,3 +1,4 @@
+import { EXPORT_DATA_BUTTON_TEXT } from "../constants/config";
 import Head from "next/head";
 import React, { useState, useEffect } from "react";
 import Layout from "../components/layout/Layout";
@@ -257,7 +258,7 @@ export default function ExportDataPage() {
                 loading={isExporting}
                 className="px-6"
               >
-                {isExporting ? "Exporting..." : "Export Data"}
+                {isExporting ? "Exporting..." : EXPORT_DATA_BUTTON_TEXT}
               </Button>
             </div>
           </div>
